@@ -31,7 +31,8 @@
 		"vscode": {
 			"extensions": [
 				"kreativ-software.csharpextensions",
-				"ms-dotnettools.csharp"
+				"ms-dotnettools.csharp",
+				"patcx.vscode-nuget-gallery"
 			]
 		}
 	}

@@ -8,7 +8,7 @@ namespace RecipesManagerApi.Application.MappingProfiles
     {
         public CategoryProfile()
         {
-            CreateMap<Category, CategoryDto>();
+            CreateMap<Category, CategoryDto>().ReverseMap();            
         }
     }
 }

@@ -15,8 +15,9 @@ namespace RecipesManagerApi.Infrastructure.Services
 
         private readonly IMapper _mapper;
 
-        public CategoriesService(ICategoriesRepository repository)
+        public CategoriesService(ICategoriesRepository repository, IMapper mapper)
         {
+            this._mapper = mapper;
             this._repository = repository;
         }
 
@@ -34,7 +35,7 @@ namespace RecipesManagerApi.Infrastructure.Services
 
         public async Task<PagedList<CategoryDto>> GetPageCategoriesAsync(PageParameters pageParameters, CancellationToken cancellationToken)
         {
-            var entities = this._repository.GetPageCategoriesAsync(pageParameters, cancellationToken);
+            var entities = await this._repository.GetPageCategoriesAsync(pageParameters, cancellationToken);
             var dtos = this._mapper.Map<List<CategoryDto>>(entities);
             var count = await this._repository.GetTotalCounAsync();
             return new PagedList<CategoryDto>(dtos, pageParameters, count);

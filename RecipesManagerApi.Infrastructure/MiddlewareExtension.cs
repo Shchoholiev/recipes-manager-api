@@ -4,6 +4,8 @@ using RecipesManagerApi.Infrastructure.Database;
 using RecipesManagerApi.Infrastructure.Repositories;
 using AutoMapper;
 using RecipesManagerApi.Application.MappingProfiles;
+using RecipesManagerApi.Application.IServices;
+using RecipesManagerApi.Infrastructure.Services;
 
 namespace RecipesManagerApi.Infrastructure;
 
@@ -19,12 +21,16 @@ public static class MiddlewareExtension
         return services;
     }
 
+    public static IServiceCollection AddServices(this IServiceCollection services)
+    {
+        services.AddScoped<ICategoriesService, CategoriesService>();
+
+        return services;
+    }
+
     public static IServiceCollection AddModels(this IServiceCollection services)
     {
-        services.AddSingleton(provider => new MapperConfiguration(cfg =>
-        {
-            cfg.AddProfile<CategoryProfile>();
-        }));
+        services.AddAutoMapper(typeof(CategoryProfile));
         return services;
     }
 }

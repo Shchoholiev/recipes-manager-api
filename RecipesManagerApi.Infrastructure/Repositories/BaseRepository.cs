@@ -4,19 +4,19 @@ using RecipesManagerApi.Domain.Common;
 
 namespace RecipesManagerApi.Infrastructure.Repositories
 {
-    abstract class BaseRepository<T> where T : EntityBase
+    abstract class BaseRepository<TEntity> where TEntity : EntityBase
     {
         private MongoDbContext _db;
 
-        private IMongoCollection<T> _collection;
+        private IMongoCollection<TEntity> _collection;
 
         public BaseRepository(MongoDbContext db, string collectionName)
         {
             this._db = db;
-            this._collection = _db.Db.GetCollection<T>(collectionName);
+            this._collection = _db.Db.GetCollection<TEntity>(collectionName);
         }
 
-        public async Task AddAsync(T entity)
+        public async Task AddAsync(TEntity entity)
         {
             await this._collection.InsertOneAsync(entity);
         }

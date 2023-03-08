@@ -6,9 +6,9 @@ namespace RecipesManagerApi.Infrastructure.Repositories
 {
     public abstract class BaseRepository<TEntity> where TEntity : EntityBase
     {
-        private MongoDbContext _db;
+        protected MongoDbContext _db;
 
-        private IMongoCollection<TEntity> _collection;
+        protected IMongoCollection<TEntity> _collection;
 
         public BaseRepository(MongoDbContext db, string collectionName)
         {
@@ -16,9 +16,9 @@ namespace RecipesManagerApi.Infrastructure.Repositories
             this._collection = _db.Db.GetCollection<TEntity>(collectionName);
         }
 
-        public async Task AddAsync(TEntity entity)
+        public async Task AddAsync(TEntity entity, CancellationToken cancellationToken)
         {
-            await this._collection.InsertOneAsync(entity);
+            await this._collection.InsertOneAsync(entity, cancellationToken);
         }
     }
 }

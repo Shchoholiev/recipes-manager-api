@@ -8,7 +8,7 @@
 
         public int TotalPages { get; set; }
 
-        public int TotalItems { get; set; }
+        public long TotalItems { get; set; }
 
         public bool HasPreviousPage => PageNumber > 1;
 
@@ -16,7 +16,7 @@
 
         public PagedList() { }
 
-        public PagedList(IEnumerable<T> items, PageParameters pageParameters, int totalItems)
+        public PagedList(IEnumerable<T> items, PageParameters pageParameters, long totalItems)
         {
             this.PageNumber = pageParameters.PageNumber;
             this.PageSize = pageParameters.PageSize;

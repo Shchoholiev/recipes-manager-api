@@ -4,7 +4,7 @@ using RecipesManagerApi.Domain.Common;
 
 namespace RecipesManagerApi.Infrastructure.Repositories
 {
-    abstract class BaseRepository<TEntity> where TEntity : EntityBase
+    public abstract class BaseRepository<TEntity> where TEntity : EntityBase
     {
         private MongoDbContext _db;
 

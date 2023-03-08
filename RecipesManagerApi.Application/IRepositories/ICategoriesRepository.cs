@@ -1,4 +1,5 @@
-﻿using RecipesManagerApi.Application.Paging;
+﻿using MongoDB.Bson;
+using RecipesManagerApi.Application.Paging;
 using RecipesManagerApi.Domain.Entities;
 using System.Linq.Expressions;
 
@@ -10,6 +11,6 @@ namespace RecipesManagerApi.Application.IRepositories
 
         Task<PagedList<Category>> GetPageCategoriesAsync(PageParameters pageParameters, Expression<Func<Category, bool>> predicate, CancellationToken cancellationToken);
 
-        Task<Category> GetCategoryAsync(int id);
+        Task<Category> GetCategoryAsync(ObjectId id, CancellationToken cancellationToken);
     }
 }

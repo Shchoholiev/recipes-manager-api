@@ -35,9 +35,9 @@ namespace RecipesManagerApi.Infrastructure.Services
 
         public async Task<PagedList<CategoryDto>> GetPageCategoriesAsync(PageParameters pageParameters, CancellationToken cancellationToken)
         {
-            var entities = await this._repository.GetPageCategoriesAsync(pageParameters, cancellationToken);
+            var entities = await this._repository.GetCategoriesPageAsync(pageParameters, cancellationToken);
             var dtos = this._mapper.Map<List<CategoryDto>>(entities);
-            var count = await this._repository.GetTotalCounAsync();
+            var count = await this._repository.GetTotalCountAsync();
             return new PagedList<CategoryDto>(dtos, pageParameters, count);
         }
     }

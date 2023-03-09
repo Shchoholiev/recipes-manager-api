@@ -8,7 +8,7 @@
 
         public int TotalPages { get; set; }
 
-        public long TotalItems { get; set; }
+        public int TotalItems { get; set; }
 
         public bool HasPreviousPage => PageNumber > 1;
 

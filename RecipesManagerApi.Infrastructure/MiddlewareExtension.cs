@@ -28,7 +28,7 @@ public static class MiddlewareExtension
         return services;
     }
 
-    public static IServiceCollection AddModels(this IServiceCollection services)
+    public static IServiceCollection AddMapper(this IServiceCollection services)
     {
         services.AddAutoMapper(typeof(CategoryProfile));
         return services;

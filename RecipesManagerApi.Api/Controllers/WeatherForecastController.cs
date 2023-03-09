@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using RecipesManagerApi.Application.IServices;
 
 namespace RecipesManagerApi.Api.Controllers;
 
@@ -13,8 +14,11 @@ public class WeatherForecastController : ControllerBase
 
     private readonly ILogger<WeatherForecastController> _logger;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger)
+    private readonly ICategoriesService _categoriesService;
+
+    public WeatherForecastController(ILogger<WeatherForecastController> logger, ICategoriesService categoriesService)
     {
+        _categoriesService = categoriesService;
         _logger = logger;
     }
 

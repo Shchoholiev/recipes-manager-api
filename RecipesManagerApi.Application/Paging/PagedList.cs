@@ -16,7 +16,7 @@
 
         public PagedList() { }
 
-        public PagedList(IEnumerable<T> items, PageParameters pageParameters, long totalItems)
+        public PagedList(IEnumerable<T> items, PageParameters pageParameters, int totalItems)
         {
             this.PageNumber = pageParameters.PageNumber;
             this.PageSize = pageParameters.PageSize;

@@ -11,7 +11,7 @@ public class Recipe : EntityBase
 
     public String? Text { get; set; }
 
-    public List<Ingredients>? Ingredients { get; set; }
+    public List<Ingredient>? Ingredients { get; set; }
 
     public String? IngredientsText { get; set; }
 

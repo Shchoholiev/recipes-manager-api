@@ -33,8 +33,8 @@ public class RecipesRepository : BaseRepository<Recipe>, IRecipesRepository
                                      .ToListAsync(cancellationToken);
     }
 
-    public async Task UpdateAsync(Recipe recipe, CancellationToken cancellationToken)
+    public async Task UpdateRecipeAsync(Recipe recipe, CancellationToken cancellationToken)
     {
-        await this._collection.ReplaceOneAsync(Builders<Recipe>.Filter.Eq(x=>x.Id, recipe.Id), recipe, new ReplaceOptions() ,cancellationToken);
+        await this._collection.ReplaceOneAsync(Builders<Recipe>.Filter.Eq(x=>x.Id, recipe.Id), recipe, new ReplaceOptions(), cancellationToken);
     }
 }

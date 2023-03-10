@@ -1,9 +1,9 @@
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson.Serialization.Attributes; 
 
-namespace RecipesManagerApi.Domain.Entities;
+namespace RecipesManagerApi.Application.Models;
 
-public class Ingredients
+public class IngredientDto
 {
     [BsonId]
     public ObjectId Id { get; set; }

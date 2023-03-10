@@ -13,5 +13,5 @@ public interface IRecipesRepository : IBaseRepository<Recipe>
 
     Task<Recipe> GetRecipeAsync(ObjectId id, CancellationToken cancellationToken);
 
-    Task UpdateAsync(Recipe recipe, CancellationToken cancellationToken);
+    Task UpdateRecipeAsync(Recipe recipe, CancellationToken cancellationToken);
 }

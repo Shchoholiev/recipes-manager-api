@@ -2,7 +2,7 @@
 
 namespace RecipesManagerApi.Domain.Entities;
 
-public class Roles : EntityBase
+public class Role : EntityBase
 {
     public string Name { get; set; }
 }

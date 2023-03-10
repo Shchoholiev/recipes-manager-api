@@ -21,6 +21,6 @@ public class User : EntityBase
 
     public ObjectId? WebId { get; set; }
 
-    public List<Roles> Roles { get; set; }
+    public List<Role> Roles { get; set; }
 }
 

@@ -10,7 +10,5 @@ public interface IRolesRepository : IBaseRepository<Role>
 
     Task<List<Role>> GetRolesPageAsync(PageParameters pageParameters, Expression<Func<Role, bool>> predicate, CancellationToken cancellationToken);
 
-    Task<int> GetTotalCountAsync();
-
     Task<Role> GetRoleAsync(ObjectId id, CancellationToken cancellationToken);
 }

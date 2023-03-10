@@ -20,5 +20,10 @@ namespace RecipesManagerApi.Infrastructure.Repositories
         {
             await this._collection.InsertOneAsync(entity, cancellationToken);
         }
+
+        public async Task<int> GetTotalCountAsync()
+        {
+            return (int)(await this._collection.EstimatedDocumentCountAsync());
+        }
     }
 }

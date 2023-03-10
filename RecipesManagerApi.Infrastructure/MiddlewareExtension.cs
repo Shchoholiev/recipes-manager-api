@@ -16,7 +16,8 @@ public static class MiddlewareExtension
         services.AddSingleton<MongoDbContext>();
         
         services.AddScoped<ICategoriesRepository, CategoriesRepository>();
-
+        services.AddScoped<IUsersRepository, UsersRepository>();
+        services.AddScoped(IRolesRepository, RolesRepository)();
 
         return services;
     }

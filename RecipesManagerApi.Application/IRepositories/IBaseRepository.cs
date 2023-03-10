@@ -5,5 +5,7 @@ namespace RecipesManagerApi.Application.IRepositories
     public interface IBaseRepository<TEntity> where TEntity : EntityBase
     {
         Task AddAsync(TEntity entity, CancellationToken cancellationToken);
+
+        Task<int> GetTotalCountAsync();
     }
 }

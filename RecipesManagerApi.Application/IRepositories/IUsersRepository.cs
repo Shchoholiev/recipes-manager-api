@@ -11,8 +11,6 @@ public interface IUsersRepository : IBaseRepository<User>
 
     Task<List<User>> GetUserPageAsync(PageParameters pageParameters, Expression<Func<User, bool>> predicate, CancellationToken cancellationToken);
 
-    Task<int> GetTotalCountAsync();
-
     Task<User> GetUserAsync(ObjectId id, CancellationToken cancellationToken);
 
     Task UpdateUserAsync(User user, CancellationToken cancellationToken);   

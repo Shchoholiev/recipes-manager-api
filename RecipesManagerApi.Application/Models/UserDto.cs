@@ -1,17 +1,16 @@
 ﻿using MongoDB.Bson;
-using RecipesManagerApi.Domain.Common;
+using RecipesManagerApi.Domain.Entities;
 
-namespace RecipesManagerApi.Domain.Entities;
-
-public class User : EntityBase
+namespace RecipesManagerApi.Application.Models;
+public class UserDto
 {
+    public ObjectId Id { get; set; }
+
     public string? Name { get; set; }
 
     public string? Email { get; set; }
 
     public string? Phone { get; set; }
-
-    public string? PasswordHash { get; set; }
 
     public string? RefreshToken { get; set; }
 
@@ -22,7 +21,4 @@ public class User : EntityBase
     public ObjectId? WebId { get; set; }
 
     public List<Role> Roles { get; set; }
-
-    public bool IsDeleted { get; set; }
 }
-

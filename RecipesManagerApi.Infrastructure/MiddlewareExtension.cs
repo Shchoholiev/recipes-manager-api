@@ -17,7 +17,7 @@ public static class MiddlewareExtension
         
         services.AddScoped<ICategoriesRepository, CategoriesRepository>();
         services.AddScoped<IUsersRepository, UsersRepository>();
-        services.AddScoped(IRolesRepository, RolesRepository)();
+        services.AddScoped<IRolesRepository, RolesRepository>();
 
         return services;
     }
@@ -32,6 +32,9 @@ public static class MiddlewareExtension
     public static IServiceCollection AddMapper(this IServiceCollection services)
     {
         services.AddAutoMapper(typeof(CategoryProfile));
+        services.AddAutoMapper(typeof(UserProfile));
+        services.AddAutoMapper(typeof(RoleProfile));
+
         return services;
     }
 }

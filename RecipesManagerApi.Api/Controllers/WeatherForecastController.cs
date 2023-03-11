@@ -17,15 +17,9 @@ public class WeatherForecastController : ControllerBase
 
     private readonly ILogger<WeatherForecastController> _logger;
 
-    private readonly IRolesService _rolesService;
-
-    private readonly IUsersService _usersService;
-
     public WeatherForecastController(ILogger<WeatherForecastController> logger, IRolesService rolesService, IUsersService usersService)
     {
-        _rolesService = rolesService;
         _logger = logger;
-        _usersService = usersService;
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
@@ -38,11 +32,5 @@ public class WeatherForecastController : ControllerBase
             Summary = Summaries[Random.Shared.Next(Summaries.Length)]
         })
         .ToArray();
-    }
-
-    [HttpGet("test")]
-    public async void Test(CancellationToken cancellationToken)
-    {
-        var res =  await this._usersService.GetPageUsersAsync(new PageParameters() { PageNumber = 1, PageSize = 3}, cancellationToken);
     }
 }

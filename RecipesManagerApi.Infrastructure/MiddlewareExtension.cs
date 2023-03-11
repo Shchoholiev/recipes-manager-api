@@ -25,6 +25,8 @@ public static class MiddlewareExtension
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddScoped<ICategoriesService, CategoriesService>();
+        services.AddScoped<IRolesService, RolesService>();
+        services.AddScoped<IUsersService, UsersService>();
 
         return services;
     }

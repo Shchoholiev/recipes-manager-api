@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
 using RecipesManagerApi.Application.IServices;
+using RecipesManagerApi.Application.Models;
+using RecipesManagerApi.Application.Paging;
 
 namespace RecipesManagerApi.Api.Controllers;
 
@@ -14,12 +17,15 @@ public class WeatherForecastController : ControllerBase
 
     private readonly ILogger<WeatherForecastController> _logger;
 
-    private readonly ICategoriesService _categoriesService;
+    private readonly IRolesService _rolesService;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger, ICategoriesService categoriesService)
+    private readonly IUsersService _usersService;
+
+    public WeatherForecastController(ILogger<WeatherForecastController> logger, IRolesService rolesService, IUsersService usersService)
     {
-        _categoriesService = categoriesService;
+        _rolesService = rolesService;
         _logger = logger;
+        _usersService = usersService;
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
@@ -32,5 +38,11 @@ public class WeatherForecastController : ControllerBase
             Summary = Summaries[Random.Shared.Next(Summaries.Length)]
         })
         .ToArray();
+    }
+
+    [HttpGet("test")]
+    public async void Test(CancellationToken cancellationToken)
+    {
+        var res =  await this._usersService.GetPageUsersAsync(new PageParameters() { PageNumber = 1, PageSize = 3}, cancellationToken);
     }
 }

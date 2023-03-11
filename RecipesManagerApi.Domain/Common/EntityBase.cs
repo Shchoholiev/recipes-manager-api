@@ -8,7 +8,7 @@ public abstract class EntityBase
     [BsonId]
     public ObjectId Id { get; set; }
 
-    public ObjectId? CreatedById { get; set; }
+    public ObjectId CreatedById { get; set; }
 
     public DateTime CreatedDateUtc { get; set; }
 }

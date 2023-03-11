@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
 using RecipesManagerApi.Application.IServices;
+using RecipesManagerApi.Application.Models;
 
 namespace RecipesManagerApi.Api.Controllers;
 
@@ -14,11 +16,14 @@ public class WeatherForecastController : ControllerBase
 
     private readonly ILogger<WeatherForecastController> _logger;
 
-    private readonly ICategoriesService _categoriesService;
+    private readonly IUsersService _usersService;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger, ICategoriesService categoriesService)
+    private readonly IRolesService _rolesService;
+
+    public WeatherForecastController(ILogger<WeatherForecastController> logger, IUsersService usersService, IRolesService rolesService)
     {
-        _categoriesService = categoriesService;
+        _rolesService = rolesService;
+        _usersService = usersService;
         _logger = logger;
     }
 
@@ -32,5 +37,12 @@ public class WeatherForecastController : ControllerBase
             Summary = Summaries[Random.Shared.Next(Summaries.Length)]
         })
         .ToArray();
+    }
+
+    [HttpGet("test-user-add")]
+    public async void TestUserAdding(CancellationToken cancellationToken)
+    {
+        var role = await this._rolesService.GetRoleAsync(new ObjectId("640cfe0bb72023aa1124c0ca"), cancellationToken);
+        await this._usersService.AddUserAsync(new UserDto() { Name = "larry", Phone = "5465456321", Email = " asdfsdf@gmail.com", RefreshToken = "yes", RefreshTokenExpiryDate = DateTime.Now, AppleDeviceId = new Guid(), WebId = Guid.NewGuid(), Roles = new List<RoleDto>() { role} }, cancellationToken);
     }
 }

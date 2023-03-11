@@ -11,8 +11,6 @@ namespace RecipesManagerApi.Application.IRepositories
 
         Task<List<Category>> GetCategoriesPageAsync(PageParameters pageParameters, Expression<Func<Category, bool>> predicate, CancellationToken cancellationToken);
 
-        Task<int> GetTotalCountAsync();
-
         Task<Category> GetCategoryAsync(ObjectId id, CancellationToken cancellationToken);
     }
 }

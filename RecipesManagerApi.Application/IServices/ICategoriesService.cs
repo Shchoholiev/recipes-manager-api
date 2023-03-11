@@ -10,7 +10,7 @@ namespace RecipesManagerApi.Application.IServices
     {
         Task AddCategoryAsync(CategoryDto dto, CancellationToken cancellationToken);
 
-        Task<PagedList<CategoryDto>> GetPageCategoriesAsync(PageParameters pageParameters, CancellationToken cancellationToken);
+        Task<PagedList<CategoryDto>> GetCategoriesPageAsync(PageParameters pageParameters, CancellationToken cancellationToken);
 
         Task<CategoryDto> GetCategoryAsync(ObjectId id, CancellationToken cancellationToken);
     }

@@ -6,6 +6,7 @@ using AutoMapper;
 using RecipesManagerApi.Application.MappingProfiles;
 using RecipesManagerApi.Application.IServices;
 using RecipesManagerApi.Infrastructure.Services;
+using System.Reflection;
 
 namespace RecipesManagerApi.Infrastructure;
 
@@ -33,9 +34,7 @@ public static class MiddlewareExtension
 
     public static IServiceCollection AddMapper(this IServiceCollection services)
     {
-        services.AddAutoMapper(typeof(CategoryProfile));
-        services.AddAutoMapper(typeof(UserProfile));
-        services.AddAutoMapper(typeof(RoleProfile));
+        services.AddAutoMapper(Assembly.GetAssembly(typeof(CategoryProfile)));
 
         return services;
     }

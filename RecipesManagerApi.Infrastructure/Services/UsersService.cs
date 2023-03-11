@@ -25,7 +25,7 @@ public class UsersService : IUsersService
         await this._repository.AddAsync(entity, cancellationToken);
     }
 
-    public async Task<PagedList<UserDto>> GetPageUsersAsync(PageParameters pageParameters, CancellationToken cancellationToken)
+    public async Task<PagedList<UserDto>> GetUsersPageAsync(PageParameters pageParameters, CancellationToken cancellationToken)
     {
         var entities = await this._repository.GetUserPageAsync(pageParameters, cancellationToken);
         var dtos = this._mapper.Map<List<UserDto>>(entities);

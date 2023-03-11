@@ -17,9 +17,9 @@ public class User : EntityBase
 
     public DateTime? RefreshTokenExpiryDate { get; set; }
 
-    public ObjectId? AppleDeviceId { get; set; }
+    public Guid? AppleDeviceId { get; set; }
 
-    public ObjectId? WebId { get; set; }
+    public Guid? WebId { get; set; }
 
     public List<Role> Roles { get; set; }
 

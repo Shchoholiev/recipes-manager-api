@@ -25,7 +25,7 @@ public class RolesService : IRolesService
         await this._repository.AddAsync(entity, cancellationToken);
     }
 
-    public async Task<PagedList<RoleDto>> GetPageRolesAsync(PageParameters pageParameters, CancellationToken cancellationToken)
+    public async Task<PagedList<RoleDto>> GetRolesPageAsync(PageParameters pageParameters, CancellationToken cancellationToken)
     {
         var entities = await this._repository.GetRolesPageAsync(pageParameters, cancellationToken);
         var dtos = this._mapper.Map<List<RoleDto>>(entities);

@@ -35,10 +35,5 @@ namespace RecipesManagerApi.Infrastructure.Repositories
                                          .Limit(pageParameters.PageSize)
                                          .ToListAsync(cancellationToken);
         }
-
-        public async Task<int> GetTotalCountAsync()
-        {
-            return (int)(await this._collection.EstimatedDocumentCountAsync());
-        }
     }
 }

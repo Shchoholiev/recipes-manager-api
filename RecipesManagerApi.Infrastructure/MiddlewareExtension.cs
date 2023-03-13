@@ -7,6 +7,7 @@ using RecipesManagerApi.Application.MappingProfiles;
 using RecipesManagerApi.Application.IServices;
 using RecipesManagerApi.Infrastructure.Services;
 using System.Reflection;
+using RecipesManagerApi.Application.IServices.Identity;
 
 namespace RecipesManagerApi.Infrastructure;
 
@@ -28,6 +29,7 @@ public static class MiddlewareExtension
         services.AddScoped<ICategoriesService, CategoriesService>();
         services.AddScoped<IRolesService, RolesService>();
         services.AddScoped<IUsersService, UsersService>();
+        services.AddScoped<IPasswordHasher, PasswordHasher>();
 
         return services;
     }

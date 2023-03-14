@@ -37,4 +37,10 @@ public class RecipesRepository : BaseRepository<Recipe>, IRecipesRepository
     {
         await this._collection.ReplaceOneAsync(Builders<Recipe>.Filter.Eq(x=>x.Id, recipe.Id), recipe, new ReplaceOptions(), cancellationToken);
     }
+
+    public async Task<int> GetTotalCountAsync(Expression<Func<Recipe, bool>> predicate)
+    {
+        var filter = Builders<Recipe>.Filter.Where(predicate);
+        return (int)(await this._collection.CountDocumentsAsync(filter));
+    }
 }

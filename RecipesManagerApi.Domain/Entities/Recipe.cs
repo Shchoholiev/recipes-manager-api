@@ -7,7 +7,7 @@ public class Recipe : EntityBase
 {
     public String Name { get; set; }
 
-    public Object? Thumbnail { get; set; }
+    public Image? Thumbnail { get; set; }
 
     public String? Text { get; set; }
 

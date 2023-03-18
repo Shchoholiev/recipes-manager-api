@@ -9,6 +9,7 @@ using RecipesManagerApi.Infrastructure.Services;
 using System.Reflection;
 using RecipesManagerApi.Application.IServices.Identity;
 using RecipesManagerApi.Infrastructure.Queries;
+using RecipesManagerApi.Infrastructure.Mutations;
 
 namespace RecipesManagerApi.Infrastructure;
 
@@ -48,6 +49,8 @@ public static class MiddlewareExtension
             .AddGraphQLServer()
             .AddQueryType()
                 .AddTypeExtension<CategoriesQuery>()
+            .AddMutationType()
+                .AddTypeExtension<CategoriesMutation>()
             .InitializeOnStartup(keepWarm: true);
         
 

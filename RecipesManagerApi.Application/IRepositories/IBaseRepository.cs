@@ -6,7 +6,7 @@ namespace RecipesManagerApi.Application.IRepositories
 {
     public interface IBaseRepository<TEntity> where TEntity : EntityBase
     {
-        Task<ObjectId> AddAsync(TEntity entity, CancellationToken cancellationToken);
+        Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken);
 
         Task<List<TEntity>> GetPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken);
 

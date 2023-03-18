@@ -18,10 +18,10 @@ namespace RecipesManagerApi.Infrastructure.Repositories
             this._collection = _db.Db.GetCollection<TEntity>(collectionName);
         }
 
-        public async Task<ObjectId> AddAsync(TEntity entity, CancellationToken cancellationToken)
+        public async Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken)
         {
-            await this._collection.InsertOneAsync(entity, cancellationToken);
-            return entity.Id;
+            await this._collection.InsertOneAsync(entity, new InsertOneOptions(), cancellationToken);
+            return entity;
         }
 
         public async Task<List<TEntity>> GetPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)

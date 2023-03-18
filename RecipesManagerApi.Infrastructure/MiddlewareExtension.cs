@@ -8,6 +8,7 @@ using RecipesManagerApi.Application.IServices;
 using RecipesManagerApi.Infrastructure.Services;
 using System.Reflection;
 using RecipesManagerApi.Application.IServices.Identity;
+using RecipesManagerApi.Infrastructure.Queries;
 
 namespace RecipesManagerApi.Infrastructure;
 
@@ -37,6 +38,18 @@ public static class MiddlewareExtension
     public static IServiceCollection AddMapper(this IServiceCollection services)
     {
         services.AddAutoMapper(Assembly.GetAssembly(typeof(CategoryProfile)));
+
+        return services;
+    }
+
+    public static IServiceCollection AddGraphQl(this IServiceCollection services)
+    {
+        services
+            .AddGraphQLServer()
+            .AddQueryType()
+                .AddTypeExtension<CategoriesQuery>()
+            .InitializeOnStartup(keepWarm: true);
+        
 
         return services;
     }

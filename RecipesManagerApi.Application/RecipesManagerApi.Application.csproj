@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="HotChocolate" Version="13.0.5" />
   </ItemGroup>
 
   <ItemGroup>

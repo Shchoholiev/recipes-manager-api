@@ -25,12 +25,12 @@ public class UsersService : IUsersService
         await this._repository.AddAsync(entity, cancellationToken);
     }
 
-    public async Task<PagedList<UserDto>> GetUsersPageAsync(PageParameters pageParameters, CancellationToken cancellationToken)
+    public async Task<PagedList<UserDto>> GetUsersPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
     {
-        var entities = await this._repository.GetUserPageAsync(pageParameters, cancellationToken);
+        var entities = await this._repository.GetPageAsync(pageNumber, pageSize, cancellationToken);
         var dtos = this._mapper.Map<List<UserDto>>(entities);
         var count = await this._repository.GetTotalCountAsync();
-        return new PagedList<UserDto>(dtos, pageParameters, count);
+        return new PagedList<UserDto>(dtos, pageNumber, pageSize, count);
     }
 
     public async Task<UserDto> GetUserAsync(ObjectId id, CancellationToken cancellationToken)

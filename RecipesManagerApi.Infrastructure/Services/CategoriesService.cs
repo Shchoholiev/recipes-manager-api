@@ -27,18 +27,21 @@ namespace RecipesManagerApi.Infrastructure.Services
             await this._repository.AddAsync(entity, cancellationToken);
         }
 
-        public async Task<CategoryDto> GetCategoryAsync(ObjectId id, CancellationToken cancellationToken)
+        public async Task<CategoryDto> GetCategoryAsync(string id, CancellationToken cancellationToken)
         {
-            var entity = await this._repository.GetCategoryAsync(id, cancellationToken);
+            if (!ObjectId.TryParse(id, out var objectId)) {
+                throw new Exception();
+            }
+            var entity = await this._repository.GetCategoryAsync(objectId, cancellationToken);
             return this._mapper.Map<CategoryDto>(entity);
         }
 
-        public async Task<PagedList<CategoryDto>> GetCategoriesPageAsync(PageParameters pageParameters, CancellationToken cancellationToken)
+        public async Task<PagedList<CategoryDto>> GetCategoriesPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
         {
-            var entities = await this._repository.GetCategoriesPageAsync(pageParameters, cancellationToken);
+            var entities = await this._repository.GetPageAsync(pageNumber, pageSize, cancellationToken);
             var dtos = this._mapper.Map<List<CategoryDto>>(entities);
             var count = await this._repository.GetTotalCountAsync();
-            return new PagedList<CategoryDto>(dtos, pageParameters, count);
+            return new PagedList<CategoryDto>(dtos, pageNumber, pageSize, count);
         }
     }
 }

@@ -7,7 +7,7 @@ public interface IUsersService
 {
     Task AddUserAsync(UserDto dto, CancellationToken cancellationToken);
 
-    Task<PagedList<UserDto>> GetUsersPageAsync(PageParameters pageParameters, CancellationToken cancellationToken);
+    Task<PagedList<UserDto>> GetUsersPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken);
 
     Task<UserDto> GetUserAsync(ObjectId id, CancellationToken cancellationToken);
 

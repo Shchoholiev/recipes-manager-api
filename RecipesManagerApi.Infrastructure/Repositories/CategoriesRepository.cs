@@ -19,21 +19,5 @@ namespace RecipesManagerApi.Infrastructure.Repositories
         {
             return await (await this._collection.FindAsync(x => x.Id == id)).FirstOrDefaultAsync(cancellationToken);
         }
-
-        public async Task<List<Category>> GetCategoriesPageAsync(PageParameters pageParameters, CancellationToken cancellationToken)
-        {
-            return await this._collection.Find(Builders<Category>.Filter.Empty)
-                                         .Skip((pageParameters.PageNumber - 1) * pageParameters.PageSize)
-                                         .Limit(pageParameters.PageSize)
-                                         .ToListAsync(cancellationToken); 
-        }
-
-        public async Task<List<Category>> GetCategoriesPageAsync(PageParameters pageParameters, Expression<Func<Category, bool>> predicate, CancellationToken cancellationToken)
-        {
-            return await this._collection.Find(predicate)
-                                         .Skip((pageParameters.PageNumber - 1) * pageParameters.PageSize)
-                                         .Limit(pageParameters.PageSize)
-                                         .ToListAsync(cancellationToken);
-        }
     }
 }

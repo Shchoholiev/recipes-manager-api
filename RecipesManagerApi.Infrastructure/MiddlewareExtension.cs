@@ -8,6 +8,8 @@ using RecipesManagerApi.Application.IServices;
 using RecipesManagerApi.Infrastructure.Services;
 using System.Reflection;
 using RecipesManagerApi.Application.IServices.Identity;
+using RecipesManagerApi.Application.Interfaces.Identity;
+using RecipesManagerApi.Infrastructure.Services.Identity;
 using RecipesManagerApi.Infrastructure.Queries;
 using RecipesManagerApi.Infrastructure.Mutations;
 
@@ -32,6 +34,7 @@ public static class MiddlewareExtension
         services.AddScoped<IRolesService, RolesService>();
         services.AddScoped<IUsersService, UsersService>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<ITokensService, TokensService>();
 
         return services;
     }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MongoDB.Bson;
+using RecipesManagerApi.Application.Exceptions;
 using RecipesManagerApi.Application.IRepositories;
 using RecipesManagerApi.Application.IServices;
 using RecipesManagerApi.Application.Models;
@@ -30,9 +31,15 @@ namespace RecipesManagerApi.Infrastructure.Services
         public async Task<CategoryDto> GetCategoryAsync(string id, CancellationToken cancellationToken)
         {
             if (!ObjectId.TryParse(id, out var objectId)) {
-                throw new Exception();
+                throw new InvalidDataException("Provided id is invalid.");
             }
+            
             var entity = await this._repository.GetCategoryAsync(objectId, cancellationToken);
+            if (entity == null)
+            {
+                throw new EntityNotFoundException<Category>();
+            }
+
             return this._mapper.Map<CategoryDto>(entity);
         }
 

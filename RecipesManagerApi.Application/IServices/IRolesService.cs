@@ -10,5 +10,5 @@ public interface IRolesService
 
     Task<PagedList<RoleDto>> GetRolesPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken);
 
-    Task<RoleDto> GetRoleAsync(ObjectId id, CancellationToken cancellationToken);
+    Task<RoleDto> GetRoleAsync(string id, CancellationToken cancellationToken);
 }

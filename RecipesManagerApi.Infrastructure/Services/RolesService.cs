@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MongoDB.Bson;
+using RecipesManagerApi.Application.Exceptions;
 using RecipesManagerApi.Application.IRepositories;
 using RecipesManagerApi.Application.IServices;
 using RecipesManagerApi.Application.Models;
@@ -33,9 +34,17 @@ public class RolesService : IRolesService
         return new PagedList<RoleDto>(dtos, pageNumber, pageSize, count);
     }
 
-    public async Task<RoleDto> GetRoleAsync(ObjectId id, CancellationToken cancellationToken)
+    public async Task<RoleDto> GetRoleAsync(string id, CancellationToken cancellationToken)
     {
-        var entity = await this._repository.GetRoleAsync(id, cancellationToken);
+        if (!ObjectId.TryParse(id, out var objectId)) {
+            throw new InvalidDataException("Provided id is invalid.");
+        }
+
+        var entity = await this._repository.GetRoleAsync(objectId, cancellationToken);
+        if (entity == null)
+        {
+            throw new EntityNotFoundException<Role>();
+        }
         return this._mapper.Map<RoleDto>(entity);
     }
 }

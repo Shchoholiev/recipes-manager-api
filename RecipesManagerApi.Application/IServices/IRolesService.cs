@@ -8,7 +8,7 @@ public interface IRolesService
 {
     Task AddRoleAsync(RoleDto dto, CancellationToken cancellationToken);
 
-    Task<PagedList<RoleDto>> GetRolesPageAsync(PageParameters pageParameters, CancellationToken cancellationToken);
+    Task<PagedList<RoleDto>> GetRolesPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken);
 
-    Task<RoleDto> GetRoleAsync(ObjectId id, CancellationToken cancellationToken);
+    Task<RoleDto> GetRoleAsync(string id, CancellationToken cancellationToken);
 }

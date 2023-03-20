@@ -2,6 +2,7 @@
 using RecipesManagerApi.Infrastructure.Database;
 using RecipesManagerApi.Domain.Common;
 using MongoDB.Bson;
+using System.Linq.Expressions;
 
 namespace RecipesManagerApi.Infrastructure.Repositories
 {
@@ -17,10 +18,26 @@ namespace RecipesManagerApi.Infrastructure.Repositories
             this._collection = _db.Db.GetCollection<TEntity>(collectionName);
         }
 
-        public async Task<ObjectId> AddAsync(TEntity entity, CancellationToken cancellationToken)
+        public async Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken)
         {
-            await this._collection.InsertOneAsync(entity, cancellationToken);
-            return entity.Id;
+            await this._collection.InsertOneAsync(entity, new InsertOneOptions(), cancellationToken);
+            return entity;
+        }
+
+        public async Task<List<TEntity>> GetPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
+        {
+            return await this._collection.Find(Builders<TEntity>.Filter.Empty)
+                                         .Skip((pageNumber - 1) * pageSize)
+                                         .Limit(pageSize)
+                                         .ToListAsync(cancellationToken); 
+        }
+
+        public async Task<List<TEntity>> GetPageAsync(int pageNumber, int pageSize, Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken)
+        {
+            return await this._collection.Find(predicate)
+                                         .Skip((pageNumber - 1) * pageSize)
+                                         .Limit(pageSize)
+                                         .ToListAsync(cancellationToken);
         }
 
         public async Task<int> GetTotalCountAsync()

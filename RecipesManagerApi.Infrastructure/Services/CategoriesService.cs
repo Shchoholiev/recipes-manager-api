@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using MongoDB.Bson;
+using RecipesManagerApi.Application.Exceptions;
 using RecipesManagerApi.Application.IRepositories;
 using RecipesManagerApi.Application.IServices;
 using RecipesManagerApi.Application.Models;
+using RecipesManagerApi.Application.Models.CreateDtos;
 using RecipesManagerApi.Application.Paging;
 using RecipesManagerApi.Domain.Entities;
 using System.Linq.Expressions;
@@ -21,24 +23,34 @@ namespace RecipesManagerApi.Infrastructure.Services
             this._repository = repository;
         }
 
-        public async Task AddCategoryAsync(CategoryDto dto, CancellationToken cancellationToken)
+        public async Task<CategoryDto> AddCategoryAsync(CategoryCreateDto dto, CancellationToken cancellationToken)
         {
             var entity = this._mapper.Map<Category>(dto);
-            await this._repository.AddAsync(entity, cancellationToken);
-        }
-
-        public async Task<CategoryDto> GetCategoryAsync(ObjectId id, CancellationToken cancellationToken)
-        {
-            var entity = await this._repository.GetCategoryAsync(id, cancellationToken);
+            var newEntity = await this._repository.AddAsync(entity, cancellationToken);
             return this._mapper.Map<CategoryDto>(entity);
         }
 
-        public async Task<PagedList<CategoryDto>> GetCategoriesPageAsync(PageParameters pageParameters, CancellationToken cancellationToken)
+        public async Task<CategoryDto> GetCategoryAsync(string id, CancellationToken cancellationToken)
         {
-            var entities = await this._repository.GetCategoriesPageAsync(pageParameters, cancellationToken);
+            if (!ObjectId.TryParse(id, out var objectId)) {
+                throw new InvalidDataException("Provided id is invalid.");
+            }
+            
+            var entity = await this._repository.GetCategoryAsync(objectId, cancellationToken);
+            if (entity == null)
+            {
+                throw new EntityNotFoundException<Category>();
+            }
+
+            return this._mapper.Map<CategoryDto>(entity);
+        }
+
+        public async Task<PagedList<CategoryDto>> GetCategoriesPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
+        {
+            var entities = await this._repository.GetPageAsync(pageNumber, pageSize, cancellationToken);
             var dtos = this._mapper.Map<List<CategoryDto>>(entities);
             var count = await this._repository.GetTotalCountAsync();
-            return new PagedList<CategoryDto>(dtos, pageParameters, count);
+            return new PagedList<CategoryDto>(dtos, pageNumber, pageSize, count);
         }
     }
 }

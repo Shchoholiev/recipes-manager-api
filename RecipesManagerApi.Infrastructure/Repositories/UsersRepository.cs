@@ -16,22 +16,6 @@ public class UsersRepository : BaseRepository<User>, IUsersRepository
         return await (await this._collection.FindAsync(x => x.Id == id)).FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<List<User>> GetUserPageAsync(PageParameters pageParameters, CancellationToken cancellationToken)
-    {
-        return await this._collection.Find(Builders<User>.Filter.Empty)
-                                     .Skip((pageParameters.PageNumber - 1) * pageParameters.PageSize)
-                                     .Limit(pageParameters.PageSize)
-                                     .ToListAsync(cancellationToken);
-    }
-
-    public async Task<List<User>> GetUserPageAsync(PageParameters pageParameters, Expression<Func<User, bool>> predicate, CancellationToken cancellationToken)
-    {
-        return await this._collection.Find(predicate)
-                                     .Skip((pageParameters.PageNumber - 1) * pageParameters.PageSize)
-                                     .Limit(pageParameters.PageSize)
-                                     .ToListAsync(cancellationToken);
-    }
-
     public async Task UpdateUserAsync(User user, CancellationToken cancellationToken)
     {
         await this._collection.ReplaceOneAsync(x => x.Id == user.Id, user, new ReplaceOptions(), cancellationToken);

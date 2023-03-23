@@ -20,11 +20,14 @@ public class WeatherForecastController : ControllerBase
 
     private readonly IRolesService _rolesService;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger, IUsersService usersService, IRolesService rolesService)
+    private readonly ICloudStorageService _cloudStorageService;
+
+    public WeatherForecastController(ILogger<WeatherForecastController> logger, IUsersService usersService, IRolesService rolesService, ICloudStorageService cloudStorageService)
     {
         _rolesService = rolesService;
         _usersService = usersService;
         _logger = logger;
+        this._cloudStorageService = cloudStorageService;
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
@@ -44,5 +47,11 @@ public class WeatherForecastController : ControllerBase
     {
         var role = await this._rolesService.GetRoleAsync(new ObjectId("640cfe0bb72023aa1124c0ca"), cancellationToken);
         await this._usersService.AddUserAsync(new UserDto() { Name = "larry", Phone = "5465456321", Email = " asdfsdf@gmail.com", RefreshToken = "yes", RefreshTokenExpiryDate = DateTime.Now, AppleDeviceId = new Guid(), WebId = Guid.NewGuid(), Roles = new List<RoleDto>() { role} }, cancellationToken);
+    }
+
+    [HttpGet("test-object-delete")]
+    public async void TestCloudStorageDelete(CancellationToken cancellationToken)
+    {
+        await this._cloudStorageService.DeleteFileAsync("testObj");
     }
 }

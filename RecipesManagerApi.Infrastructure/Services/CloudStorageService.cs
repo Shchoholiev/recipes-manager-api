@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Security.AccessControl;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Microsoft.Extensions.Configuration;
 using RecipesManagerApi.Application.IServices;
+using SharpCompress.Common;
 
 namespace RecipesManagerApi.Infrastructure.Services;
 
@@ -21,7 +23,7 @@ public class CloudStorageService : ICloudStorageService
         this._s3Client = new AmazonS3Client(accessKey, secretKey, config);
     }
 
-    public async Task DeleteFileAsync(string fileName)
+    public async Task DeleteFileAsync(string fileName, CancellationToken cancellationToken)
     {
         try
         {
@@ -41,8 +43,27 @@ public class CloudStorageService : ICloudStorageService
         }
     }
 
-    public async Task<string> UploadFileAsync(string fileName)
+    public async Task<string> UploadFileAsync(string filePath, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var fileName = filePath.Split("/").Last();
+        var request = new PutObjectRequest()
+        {
+            BucketName = this._bucketName,
+            Key = fileName,
+            FilePath = filePath
+        };
+
+        var response = await this._s3Client.PutObjectAsync(request);
+        if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
+        {
+            Console.WriteLine($"Successfully uploaded {fileName} to {this._bucketName}.");
+            var fileUrl = "https://app.idrivee2.com/region/FRA/buckets/recipes-manager-api/object-storage/info?path=%2F" + fileName;
+            return fileUrl;
+        }
+        else
+        {
+            throw new Exception($"Could not upload {fileName} to {this._bucketName}.");
+        }
+
     }
 }

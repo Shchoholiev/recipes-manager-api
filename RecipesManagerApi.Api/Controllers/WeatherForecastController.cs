@@ -52,6 +52,12 @@ public class WeatherForecastController : ControllerBase
     [HttpGet("test-object-delete")]
     public async void TestCloudStorageDelete(CancellationToken cancellationToken)
     {
-        await this._cloudStorageService.DeleteFileAsync("testObj");
+        await this._cloudStorageService.DeleteFileAsync("ArticleImage_126279.jpg", cancellationToken);
+    }
+
+    [HttpGet("test-object-upload")]
+    public async void TestCloudStorageAdd(CancellationToken cancellationToken)
+    {
+        Console.WriteLine(await this._cloudStorageService.UploadFileAsync(@"/Users/vitaliy/Desktop/Screenshot.png", cancellationToken));
     }
 }

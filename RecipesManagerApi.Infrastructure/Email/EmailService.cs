@@ -1,18 +1,19 @@
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace RecipesManagerApi.Infrastructure.Email
 {
     public class EmailService
     {
-        private readonly SmtpClient smtpClient;
+        private readonly SmtpClient _smtpClient;
 
-        public EmailService(EmailSettings emailSettings)
+        public EmailService(IConfiguration configuration)
         {
-            smtpClient = new SmtpClient(emailSettings.Host, emailSettings.Port)
+            _smtpClient = new SmtpClient(configuration["SmtpHost"], configuration["SmtpPort"])
             {
-                Credentials = new NetworkCredential(emailSettings.Username, emailSettings.Password),
+                Credentials = new NetworkCredential(configuration["SmtpUsername"], configuration["SmtpPassword"]),
                 EnableSsl = true
             };
         }
@@ -41,7 +42,7 @@ namespace RecipesManagerApi.Infrastructure.Email
                     }
                 }
 
-                await smtpClient.SendMailAsync(message);
+                await _smtpClient.SendMailAsync(message);
             }
             catch (Exception ex)
             {

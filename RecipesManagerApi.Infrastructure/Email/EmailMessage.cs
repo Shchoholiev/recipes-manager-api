@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Net.Mail;
 
 namespace RecipesManagerApi.Infrastructure.Email
 {
@@ -9,6 +10,6 @@ namespace RecipesManagerApi.Infrastructure.Email
         public List<string> Recipients { get; set; }
         public string Body { get; set; }
         public string Subject { get; set; }
-        public List<string> Attachements { get; set; }
+        public List<Attachment> Attachments { get; set; }
     }
 }

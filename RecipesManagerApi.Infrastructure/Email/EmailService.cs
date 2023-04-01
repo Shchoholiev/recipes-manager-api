@@ -11,7 +11,7 @@ namespace RecipesManagerApi.Infrastructure.Email
 
         public EmailService(IConfiguration configuration)
         {
-            _smtpClient = new SmtpClient(configuration["SmtpHost"], configuration["SmtpPort"])
+            _smtpClient = new SmtpClient(configuration["SmtpHost"], Int32.Parse(configuration["SmtpPort"]))
             {
                 Credentials = new NetworkCredential(configuration["SmtpUsername"], configuration["SmtpPassword"]),
                 EnableSsl = true

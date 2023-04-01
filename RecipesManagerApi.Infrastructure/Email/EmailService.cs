@@ -38,7 +38,7 @@ namespace RecipesManagerApi.Infrastructure.Email
                 {
                     foreach (var attachment in emailMessage.Attachments)
                     {
-                        message.Attachments.Add(attachment);
+                        message.Attachments.Add(new Attachment(new MemoryStream(attachment.Content), attachment.FileName, attachment.ContentType));
                     }
                 }
 

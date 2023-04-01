@@ -31,15 +31,19 @@ public class WeatherForecastController : ControllerBase
 
     private readonly ICloudStorageService _cloudStorageService;
 
+    private readonly IContactsService _contactService;
+    
     private readonly IRecipesService _recipesService;
 
     public WeatherForecastController(ILogger<WeatherForecastController> logger, IUsersService usersService, IRolesService rolesService, ICloudStorageService cloudStorageService,
-        IRecipesService recipesService)
+        IRecipesService recipesService, IContactsService contactsService)
     {
         _rolesService = rolesService;
         _usersService = usersService;
         _logger = logger;
         this._cloudStorageService = cloudStorageService;
+        this._contactService = contactsService;
+
         _recipesService = recipesService;
     }
 
@@ -68,7 +72,6 @@ public class WeatherForecastController : ControllerBase
     {
         Console.WriteLine(await this._cloudStorageService.UploadFileAsync(file, Guid.NewGuid(), file.FileName.Split(".").Last(), cancellationToken));
     }
-
 
     [HttpPost("recipes")]
     public async Task CreateRecipeAsync([FromForm]RecipeCreateDto dto, CancellationToken cancellationToken)

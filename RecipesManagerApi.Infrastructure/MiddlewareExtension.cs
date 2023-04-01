@@ -61,21 +61,20 @@ public static class MiddlewareExtension
     public static IServiceCollection AddGraphQl(this IServiceCollection services)
     {
         services
-             .AddGraphQLServer()
-             .AddQueryType()
-                 .AddTypeExtension<CategoriesQuery>()
-                 .AddTypeExtension<ContactsQuery>()
-             .AddMutationType()
-                 .AddTypeExtension<CategoriesMutation>()
-                 .AddTypeExtension<ContactsMutation>()
-                 .AddTypeExtension<RegisterMutation>()
-                 .AddTypeExtension<LoginMutation>()
-                 .AddTypeExtension<AccessMutation>()
-                 .AddTypeExtension<UserMutation>()
-                 .AddTypeExtension<RoleMutation>()
-             .AddAuthorization()
-             .InitializeOnStartup(keepWarm: true);
-
+            .AddGraphQLServer()
+            .AddQueryType()
+                .AddTypeExtension<CategoriesQuery>()
+                .AddTypeExtension<ContactsQuery>()
+            .AddMutationType()
+                .AddTypeExtension<CategoriesMutation>()
+                .AddTypeExtension<ContactsMutation>()
+                .AddTypeExtension<RegisterMutation>()
+                .AddTypeExtension<LoginMutation>()
+                .AddTypeExtension<AccessMutation>()
+                .AddTypeExtension<UserMutation>()
+                .AddTypeExtension<RoleMutation>()
+            .AddAuthorization()
+            .InitializeOnStartup(keepWarm: true);
 
         return services;
     }

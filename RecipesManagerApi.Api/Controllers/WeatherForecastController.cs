@@ -49,7 +49,7 @@ public class WeatherForecastController : ControllerBase
     [HttpGet("test-user-add")]
     public async void TestUserAdding(CancellationToken cancellationToken)
     {
-        var role = await this._rolesService.GetRoleAsync(new ObjectId("640cfe0bb72023aa1124c0ca"), cancellationToken);
+        var role = await this._rolesService.GetRoleAsync("640cfe0bb72023aa1124c0ca", cancellationToken);
         await this._usersService.AddUserAsync(new UserDto() { Name = "larry", Phone = "5465456321", Email = " asdfsdf@gmail.com", RefreshToken = "yes", RefreshTokenExpiryDate = DateTime.Now, AppleDeviceId = new Guid(), WebId = Guid.NewGuid(), Roles = new List<RoleDto>() { role} }, cancellationToken);
     }
 

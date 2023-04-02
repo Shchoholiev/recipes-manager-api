@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver.Linq;
 using RecipesManagerApi.Application.Exceptions;
 using RecipesManagerApi.Application.Interfaces.Identity;
 using RecipesManagerApi.Application.IRepositories;
@@ -84,6 +83,77 @@ public class UserManager : IUserManager
 
         return tokens;
     }
+
+    public async Task<TokensModel> AddToRoleAsync(string roleName, string email, CancellationToken cancellationToken)
+    {
+        var role = await this._rolesRepository.GetRoleAsync(r => r.Name == roleName, cancellationToken);
+        if (role == null)
+        {
+            throw new EntityNotFoundException<Role>();
+        }
+
+        var user = await this._usersRepository.GetUserAsync(x => x.Email == email, cancellationToken);
+        if (user == null)
+        {
+            throw new EntityNotFoundException<User>();
+        }
+
+        user.Roles.Add(role);
+        await this._usersRepository.UpdateUserAsync(user, cancellationToken);
+        var tokens = this.GetUserTokens(user);
+
+        this._logger.LogInformation($"Added role {roleName} to user with email: {email}.");
+
+        return tokens;
+    }
+
+    public async Task<TokensModel> RemoveFromRole(string roleName, string email, CancellationToken cancellationToken)
+    {
+        var role = await this._rolesRepository.GetRoleAsync(r => r.Name == roleName, cancellationToken);
+        if (role == null)
+        {
+            throw new EntityNotFoundException<Role>();
+        }
+
+        var user = await this._usersRepository.GetUserAsync(x => x.Email == email, cancellationToken);
+        if (user == null)
+        {
+            throw new EntityNotFoundException<User>();
+        }
+
+        user.Roles.Remove(role);
+        await this._usersRepository.UpdateUserAsync(user, cancellationToken);
+        var tokens = this.GetUserTokens(user);
+
+        this._logger.LogInformation($"Added role {roleName} to user with email: {email}.");
+
+        return tokens;
+    }
+
+    public async Task<TokensModel> UpdateAsync(string email, UserDto userDto, CancellationToken cancellationToken)
+    {
+        var user = await this._usersRepository.GetUserAsync(email, cancellationToken);
+        if (user == null)
+        {
+            throw new EntityNotFoundException<User>();
+        }
+
+        if (email != userDto.Email
+            && await this._usersRepository.GetUserAsync(x => x.Email == userDto.Email, cancellationToken) != null)
+        {
+            throw new EntityAlreadyExistsException<User>("email", userDto.Email);
+        }
+
+        this._mapper.Map(user, userDto);
+        user.UserToken = this.GetRefreshToken();
+        await this._usersRepository.UpdateUserAsync(user, cancellationToken);
+        var tokens = this.GetUserTokens(user);
+
+        this._logger.LogInformation($"Update user with email: {email}.");
+
+        return tokens;
+    }
+
 
     private string GetRefreshToken()
     {

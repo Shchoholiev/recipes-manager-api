@@ -1,5 +1,6 @@
 ﻿using RecipesManagerApi.Application.Models.Identity;
-using RecipesManagerApi.Application.Models;
+using RecipesManagerApi.Application.Models.Login;
+using RecipesManagerApi.Application.Models.Register;
 
 namespace RecipesManagerApi.Application.IServices.Identity;
 public interface IUserManager

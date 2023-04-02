@@ -6,6 +6,8 @@ using RecipesManagerApi.Application.IRepositories;
 using RecipesManagerApi.Application.IServices.Identity;
 using RecipesManagerApi.Application.Models;
 using RecipesManagerApi.Application.Models.Identity;
+using RecipesManagerApi.Application.Models.Login;
+using RecipesManagerApi.Application.Models.Register;
 using RecipesManagerApi.Domain.Entities;
 using System.Security.Claims;
 
@@ -57,6 +59,40 @@ public class UserManager : IUserManager
         return tokens;
     }
 
+    public async Task<TokensModel> LoginAppleGuestAsync(LoginAppleGuestModel login, CancellationToken cancellationToken)
+    {
+        var user = await this._usersRepository.GetUserAsync(x => x.AppleDeviceId == login.AppleDeviceId, cancellationToken);
+        if (user == null)
+        {
+            throw new EntityNotFoundException<User>();
+        }
+
+        user.RefreshToken = this.GetRefreshToken();
+        await this._usersRepository.UpdateUserAsync(user, cancellationToken);
+        var tokens = this.GetAppleGuestTokens(user);
+
+        this._logger.LogInformation($"Logged in apple guest with apple device id: {login.AppleDeviceId}.");
+
+        return tokens;
+    }
+
+    public async Task<TokensModel> LoginWebGuestAsync(LoginWebGuestModel login, CancellationToken cancellationToken)
+    {
+        var user = await this._usersRepository.GetUserAsync(x => x.WebId == login.WebId, cancellationToken);
+        if (user == null)
+        {
+            throw new EntityNotFoundException<User>();
+        }
+
+        user.RefreshToken = this.GetRefreshToken();
+        await this._usersRepository.UpdateUserAsync(user, cancellationToken);
+        var tokens = this.GetWebGuestTokens(user);
+
+        this._logger.LogInformation($"Logged in web guest with web id: {login.WebId}.");
+
+        return tokens;
+    }
+
     public async Task<TokensModel> RegisterAsync(RegisterModel register, CancellationToken cancellationToken)
     {
         if (await this._usersRepository.ExistsAsync(u => u.Email == register.Email, cancellationToken))
@@ -80,6 +116,56 @@ public class UserManager : IUserManager
         var tokens = this.GetUserTokens(user);
 
         this._logger.LogInformation($"Created user with email: {user.Email}.");
+
+        return tokens;
+    }
+
+    public async Task<TokensModel> RegisterWebGuestAsync(RegisterWebGuestModel register, CancellationToken cancellationToken)
+    {
+        if (await this._usersRepository.ExistsAsync(u => u.WebId == register.WebId, cancellationToken))
+        {
+            throw new EntityAlreadyExistsException<User>("guest Web Id", register.WebId.ToString());
+        }
+
+        var role = await this._rolesRepository.GetRoleAsync(r => r.Name == "Guest", cancellationToken);
+
+        var user = new User
+        {
+            Name = "Guest",
+            Roles = new List<Role> { role },
+            RefreshToken = this.GetRefreshToken(),
+            RefreshTokenExpiryDate = DateTime.Now.AddDays(7),
+        };
+
+        await this._usersRepository.AddAsync(user, cancellationToken);
+        var tokens = this.GetWebGuestTokens(user);
+
+        this._logger.LogInformation($"Created web guest with web id: {user.WebId}.");
+
+        return tokens;
+    }
+
+    public async Task<TokensModel> RegisterAppleGuestAsync(RegisterAppleGuestModel register, CancellationToken cancellationToken)
+    {
+        if (await this._usersRepository.ExistsAsync(u => u.AppleDeviceId == register.AppleDeviceId, cancellationToken))
+        {
+            throw new EntityAlreadyExistsException<User>("apple guest apple Id", register.AppleDeviceId.ToString());
+        }
+
+        var role = await this._rolesRepository.GetRoleAsync(r => r.Name == "Guest", cancellationToken);
+
+        var user = new User
+        {
+            Name = register.Name,
+            Roles = new List<Role> { role },
+            RefreshToken = this.GetRefreshToken(),
+            RefreshTokenExpiryDate = DateTime.Now.AddDays(7),
+        };
+
+        await this._usersRepository.AddAsync(user, cancellationToken);
+        var tokens = this.GetAppleGuestTokens(user);
+
+        this._logger.LogInformation($"Created apple guest with apple device id: {user.AppleDeviceId}.");
 
         return tokens;
     }
@@ -132,7 +218,7 @@ public class UserManager : IUserManager
 
     public async Task<TokensModel> UpdateAsync(string email, UserDto userDto, CancellationToken cancellationToken)
     {
-        var user = await this._usersRepository.GetUserAsync(email, cancellationToken);
+        var user = await this._usersRepository.GetUserAsync(x => x.Email == email, cancellationToken);
         if (user == null)
         {
             throw new EntityNotFoundException<User>();
@@ -145,7 +231,7 @@ public class UserManager : IUserManager
         }
 
         this._mapper.Map(user, userDto);
-        user.UserToken = this.GetRefreshToken();
+        user.RefreshToken = this.GetRefreshToken();
         await this._usersRepository.UpdateUserAsync(user, cancellationToken);
         var tokens = this.GetUserTokens(user);
 
@@ -153,7 +239,6 @@ public class UserManager : IUserManager
 
         return tokens;
     }
-
 
     private string GetRefreshToken()
     {
@@ -178,12 +263,78 @@ public class UserManager : IUserManager
         };
     }
 
+    private TokensModel GetAppleGuestTokens(User user)
+    {
+        var claims = this.GetAppleGuestClaims(user);
+        var accessToken = this._tokensService.GenerateAccessToken(claims);
+
+        this._logger.LogInformation($"Returned new access and refresh tokens.");
+
+        return new TokensModel
+        {
+            AccessToken = accessToken,
+            RefreshToken = user.RefreshToken,
+        };
+    }
+
+    private TokensModel GetWebGuestTokens(User user)
+    {
+        var claims = this.GetWebGuestClaims(user);
+        var accessToken = this._tokensService.GenerateAccessToken(claims);
+
+        this._logger.LogInformation($"Returned new access and refresh tokens.");
+
+        return new TokensModel
+        {
+            AccessToken = accessToken,
+            RefreshToken = user.RefreshToken,
+        };
+    }
+
     private IEnumerable<Claim> GetClaims(User user)
     {
         var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.Name),
                 new Claim(ClaimTypes.Email, user.Email),
+            };
+
+        foreach (var role in user.Roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role.Name));
+        }
+
+        this._logger.LogInformation($"Returned claims for user with email: {user.Email}.");
+
+        return claims;
+    }
+
+    private IEnumerable<Claim> GetAppleGuestClaims(User user)
+    {
+        var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.Name),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.NameIdentifier, user.AppleDeviceId.ToString()),
+            };
+
+        foreach (var role in user.Roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role.Name));
+        }
+
+        this._logger.LogInformation($"Returned claims for user with email: {user.Email}.");
+
+        return claims;
+    }
+
+    private IEnumerable<Claim> GetWebGuestClaims(User user)
+    {
+        var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.Name),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.NameIdentifier, user.WebId.ToString()),
             };
 
         foreach (var role in user.Roles)

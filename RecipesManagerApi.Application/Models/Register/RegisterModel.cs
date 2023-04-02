@@ -1,4 +1,4 @@
-﻿namespace RecipesManagerApi.Application.Models;
+﻿namespace RecipesManagerApi.Application.Models.Register;
 public class RegisterModel
 {
     public string Name { get; set; }

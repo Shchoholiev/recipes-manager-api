@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
+using System.IO;
 using RecipesManagerApi.Application.IServices;
 using RecipesManagerApi.Application.Models;
 
@@ -9,6 +11,7 @@ namespace RecipesManagerApi.Api.Controllers;
 [Route("[controller]")]
 public class WeatherForecastController : ControllerBase
 {
+    private readonly Guid guid;
     private static readonly string[] Summaries = new[]
     {
         "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
@@ -28,6 +31,7 @@ public class WeatherForecastController : ControllerBase
         _usersService = usersService;
         _logger = logger;
         this._cloudStorageService = cloudStorageService;
+        guid = new Guid();
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
@@ -52,12 +56,15 @@ public class WeatherForecastController : ControllerBase
     [HttpGet("test-object-delete")]
     public async void TestCloudStorageDelete(CancellationToken cancellationToken)
     {
-        await this._cloudStorageService.DeleteFileAsync("ArticleImage_126279.jpg", cancellationToken);
+        await this._cloudStorageService.DeleteFileAsync(guid, cancellationToken);
     }
 
     [HttpGet("test-object-upload")]
     public async void TestCloudStorageAdd(CancellationToken cancellationToken)
     {
-        Console.WriteLine(await this._cloudStorageService.UploadFileAsync(@"/Users/vitaliy/Desktop/Screenshot.png", cancellationToken));
+        var filePath = @"/Users/vitaliy/Desktop/image.jpg";
+        using var stream = new MemoryStream(System.IO.File.ReadAllBytes(filePath).ToArray());
+        var formFile = new FormFile(stream, 0, stream.Length, (guid.ToString() + Path.GetExtension(filePath)), (guid.ToString() + Path.GetExtension(filePath)));        
+        Console.WriteLine(await this._cloudStorageService.UploadFileAsync(formFile, cancellationToken));
     }
 }

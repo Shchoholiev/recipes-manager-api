@@ -5,6 +5,7 @@ using Amazon.S3.Model;
 using Microsoft.Extensions.Configuration;
 using RecipesManagerApi.Application.IServices;
 using SharpCompress.Common;
+using Microsoft.AspNetCore.Http;
 
 namespace RecipesManagerApi.Infrastructure.Services;
 
@@ -23,14 +24,15 @@ public class CloudStorageService : ICloudStorageService
         this._s3Client = new AmazonS3Client(accessKey, secretKey, config);
     }
 
-    public async Task DeleteFileAsync(string fileName, CancellationToken cancellationToken)
+    public async Task DeleteFileAsync(Guid guid, CancellationToken cancellationToken)
     {
+        var fileName = guid.ToString();
         try
         {
             var deleteObjectRequest = new DeleteObjectRequest
             {
                 BucketName = this._bucketName,
-                Key = fileName,
+                Key = fileName + ".jpg"
             };
 
             Console.WriteLine($"Deleting object: {fileName}");
@@ -43,27 +45,33 @@ public class CloudStorageService : ICloudStorageService
         }
     }
 
-    public async Task<string> UploadFileAsync(string filePath, CancellationToken cancellationToken)
+    public async Task<string> UploadFileAsync(IFormFile file, CancellationToken cancellationToken)
     {
-        var fileName = filePath.Split("/").Last();
-        var request = new PutObjectRequest()
+        var fileName = file.FileName;
+        using (var newMemoryStream = new MemoryStream())
         {
-            BucketName = this._bucketName,
-            Key = fileName,
-            FilePath = filePath
-        };
+            file.CopyTo(newMemoryStream);
 
-        var response = await this._s3Client.PutObjectAsync(request);
-        if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
-        {
-            Console.WriteLine($"Successfully uploaded {fileName} to {this._bucketName}.");
-            var fileUrl = "https://app.idrivee2.com/region/FRA/buckets/recipes-manager-api/object-storage/info?path=%2F" + fileName;
-            return fileUrl;
-        }
-        else
-        {
-            throw new Exception($"Could not upload {fileName} to {this._bucketName}.");
-        }
+            var request = new PutObjectRequest()
+            {
+                BucketName = this._bucketName,
+                Key = fileName,
+                InputStream = newMemoryStream
+            };
 
+
+            var response = await this._s3Client.PutObjectAsync(request);
+            if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
+            {
+                Console.WriteLine($"Successfully uploaded {fileName} to {this._bucketName}.");
+                
+                var fileUrl = "https://l7l2.c16.e2-2.dev/recipes/" + fileName;
+                return fileUrl;
+            }
+            else
+            {
+                throw new Exception($"Could not upload {fileName} to {this._bucketName}.");
+            }
+        }
     }
 }

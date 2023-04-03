@@ -27,15 +27,7 @@ public class RecipesService : IRecipesService
         await this._recipesRepository.AddAsync(entity, cancellationToken);
     }
 
-    public async Task<PagedList<RecipeDto>> GetPageRecipesAsync(PageParameters pageParameters, CancellationToken cancellationToken)
-    {
-        var entities = await this._recipesRepository.GetRecipesPageAsync(pageParameters, cancellationToken);
-        var dtos = this._mapper.Map<List<RecipeDto>>(entities);
-        var count = await this._recipesRepository.GetTotalCountAsync();
-        return new PagedList<RecipeDto>(dtos, pageParameters, count);
-    }
-
-    public async Task<PagedList<RecipeDto>> GetSearchPageAsync(PageParameters pageParameters, RecipesSearchTypes recipeSearchType, ObjectId userId, CancellationToken cancellationToken)
+    public async Task<PagedList<RecipeDto>> GetSearchPageAsync(int pageNumber, int pageSize, RecipesSearchTypes recipeSearchType, ObjectId userId, CancellationToken cancellationToken)
     {
         List<Recipe>? entities;
         List<RecipeDto>? dtos;
@@ -43,16 +35,16 @@ public class RecipesService : IRecipesService
         switch (recipeSearchType)
         {
             case RecipesSearchTypes.Personal:
-                entities = await this.GetPersonalRecipesPageAsync(pageParameters, userId, cancellationToken);
+                entities = await this.GetPersonalRecipesPageAsync(pageNumber, pageSize, userId, cancellationToken);
                 dtos = this._mapper.Map<List<RecipeDto>>(entities);
                 count = await this._recipesRepository.GetTotalCountAsync(x=> x.IsPublic != true && x.CreatedById == userId);
-                return new PagedList<RecipeDto>(dtos, pageParameters, count);
+                return new PagedList<RecipeDto>(dtos, pageNumber, pageSize, count);
 
             case RecipesSearchTypes.Public:
-                entities = await this.GetPublicRecipesPageAsync(pageParameters, userId, cancellationToken);
+                entities = await this.GetPublicRecipesPageAsync(pageNumber, pageSize, userId, cancellationToken);
                 dtos = this._mapper.Map<List<RecipeDto>>(entities);
                 count = await this._recipesRepository.GetTotalCountAsync(x=> x.IsPublic == true && x.CreatedById != userId);
-                return new PagedList<RecipeDto>(dtos, pageParameters, count);
+                return new PagedList<RecipeDto>(dtos, pageNumber, pageSize, count);
 
             case RecipesSearchTypes.Subscribed:
                 throw new NotImplementedException();
@@ -77,11 +69,11 @@ public class RecipesService : IRecipesService
         await this._recipesRepository.UpdateRecipeAsync(entity, cancellationToken);
     }
 
-    private async Task<List<Recipe>> GetPublicRecipesPageAsync(PageParameters pageParameters, ObjectId userId, CancellationToken cancellationToken){
-        return await this._recipesRepository.GetRecipesPageAsync(pageParameters, x => x.IsPublic == true && x.CreatedById != userId , cancellationToken);
+    private async Task<List<Recipe>> GetPublicRecipesPageAsync(int pageNumber, int pageSize, ObjectId userId, CancellationToken cancellationToken){
+        return await this._recipesRepository.GetPageAsync(pageNumber,  pageSize, x => x.IsPublic == true && x.CreatedById != userId , cancellationToken);
     }
     
-    private async Task<List<Recipe>> GetPersonalRecipesPageAsync(PageParameters pageParameters, ObjectId userId, CancellationToken cancellationToken){
-        return await this._recipesRepository.GetRecipesPageAsync(pageParameters, x => x.IsPublic != true && x.CreatedById == userId , cancellationToken);
+    private async Task<List<Recipe>> GetPersonalRecipesPageAsync(int pageNumber, int pageSize, ObjectId userId, CancellationToken cancellationToken){
+        return await this._recipesRepository.GetPageAsync(pageNumber,  pageSize, x => x.IsPublic != true && x.CreatedById == userId , cancellationToken);
     }
 }

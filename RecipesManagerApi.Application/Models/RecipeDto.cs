@@ -1,18 +1,16 @@
-using MongoDB.Bson;
-
 namespace RecipesManagerApi.Application.Models;
 
 public class RecipeDto
 {
-    public ObjectId Id { get; set; }
+    public string Id { get; set; }
 
-    public String Name { get; set; }
+    public string Name { get; set; }
 
     public ImageDto? Thumbnail { get; set; }
 
     public List<IngredientDto>? Ingredients { get; set; }
 
-    public String? IngredientsText {get; set;}
+    public string? IngredientsText {get; set;}
 
     public List<CategoryDto> Categories { get; set; }
 

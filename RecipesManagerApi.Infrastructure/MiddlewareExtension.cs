@@ -35,6 +35,7 @@ public static class MiddlewareExtension
         services.AddScoped<IUsersService, UsersService>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<ITokensService, TokensService>();
+        services.AddScoped<ICloudStorageService, CloudStorageService>();
 
         return services;
     }

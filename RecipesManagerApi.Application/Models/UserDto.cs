@@ -1,5 +1,4 @@
 ﻿using MongoDB.Bson;
-using RecipesManagerApi.Domain.Entities;
 
 namespace RecipesManagerApi.Application.Models;
 public class UserDto

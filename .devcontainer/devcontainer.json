@@ -32,7 +32,8 @@
 			"extensions": [
 				"kreativ-software.csharpextensions",
 				"ms-dotnettools.csharp",
-				"patcx.vscode-nuget-gallery"
+				"patcx.vscode-nuget-gallery",
+				"mhutchie.git-graph"
 			]
 		}
 	}

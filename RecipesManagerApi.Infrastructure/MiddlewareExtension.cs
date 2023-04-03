@@ -8,6 +8,10 @@ using RecipesManagerApi.Application.IServices;
 using RecipesManagerApi.Infrastructure.Services;
 using System.Reflection;
 using RecipesManagerApi.Application.IServices.Identity;
+using RecipesManagerApi.Application.Interfaces.Identity;
+using RecipesManagerApi.Infrastructure.Services.Identity;
+using RecipesManagerApi.Infrastructure.Queries;
+using RecipesManagerApi.Infrastructure.Mutations;
 
 namespace RecipesManagerApi.Infrastructure;
 
@@ -31,6 +35,7 @@ public static class MiddlewareExtension
         services.AddScoped<IRolesService, RolesService>();
         services.AddScoped<IUsersService, UsersService>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<ITokensService, TokensService>();
         services.AddScoped<IRecipesService, RecipesService>();
 
         return services;
@@ -40,6 +45,20 @@ public static class MiddlewareExtension
     {
         services.AddAutoMapper(Assembly.GetAssembly(typeof(CategoryProfile)));
         services.AddAutoMapper(Assembly.GetAssembly(typeof(RecipeProfile)));
+
+        return services;
+    }
+
+    public static IServiceCollection AddGraphQl(this IServiceCollection services)
+    {
+        services
+            .AddGraphQLServer()
+            .AddQueryType()
+                .AddTypeExtension<CategoriesQuery>()
+            .AddMutationType()
+                .AddTypeExtension<CategoriesMutation>()
+            .InitializeOnStartup(keepWarm: true);
+        
 
         return services;
     }

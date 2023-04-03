@@ -1,7 +1,9 @@
 ﻿namespace RecipesManagerApi.Application.Paging
 {
-    public class PagedList<T> : List<T>
+    public class PagedList<T>
     {
+        public IEnumerable<T> Items { get; set; }
+
         public int PageNumber { get; set; }
 
         public int PageSize { get; set; }
@@ -16,14 +18,14 @@
 
         public PagedList() { }
 
-        public PagedList(IEnumerable<T> items, PageParameters pageParameters, int totalItems)
+        public PagedList(IEnumerable<T> items, int pageNumber, int pageSize, int totalItems)
         {
-            this.PageNumber = pageParameters.PageNumber;
-            this.PageSize = pageParameters.PageSize;
+            this.PageNumber = pageNumber;
+            this.PageSize = pageSize;
             this.TotalItems = totalItems;
-            this.TotalPages = (int)Math.Ceiling(totalItems / (double)pageParameters.PageSize);
+            this.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
-            this.AddRange(items);
+            this.Items = items;
         }
     }
 }

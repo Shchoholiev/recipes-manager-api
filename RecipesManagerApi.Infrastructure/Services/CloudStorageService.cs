@@ -6,12 +6,14 @@ using Microsoft.Extensions.Configuration;
 using RecipesManagerApi.Application.IServices;
 using SharpCompress.Common;
 using Microsoft.AspNetCore.Http;
+using RecipesManagerApi.Application.Exceptions;
 
 namespace RecipesManagerApi.Infrastructure.Services;
 
 public class CloudStorageService : ICloudStorageService
 {
     private readonly string _bucketName;
+    private readonly string _objectUrl;
     private readonly AmazonS3Client _s3Client;
 
     public CloudStorageService(IConfiguration configuration)
@@ -21,10 +23,11 @@ public class CloudStorageService : ICloudStorageService
         config.ServiceURL = configuration.GetConnectionString("StorageEndpoint");
         var accessKey = configuration.GetSection("CloudObjectStorage")["AccessKey"];
         var secretKey = configuration.GetSection("CloudObjectStorage")["SecretKey"];
+        this._objectUrl = configuration.GetSection("CloudObjectStorage")["ObjectUrl"];
         this._s3Client = new AmazonS3Client(accessKey, secretKey, config);
     }
 
-    public async Task DeleteFileAsync(Guid guid, CancellationToken cancellationToken)
+    public async Task DeleteFileAsync(Guid guid, string fileExtension, CancellationToken cancellationToken)
     {
         var fileName = guid.ToString();
         try
@@ -32,7 +35,7 @@ public class CloudStorageService : ICloudStorageService
             var deleteObjectRequest = new DeleteObjectRequest
             {
                 BucketName = this._bucketName,
-                Key = fileName + ".jpg"
+                Key = fileName + "." + fileExtension
             };
 
             Console.WriteLine($"Deleting object: {fileName}");
@@ -45,9 +48,9 @@ public class CloudStorageService : ICloudStorageService
         }
     }
 
-    public async Task<string> UploadFileAsync(IFormFile file, CancellationToken cancellationToken)
+    public async Task<string> UploadFileAsync(IFormFile file, Guid guid, string fileExtension, CancellationToken cancellationToken)
     {
-        var fileName = file.FileName;
+        var fileName = guid.ToString()+ "." + fileExtension;
         using (var newMemoryStream = new MemoryStream())
         {
             file.CopyTo(newMemoryStream);
@@ -65,12 +68,12 @@ public class CloudStorageService : ICloudStorageService
             {
                 Console.WriteLine($"Successfully uploaded {fileName} to {this._bucketName}.");
                 
-                var fileUrl = "https://l7l2.c16.e2-2.dev/recipes/" + fileName;
+                var fileUrl = this._objectUrl + this._bucketName+ "/" + fileName;
                 return fileUrl;
             }
             else
             {
-                throw new Exception($"Could not upload {fileName} to {this._bucketName}.");
+                throw new UploadFileException(fileName, this._bucketName);
             }
         }
     }

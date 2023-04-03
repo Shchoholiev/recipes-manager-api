@@ -11,7 +11,6 @@ namespace RecipesManagerApi.Api.Controllers;
 [Route("[controller]")]
 public class WeatherForecastController : ControllerBase
 {
-    private readonly Guid guid;
     private static readonly string[] Summaries = new[]
     {
         "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
@@ -31,7 +30,6 @@ public class WeatherForecastController : ControllerBase
         _usersService = usersService;
         _logger = logger;
         this._cloudStorageService = cloudStorageService;
-        guid = new Guid();
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
@@ -53,18 +51,17 @@ public class WeatherForecastController : ControllerBase
         await this._usersService.AddUserAsync(new UserDto() { Name = "larry", Phone = "5465456321", Email = " asdfsdf@gmail.com", RefreshToken = "yes", RefreshTokenExpiryDate = DateTime.Now, AppleDeviceId = new Guid(), WebId = Guid.NewGuid(), Roles = new List<RoleDto>() { role} }, cancellationToken);
     }
 
-    [HttpGet("test-object-delete")]
-    public async void TestCloudStorageDelete(CancellationToken cancellationToken)
+    [HttpDelete("test-object-delete")]
+    public async void TestCloudStorageDelete(string objectGuid, string fileExtension, CancellationToken cancellationToken)
     {
-        await this._cloudStorageService.DeleteFileAsync(guid, cancellationToken);
+        Guid guid;
+        Guid.TryParse(objectGuid, out guid);
+        await this._cloudStorageService.DeleteFileAsync(guid, fileExtension, cancellationToken);
     }
 
-    [HttpGet("test-object-upload")]
-    public async void TestCloudStorageAdd(CancellationToken cancellationToken)
+    [HttpPost("test-object-upload")]
+    public async void TestCloudStorageAdd(IFormFile file, CancellationToken cancellationToken)
     {
-        var filePath = @"/Users/vitaliy/Desktop/image.jpg";
-        using var stream = new MemoryStream(System.IO.File.ReadAllBytes(filePath).ToArray());
-        var formFile = new FormFile(stream, 0, stream.Length, (guid.ToString() + Path.GetExtension(filePath)), (guid.ToString() + Path.GetExtension(filePath)));        
-        Console.WriteLine(await this._cloudStorageService.UploadFileAsync(formFile, cancellationToken));
+        Console.WriteLine(await this._cloudStorageService.UploadFileAsync(file, Guid.NewGuid(), file.FileName.Split(".").Last(), cancellationToken));
     }
 }

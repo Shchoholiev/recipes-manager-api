@@ -5,7 +5,6 @@ using System.IO;
 using RecipesManagerApi.Application.IServices;
 using RecipesManagerApi.Application.IServices.Identity;
 using RecipesManagerApi.Application.Models;
-using RecipesManagerApi.Application.Models.CreateDtos;
 using RecipesManagerApi.Application.Models.Identity;
 using RecipesManagerApi.Application.Paging;
 using HotChocolate.Authorization;
@@ -31,19 +30,15 @@ public class WeatherForecastController : ControllerBase
 
     private readonly ICloudStorageService _cloudStorageService;
 
-    private readonly IContactsService _contactService;
-    
     private readonly IRecipesService _recipesService;
 
     public WeatherForecastController(ILogger<WeatherForecastController> logger, IUsersService usersService, IRolesService rolesService, ICloudStorageService cloudStorageService,
-        IRecipesService recipesService, IContactsService contactsService)
+        IRecipesService recipesService)
     {
         _rolesService = rolesService;
         _usersService = usersService;
         _logger = logger;
         this._cloudStorageService = cloudStorageService;
-        this._contactService = contactsService;
-
         _recipesService = recipesService;
     }
 
@@ -68,7 +63,7 @@ public class WeatherForecastController : ControllerBase
     }
 
     [HttpPost("test-object-upload")]
-    public async void TestCloudStorageAdd(IFormFile file,CancellationToken cancellationToken)
+    public async void TestCloudStorageAdd(IFormFile file, CancellationToken cancellationToken)
     {
         Console.WriteLine(await this._cloudStorageService.UploadFileAsync(file, Guid.NewGuid(), file.FileName.Split(".").Last(), cancellationToken));
     }

@@ -29,7 +29,6 @@ public static class MiddlewareExtension
         services.AddScoped<IUsersRepository, UsersRepository>();
         services.AddScoped<IRolesRepository, RolesRepository>();
         services.AddScoped<IRecipesRepository, RecipesRepository>();
-        services.AddScoped<IContactsRepository, ContactsRepository>();
         services.AddScoped<IImagesRepository, ImagesRepository>();
 
         return services;
@@ -44,7 +43,6 @@ public static class MiddlewareExtension
         services.AddScoped<ITokensService, TokensService>();
         services.AddScoped<ICloudStorageService, CloudStorageService>();
         services.AddScoped<IRecipesService, RecipesService>();
-        services.AddScoped<IContactsService, ContactsService>();
         services.AddScoped<IImagesService, ImagesService>();
         services.AddScoped<IUserManager, UserManager>();
 
@@ -64,10 +62,8 @@ public static class MiddlewareExtension
             .AddGraphQLServer()
             .AddQueryType()
                 .AddTypeExtension<CategoriesQuery>()
-                .AddTypeExtension<ContactsQuery>()
             .AddMutationType()
                 .AddTypeExtension<CategoriesMutation>()
-                .AddTypeExtension<ContactsMutation>()
                 .AddTypeExtension<RegisterMutation>()
                 .AddTypeExtension<LoginMutation>()
                 .AddTypeExtension<AccessMutation>()
@@ -75,6 +71,7 @@ public static class MiddlewareExtension
                 .AddTypeExtension<RoleMutation>()
             .AddAuthorization()
             .InitializeOnStartup(keepWarm: true);
+        
 
         return services;
     }

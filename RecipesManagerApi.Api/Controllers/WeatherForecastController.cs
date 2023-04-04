@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
+using System.IO;
 using RecipesManagerApi.Application.IServices;
 using RecipesManagerApi.Application.IServices.Identity;
 using RecipesManagerApi.Application.Models;
@@ -27,12 +29,15 @@ public class WeatherForecastController : ControllerBase
 
     private readonly IUserManager _userManager;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger, IUsersService usersService, IRolesService rolesService, IUserManager userManager)
+    private readonly ICloudStorageService _cloudStorageService;
+
+    public WeatherForecastController(ILogger<WeatherForecastController> logger, IUsersService usersService, IRolesService rolesService, IUserManager userManager, ICloudStorageService cloudStorageService)
     {
         _rolesService = rolesService;
         _usersService = usersService;
         _logger = logger;
         _userManager = userManager;
+        _cloudStorageService = cloudStorageService;
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
@@ -57,5 +62,19 @@ public class WeatherForecastController : ControllerBase
         };
 
         return await this._userManager.AccessAppleGuestAsync(guest, cancellationToken);
+    }
+
+    [HttpDelete("test-object-delete")]
+    public async void TestCloudStorageDelete(string objectGuid, string fileExtension, CancellationToken cancellationToken)
+    {
+        Guid guid;
+        Guid.TryParse(objectGuid, out guid);
+        await this._cloudStorageService.DeleteFileAsync(guid, fileExtension, cancellationToken);
+    }
+
+    [HttpPost("test-object-upload")]
+    public async void TestCloudStorageAdd(IFormFile file, CancellationToken cancellationToken)
+    {
+        Console.WriteLine(await this._cloudStorageService.UploadFileAsync(file, Guid.NewGuid(), file.FileName.Split(".").Last(), cancellationToken));
     }
 }

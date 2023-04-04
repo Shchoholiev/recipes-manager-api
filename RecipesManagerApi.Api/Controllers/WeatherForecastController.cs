@@ -1,7 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using RecipesManagerApi.Application.IServices;
+using RecipesManagerApi.Application.IServices.Identity;
 using RecipesManagerApi.Application.Models;
+using RecipesManagerApi.Application.Models.Access;
+using RecipesManagerApi.Application.Models.Identity;
+using RecipesManagerApi.Application.Models.Login;
+using RecipesManagerApi.Application.Models.Register;
 
 namespace RecipesManagerApi.Api.Controllers;
 
@@ -20,11 +25,14 @@ public class WeatherForecastController : ControllerBase
 
     private readonly IRolesService _rolesService;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger, IUsersService usersService, IRolesService rolesService)
+    private readonly IUserManager _userManager;
+
+    public WeatherForecastController(ILogger<WeatherForecastController> logger, IUsersService usersService, IRolesService rolesService, IUserManager userManager)
     {
         _rolesService = rolesService;
         _usersService = usersService;
         _logger = logger;
+        _userManager = userManager;
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
@@ -39,10 +47,15 @@ public class WeatherForecastController : ControllerBase
         .ToArray();
     }
 
-    [HttpGet("test-user-add")]
-    public async void TestUserAdding(CancellationToken cancellationToken)
+    [HttpGet("test-guest-add")]
+    public async Task<TokensModel> TestGuestAdding(CancellationToken cancellationToken)
     {
-        var role = await this._rolesService.GetRoleAsync("640cfe0bb72023aa1124c0ca", cancellationToken);
-        await this._usersService.AddUserAsync(new UserDto() { Name = "larry", Phone = "5465456321", Email = " asdfsdf@gmail.com", RefreshToken = "yes", RefreshTokenExpiryDate = DateTime.Now, AppleDeviceId = new Guid(), WebId = Guid.NewGuid(), Roles = new List<RoleDto>() { role} }, cancellationToken);
+        var guest = new AccessAppleGuestModel
+        {
+            Name = "testmobile",
+            AppleDeviceId = Guid.NewGuid(),
+        };
+
+        return await this._userManager.AccessAppleGuestAsync(guest, cancellationToken);
     }
 }

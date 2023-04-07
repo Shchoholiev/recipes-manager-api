@@ -25,6 +25,7 @@ public static class MiddlewareExtension
         services.AddScoped<IUsersRepository, UsersRepository>();
         services.AddScoped<IRolesRepository, RolesRepository>();
         services.AddScoped<IRecipesRepository, RecipesRepository>();
+        services.AddScoped<IContactsRepository, ContactsRepository>();
 
         return services;
     }

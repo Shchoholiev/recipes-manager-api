@@ -47,6 +47,7 @@ public static class MiddlewareExtension
     {
         services.AddAutoMapper(Assembly.GetAssembly(typeof(CategoryProfile)));
         services.AddAutoMapper(Assembly.GetAssembly(typeof(RecipeProfile)));
+        services.AddAutoMapper(Assembly.GetAssembly(typeof(ContactProfile)));
 
         return services;
     }

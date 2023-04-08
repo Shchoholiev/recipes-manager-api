@@ -63,6 +63,12 @@ public static class MiddlewareExtension
                 .AddTypeExtension<CategoriesQuery>()
             .AddMutationType()
                 .AddTypeExtension<CategoriesMutation>()
+                .AddTypeExtension<RegisterMutation>()
+                .AddTypeExtension<LoginMutation>()
+                .AddTypeExtension<AccessMutation>()
+                .AddTypeExtension<UserMutation>()
+                .AddTypeExtension<RoleMutation>()
+            .AddAuthorization()
             .InitializeOnStartup(keepWarm: true);
         
 
@@ -83,7 +89,8 @@ public static class MiddlewareExtension
                 ValidateIssuerSigningKey = configuration.GetValue<bool>("JsonWebTokenKeys:ValidateIssuerSigningKey"),
                 ValidIssuer = configuration.GetValue<string>("JsonWebTokenKeys:ValidIssuer"),
                 ValidAudience = configuration.GetValue<string>("JsonWebTokenKeys:ValidAudience"),
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue<string>("JsonWebTokenKeys:IssuerSigningKey")))
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue<string>("JsonWebTokenKeys:IssuerSigningKey"))),
+                ClockSkew = TimeSpan.Zero
             };
         });
 

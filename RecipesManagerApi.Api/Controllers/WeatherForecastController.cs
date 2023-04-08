@@ -7,8 +7,11 @@ using RecipesManagerApi.Application.IServices.Identity;
 using RecipesManagerApi.Application.Models;
 using RecipesManagerApi.Application.Models.Access;
 using RecipesManagerApi.Application.Models.Identity;
-using RecipesManagerApi.Application.Models.Login;
 using RecipesManagerApi.Application.Models.Register;
+using RecipesManagerApi.Application.Paging;
+using HotChocolate.Authorization;
+using Microsoft.AspNetCore.Authorization;
+using RecipesManagerApi.Application.Interfaces.Identity;
 
 namespace RecipesManagerApi.Api.Controllers;
 
@@ -31,13 +34,19 @@ public class WeatherForecastController : ControllerBase
 
     private readonly ICloudStorageService _cloudStorageService;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger, IUsersService usersService, IRolesService rolesService, IUserManager userManager, ICloudStorageService cloudStorageService)
+    private readonly ICategoriesService _categoriesService;
+
+    private readonly ITokensService _tokensService;
+
+    public WeatherForecastController(ILogger<WeatherForecastController> logger, IUsersService usersService, IRolesService rolesService, IUserManager userManager, ICloudStorageService cloudStorageService, ICategoriesService categoriesService, ITokensService tokensService)
     {
         _rolesService = rolesService;
         _usersService = usersService;
         _logger = logger;
         _userManager = userManager;
         _cloudStorageService = cloudStorageService;
+        _categoriesService = categoriesService;
+        _tokensService = tokensService;
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
@@ -50,18 +59,6 @@ public class WeatherForecastController : ControllerBase
             Summary = Summaries[Random.Shared.Next(Summaries.Length)]
         })
         .ToArray();
-    }
-
-    [HttpGet("test-guest-add")]
-    public async Task<TokensModel> TestGuestAdding(CancellationToken cancellationToken)
-    {
-        var guest = new AccessAppleGuestModel
-        {
-            Name = "testmobile",
-            AppleDeviceId = Guid.NewGuid(),
-        };
-
-        return await this._userManager.AccessAppleGuestAsync(guest, cancellationToken);
     }
 
     [HttpDelete("test-object-delete")]

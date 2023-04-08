@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Amazon.SecurityToken.Model;
+using AutoMapper;
 using DnsClient;
 using Microsoft.Extensions.Logging;
 using RecipesManagerApi.Application.Exceptions;
@@ -11,9 +12,11 @@ using RecipesManagerApi.Application.Models.Identity;
 using RecipesManagerApi.Application.Models.Login;
 using RecipesManagerApi.Application.Models.Register;
 using RecipesManagerApi.Domain.Entities;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace RecipesManagerApi.Infrastructure.Services.Identity;
+
 public class UserManager : IUserManager
 {
     private readonly IUsersRepository _usersRepository;
@@ -90,10 +93,10 @@ public class UserManager : IUserManager
 
     public async Task<TokensModel> AccessWebGuestAsync(AccessWebGuestModel register, CancellationToken cancellationToken)
     {
-        if (await this._usersRepository.ExistsAsync(u => u.WebId == register.WebId, cancellationToken))
-        {
-            var user = await this._usersRepository.GetUserAsync(x => x.WebId == register.WebId, cancellationToken);
+        var user = await this._usersRepository.GetUserAsync(x => x.WebId == register.WebId, cancellationToken);
 
+        if (user != null)
+        {
             user.RefreshToken = this.GetRefreshToken();
             await this._usersRepository.UpdateUserAsync(user, cancellationToken);
             var userTokens = this.GetWebGuestTokens(user);
@@ -179,7 +182,7 @@ public class UserManager : IUserManager
         return tokens;
     }
 
-    public async Task<TokensModel> RemoveFromRole(string roleName, string email, CancellationToken cancellationToken)
+    public async Task<TokensModel> RemoveFromRoleAsync(string roleName, string email, CancellationToken cancellationToken)
     {
         var role = await this._rolesRepository.GetRoleAsync(r => r.Name == roleName, cancellationToken);
         if (role == null)

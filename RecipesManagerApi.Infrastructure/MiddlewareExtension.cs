@@ -25,6 +25,7 @@ public static class MiddlewareExtension
         services.AddScoped<IUsersRepository, UsersRepository>();
         services.AddScoped<IRolesRepository, RolesRepository>();
         services.AddScoped<IRecipesRepository, RecipesRepository>();
+        services.AddScoped<IImagesRepository, ImagesRepository>();
 
         return services;
     }
@@ -38,6 +39,7 @@ public static class MiddlewareExtension
         services.AddScoped<ITokensService, TokensService>();
         services.AddScoped<ICloudStorageService, CloudStorageService>();
         services.AddScoped<IRecipesService, RecipesService>();
+        services.AddScoped<IImagesService, ImagesService>();
 
         return services;
     }
@@ -45,7 +47,6 @@ public static class MiddlewareExtension
     public static IServiceCollection AddMapper(this IServiceCollection services)
     {
         services.AddAutoMapper(Assembly.GetAssembly(typeof(CategoryProfile)));
-        services.AddAutoMapper(Assembly.GetAssembly(typeof(RecipeProfile)));
 
         return services;
     }

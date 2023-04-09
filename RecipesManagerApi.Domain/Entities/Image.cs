@@ -1,12 +1,17 @@
 using RecipesManagerApi.Domain.Common;
+using RecipesManagerApi.Domain.Enums;
 
 namespace RecipesManagerApi.Domain.Entities;
 
 public class Image : EntityBase
 {
-    public String OriginalPhotoLink { get; set; }
+    public Guid OriginalPhotoGuid { get; set; }
 
-    public bool SmallPhotoLink { get; set; }
+    public Guid SmallPhotoGuid { get; set; }
 
-    public String Md2Hash { get; set; }
+    public string Extension { get; set; }
+
+    public string Md5Hash { get; set; }
+    
+    public ImageUploadStates ImageUploadState { get; set; }
 }

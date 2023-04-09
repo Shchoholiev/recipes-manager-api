@@ -18,5 +18,8 @@ public class RecipeProfile : Profile
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToString()));            
         CreateMap<IngredientDto, Ingredient>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => ObjectId.Parse(src.Id)));
+
+        CreateMap<RecipeCreateDto, Recipe>()
+            .ForMember(dest => dest.Thumbnail, opt => opt.Ignore());
     }
 }

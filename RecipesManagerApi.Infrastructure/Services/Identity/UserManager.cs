@@ -14,6 +14,7 @@ using RecipesManagerApi.Application.Models.Register;
 using RecipesManagerApi.Domain.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace RecipesManagerApi.Infrastructure.Services.Identity;
 
@@ -66,6 +67,9 @@ public class UserManager : IUserManager
 
     public async Task<TokensModel> RegisterAsync(RegisterModel register, CancellationToken cancellationToken)
     {
+        ValidatePassword(register.Password);
+        ValidateEmail(register.Email);
+
         if (await this._usersRepository.ExistsAsync(u => u.Email == register.Email, cancellationToken))
         {
             throw new EntityAlreadyExistsException<User>("user email", register.Email);
@@ -334,5 +338,25 @@ public class UserManager : IUserManager
         this._logger.LogInformation($"Returned claims for user with email: {user.Email}.");
 
         return claims;
+    }
+
+    private void ValidatePassword(string password)
+    {
+        string regex = @"^(?=.*[a-zA-Z])(?=.*[\W_]).{8,}$";
+
+        if (!Regex.IsMatch(password, regex))
+        {
+            throw new InvalidPasswordException(password);
+        }
+    }
+
+    private void ValidateEmail(string email)
+    {
+        string regex = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+
+        if (!Regex.IsMatch(email, regex))
+        {
+            throw new InvalidEmailException(email);
+        }
     }
 }

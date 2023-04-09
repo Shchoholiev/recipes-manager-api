@@ -5,6 +5,7 @@ using RecipesManagerApi.Application.Models.Login;
 using RecipesManagerApi.Application.Models.Register;
 
 namespace RecipesManagerApi.Application.IServices.Identity;
+
 public interface IUserManager
 {
     Task<TokensModel> RegisterAsync(RegisterModel register, CancellationToken cancellationToken);

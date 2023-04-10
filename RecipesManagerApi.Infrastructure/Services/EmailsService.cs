@@ -30,7 +30,8 @@ public class EmailsService : IEmailsService
 			{
 				From = new MailAddress(this._configuration["SmtpUsername"], this._configuration["EmailsSenderName"]),
 				Subject = emailMessage.Subject,
-				Body = emailMessage.Body
+				Body = emailMessage.Body,
+				IsBodyHtml = true
 			};
 
 			foreach (var recipient in emailMessage.Recipients)

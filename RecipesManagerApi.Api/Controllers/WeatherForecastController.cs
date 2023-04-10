@@ -30,23 +30,18 @@ public class WeatherForecastController : ControllerBase
 
     private readonly IRolesService _rolesService;
 
-    private readonly IUserManager _userManager;
-
     private readonly ICloudStorageService _cloudStorageService;
 
-    private readonly ICategoriesService _categoriesService;
+    private readonly IRecipesService _recipesService;
 
-    private readonly ITokensService _tokensService;
-
-    public WeatherForecastController(ILogger<WeatherForecastController> logger, IUsersService usersService, IRolesService rolesService, IUserManager userManager, ICloudStorageService cloudStorageService, ICategoriesService categoriesService, ITokensService tokensService)
+    public WeatherForecastController(ILogger<WeatherForecastController> logger, IUsersService usersService, IRolesService rolesService, ICloudStorageService cloudStorageService,
+        IRecipesService recipesService)
     {
         _rolesService = rolesService;
         _usersService = usersService;
         _logger = logger;
-        _userManager = userManager;
-        _cloudStorageService = cloudStorageService;
-        _categoriesService = categoriesService;
-        _tokensService = tokensService;
+        this._cloudStorageService = cloudStorageService;
+        _recipesService = recipesService;
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
@@ -73,5 +68,11 @@ public class WeatherForecastController : ControllerBase
     public async void TestCloudStorageAdd(IFormFile file, CancellationToken cancellationToken)
     {
         Console.WriteLine(await this._cloudStorageService.UploadFileAsync(file, Guid.NewGuid(), file.FileName.Split(".").Last(), cancellationToken));
+    }
+
+    [HttpPost("recipes")]
+    public async Task CreateRecipeAsync([FromForm]RecipeCreateDto dto, CancellationToken cancellationToken)
+    {
+        await _recipesService.AddRecipeAsync(dto, cancellationToken);
     }
 }

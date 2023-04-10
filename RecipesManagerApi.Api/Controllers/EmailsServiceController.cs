@@ -1,21 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RecipesManagerApi.Infrastructure.Email;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using RecipesManagerApi.Application.Exceptions;
+using RecipesManagerApi.Application.IServices;
+using RecipesManagerApi.Application.Models.EmailModels;
+using RecipesManagerApi.Infrastructure.Services;
 
 namespace RecipesManagerApi.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class EmailServiceController : ControllerBase
+public class EmailsServiceController : ControllerBase
 {
-	private readonly EmailService _emailService;
+	private readonly IEmailsService _emailService;
 	private readonly IConfiguration _configuration;
 
-	public EmailServiceController(IConfiguration configuration)
+	public EmailsServiceController(IConfiguration configuration)
 	{
 		_configuration = configuration;
-		_emailService = new EmailService(_configuration);
+		_emailService = new EmailsService(_configuration);
 	}
 
 	[HttpPost("send")]
@@ -26,7 +27,7 @@ public class EmailServiceController : ControllerBase
             await _emailService.SendEmailMessageAsync(emailMessage);
 			return Ok();
 		}
-		catch(EmailServiceException ex)
+		catch(EmailsServiceException ex)
 		{
 			return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }

@@ -3,7 +3,15 @@ using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
 using System.IO;
 using RecipesManagerApi.Application.IServices;
+using RecipesManagerApi.Application.IServices.Identity;
 using RecipesManagerApi.Application.Models;
+using RecipesManagerApi.Application.Models.Access;
+using RecipesManagerApi.Application.Models.Identity;
+using RecipesManagerApi.Application.Models.Register;
+using RecipesManagerApi.Application.Paging;
+using HotChocolate.Authorization;
+using Microsoft.AspNetCore.Authorization;
+using RecipesManagerApi.Application.Interfaces.Identity;
 
 namespace RecipesManagerApi.Api.Controllers;
 
@@ -46,13 +54,6 @@ public class WeatherForecastController : ControllerBase
             Summary = Summaries[Random.Shared.Next(Summaries.Length)]
         })
         .ToArray();
-    }
-
-    [HttpGet("test-user-add")]
-    public async void TestUserAdding(CancellationToken cancellationToken)
-    {
-        var role = await this._rolesService.GetRoleAsync("640cfe0bb72023aa1124c0ca", cancellationToken);
-        await this._usersService.AddUserAsync(new UserDto() { Name = "larry", Phone = "5465456321", Email = " asdfsdf@gmail.com", RefreshToken = "yes", RefreshTokenExpiryDate = DateTime.Now, AppleDeviceId = new Guid(), WebId = Guid.NewGuid(), Roles = new List<RoleDto>() { role} }, cancellationToken);
     }
 
     [HttpDelete("test-object-delete")]

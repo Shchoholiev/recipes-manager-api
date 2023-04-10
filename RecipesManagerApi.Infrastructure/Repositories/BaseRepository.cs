@@ -3,6 +3,7 @@ using RecipesManagerApi.Infrastructure.Database;
 using RecipesManagerApi.Domain.Common;
 using MongoDB.Bson;
 using System.Linq.Expressions;
+using RecipesManagerApi.Domain.Entities;
 
 namespace RecipesManagerApi.Infrastructure.Repositories
 {
@@ -43,6 +44,11 @@ namespace RecipesManagerApi.Infrastructure.Repositories
         public async Task<int> GetTotalCountAsync()
         {
             return (int)(await this._collection.EstimatedDocumentCountAsync());
+        }
+
+        public async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken)
+        {
+            return await this._collection.Find(predicate).AnyAsync(cancellationToken);
         }
     }
 }

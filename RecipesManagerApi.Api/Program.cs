@@ -3,6 +3,7 @@ using RecipesManagerApi.Infrastructure.Queries;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddJWTTokenAuthentication(builder.Configuration);
 builder.Services.AddInfrastructure();
 builder.Services.AddMapper();
 builder.Services.AddServices();
@@ -28,6 +29,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+app.UseAuthentication();
 
 app.MapGraphQL();
 

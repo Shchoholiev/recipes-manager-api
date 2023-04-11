@@ -1,3 +1,4 @@
+using HotChocolate.Authorization;
 using MongoDB.Bson;
 using RecipesManagerApi.Application.IServices;
 using RecipesManagerApi.Application.Models;
@@ -8,7 +9,8 @@ namespace RecipesManagerApi.Infrastructure.Queries;
 [ExtendObjectType(OperationTypeNames.Query)]
 public class CategoriesQuery
 {
-    public Task<PagedList<CategoryDto>> GetCategoriesAsync(int pageNumber, int pageSize, CancellationToken cancellationToken, 
+    [Authorize]
+    public Task<PagedList<CategoryDto>> GetCategoriesAsync(int pageNumber, int pageSize, CancellationToken cancellationToken,
         [Service] ICategoriesService service)
         => service.GetCategoriesPageAsync(pageNumber, pageSize, cancellationToken);
 

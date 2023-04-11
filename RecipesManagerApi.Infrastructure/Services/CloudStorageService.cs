@@ -1,10 +1,7 @@
-﻿using System;
-using System.Security.AccessControl;
-using Amazon.S3;
+﻿using Amazon.S3;
 using Amazon.S3.Model;
 using Microsoft.Extensions.Configuration;
 using RecipesManagerApi.Application.IServices;
-using SharpCompress.Common;
 using Microsoft.AspNetCore.Http;
 using RecipesManagerApi.Application.Exceptions;
 
@@ -55,6 +52,34 @@ public class CloudStorageService : ICloudStorageService
         {
             file.CopyTo(newMemoryStream);
 
+            var request = new PutObjectRequest()
+            {
+                BucketName = this._bucketName,
+                Key = fileName,
+                InputStream = newMemoryStream
+            };
+
+
+            var response = await this._s3Client.PutObjectAsync(request);
+            if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
+            {
+                Console.WriteLine($"Successfully uploaded {fileName} to {this._bucketName}.");
+                
+                var fileUrl = this._objectUrl + this._bucketName+ "/" + fileName;
+                return fileUrl;
+            }
+            else
+            {
+                throw new UploadFileException(fileName, this._bucketName);
+            }
+        }
+    }
+
+    public async Task<string> UploadFileAsync(byte[] file, Guid guid, string fileExtension, CancellationToken cancellationToken)
+    {
+        var fileName = guid.ToString()+ "." + fileExtension;
+        using (var newMemoryStream = new MemoryStream(file))
+        {
             var request = new PutObjectRequest()
             {
                 BucketName = this._bucketName,

@@ -9,5 +9,7 @@ public interface IUsersRepository : IBaseRepository<User>
 {
     Task<User> GetUserAsync(ObjectId id, CancellationToken cancellationToken);
 
-    Task UpdateUserAsync(User user, CancellationToken cancellationToken);   
+    Task<User> GetUserAsync(Expression<Func<User, bool>> predicate, CancellationToken cancellationToken);
+
+    Task UpdateUserAsync(User user, CancellationToken cancellationToken);
 }

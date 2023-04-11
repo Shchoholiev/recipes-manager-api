@@ -4,6 +4,7 @@ using MongoDB.Bson;
 using System.IO;
 using RecipesManagerApi.Application.IServices;
 using RecipesManagerApi.Application.Models;
+using RecipesManagerApi.Application.Models.CreateDtos;
 
 namespace RecipesManagerApi.Api.Controllers;
 
@@ -24,12 +25,15 @@ public class WeatherForecastController : ControllerBase
 
     private readonly ICloudStorageService _cloudStorageService;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger, IUsersService usersService, IRolesService rolesService, ICloudStorageService cloudStorageService)
+    private readonly IContactsService _contactService;
+
+    public WeatherForecastController(ILogger<WeatherForecastController> logger, IUsersService usersService, IRolesService rolesService, ICloudStorageService cloudStorageService, IContactsService contactsService)
     {
         _rolesService = rolesService;
         _usersService = usersService;
         _logger = logger;
         this._cloudStorageService = cloudStorageService;
+        this._contactService = contactsService;
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
@@ -60,8 +64,33 @@ public class WeatherForecastController : ControllerBase
     }
 
     [HttpPost("test-object-upload")]
-    public async void TestCloudStorageAdd(IFormFile file, CancellationToken cancellationToken)
+    public async void TestCloudStorageAdd(IFormFile file,CancellationToken cancellationToken)
     {
         Console.WriteLine(await this._cloudStorageService.UploadFileAsync(file, Guid.NewGuid(), file.FileName.Split(".").Last(), cancellationToken));
+    }
+
+    [HttpPost("test-contact-create")]
+    public async void TestContatcAdd(CancellationToken cancellationToken)
+    {
+        var contact = await this._contactService.AddContactAsync(new ContactCreateDto() {Name = "Willy"}, cancellationToken);
+        Console.WriteLine(contact.Id);
+    }
+
+    // [HttpPost("test-contact-update")]
+    // public async void TestCloudStorageAdd(IFormFile file, CancellationToken cancellationToken)
+    // {
+    //     Console.WriteLine(await this._cloudStorageService.UploadFileAsync(file, Guid.NewGuid(), file.FileName.Split(".").Last(), cancellationToken));
+    // }
+
+    // [HttpPost("test-contact-delete")]
+    // public async void TestCloudStorageAdd(IFormFile file, CancellationToken cancellationToken)
+    // {
+    //     Console.WriteLine(await this._cloudStorageService.UploadFileAsync(file, Guid.NewGuid(), file.FileName.Split(".").Last(), cancellationToken));
+    // }
+
+    [HttpGet("test-contact-get")]
+    public async void TestGetContact(string id, CancellationToken cancellationToken)
+    {
+        await this._contactService.GetContactAsync(id, cancellationToken);
     }
 }

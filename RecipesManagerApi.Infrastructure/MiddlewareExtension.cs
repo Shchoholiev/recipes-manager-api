@@ -39,6 +39,7 @@ public static class MiddlewareExtension
         services.AddScoped<ITokensService, TokensService>();
         services.AddScoped<ICloudStorageService, CloudStorageService>();
         services.AddScoped<IRecipesService, RecipesService>();
+        services.AddScoped<IContactsService, ContactsService>();
 
         return services;
     }
@@ -46,8 +47,6 @@ public static class MiddlewareExtension
     public static IServiceCollection AddMapper(this IServiceCollection services)
     {
         services.AddAutoMapper(Assembly.GetAssembly(typeof(CategoryProfile)));
-        services.AddAutoMapper(Assembly.GetAssembly(typeof(RecipeProfile)));
-        services.AddAutoMapper(Assembly.GetAssembly(typeof(ContactProfile)));
 
         return services;
     }
@@ -58,8 +57,10 @@ public static class MiddlewareExtension
             .AddGraphQLServer()
             .AddQueryType()
                 .AddTypeExtension<CategoriesQuery>()
+                .AddTypeExtension<ContactsQuery>()
             .AddMutationType()
                 .AddTypeExtension<CategoriesMutation>()
+                .AddTypeExtension<ContactsMutation>()
             .InitializeOnStartup(keepWarm: true);
         
 

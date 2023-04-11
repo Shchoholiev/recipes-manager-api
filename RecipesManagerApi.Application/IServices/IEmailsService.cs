@@ -4,5 +4,5 @@ namespace RecipesManagerApi.Application.IServices;
 
 public interface IEmailsService
 {
-	Task SendEmailMessageAsync(EmailMessage emailMessage);
+	Task SendEmailMessageAsync(EmailMessage emailMessage, CancellationToken cancellationToken);
 }

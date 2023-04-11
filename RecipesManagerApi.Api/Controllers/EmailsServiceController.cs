@@ -24,7 +24,7 @@ public class EmailsServiceController : ControllerBase
 	{
 		try
 		{
-            await _emailService.SendEmailMessageAsync(emailMessage);
+            await _emailService.SendEmailMessageAsync(emailMessage, new CancellationToken());
 			return Ok();
 		}
 		catch(EmailsServiceException ex)

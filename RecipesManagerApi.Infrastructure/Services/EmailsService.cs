@@ -22,7 +22,7 @@ public class EmailsService : IEmailsService
 		};
 	}
 
-	public async Task SendEmailMessageAsync(EmailMessage emailMessage)
+	public async Task SendEmailMessageAsync(EmailMessage emailMessage, CancellationToken cancellationToken)
 	{
 		try
 		{
@@ -47,7 +47,7 @@ public class EmailsService : IEmailsService
 				}
 			}
 
-			await _smtpClient.SendMailAsync(message);
+			await _smtpClient.SendMailAsync(message, cancellationToken);
 		}
 		catch (Exception ex)
 		{

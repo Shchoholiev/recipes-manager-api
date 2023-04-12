@@ -1,5 +1,4 @@
 ﻿namespace RecipesManagerApi.Application.Models.Identity;
-
 public class LoginModel
 {
     public string Email { get; set; }

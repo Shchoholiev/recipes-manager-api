@@ -1,7 +1,5 @@
 ﻿using RecipesManagerApi.Application.IServices.Identity;
 using RecipesManagerApi.Application.Models.Identity;
-using RecipesManagerApi.Application.Models.Login;
-using RecipesManagerApi.Application.Models.Register;
 
 namespace RecipesManagerApi.Infrastructure.Mutations;
 

@@ -287,6 +287,7 @@ public class UserManager : IUserManager
     {
         var claims = new List<Claim>
             {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Name),
                 new Claim(ClaimTypes.Email, user.Email),
             };
@@ -305,8 +306,9 @@ public class UserManager : IUserManager
     {
         var claims = new List<Claim>
             {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Name),
-                new Claim(ClaimTypes.NameIdentifier, user.AppleDeviceId.ToString()),
+                new Claim("AppleId", user.AppleDeviceId.ToString()),
             };
 
         foreach (var role in user.Roles)
@@ -323,8 +325,9 @@ public class UserManager : IUserManager
     {
         var claims = new List<Claim>
             {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Name),
-                new Claim(ClaimTypes.NameIdentifier, user.WebId.ToString()),
+                new Claim("WebId", user.WebId.ToString()),
             };
 
         foreach (var role in user.Roles)

@@ -1,3 +1,5 @@
+using RecipesManagerApi.Api;
+using RecipesManagerApi.Api.CustomMiddlewares;
 using RecipesManagerApi.Infrastructure;
 using RecipesManagerApi.Infrastructure.Queries;
 
@@ -30,6 +32,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 app.UseAuthentication();
+app.ConfogureGlobalUserMiddleware();
 
 app.MapGraphQL();
 

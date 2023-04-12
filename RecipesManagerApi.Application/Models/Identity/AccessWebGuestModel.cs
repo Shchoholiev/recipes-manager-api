@@ -1,4 +1,4 @@
-﻿namespace RecipesManagerApi.Application.Models.Access;
+﻿namespace RecipesManagerApi.Application.Models.Identity;
 public class AccessWebGuestModel
 {
     public Guid WebId { get; set; }

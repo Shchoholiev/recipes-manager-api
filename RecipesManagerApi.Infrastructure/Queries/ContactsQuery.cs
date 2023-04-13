@@ -9,7 +9,7 @@ public class ContactsQuery
 {
     public Task<PagedList<ContactDto>> GetContactsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken, 
         [Service] IContactsService service)
-        => service.GetContactsAsync(pageNumber, pageSize, cancellationToken);
+        => service.GetContactsPageAsync(pageNumber, pageSize, cancellationToken);
 
     public Task<ContactDto> GetContactAsync(string id, CancellationToken cancellationToken, 
         [Service] IContactsService service)

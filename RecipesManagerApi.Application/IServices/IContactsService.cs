@@ -11,9 +11,9 @@ public interface IContactsService
 
     Task<ContactDto> UpdateContactAsync(ContactDto dto, CancellationToken cancellationToken);
 
-    Task<ContactDto> DeleteContactAsync(ContactDto dto, CancellationToken cancellationToken);
+    Task DeleteContactAsync(ContactDto dto, CancellationToken cancellationToken);
 
     Task<ContactDto> GetContactAsync(string id, CancellationToken cancellationToken);
 
-    Task<PagedList<ContactDto>> GetContactsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken);
+    Task<PagedList<ContactDto>> GetContactsPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken);
 }

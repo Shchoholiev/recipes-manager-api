@@ -12,6 +12,10 @@ using RecipesManagerApi.Application.Interfaces.Identity;
 using RecipesManagerApi.Infrastructure.Services.Identity;
 using RecipesManagerApi.Infrastructure.Queries;
 using RecipesManagerApi.Infrastructure.Mutations;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace RecipesManagerApi.Infrastructure;
 
@@ -26,6 +30,7 @@ public static class MiddlewareExtension
         services.AddScoped<IRolesRepository, RolesRepository>();
         services.AddScoped<IRecipesRepository, RecipesRepository>();
         services.AddScoped<IContactsRepository, ContactsRepository>();
+        services.AddScoped<IImagesRepository, ImagesRepository>();
 
         return services;
     }
@@ -40,6 +45,8 @@ public static class MiddlewareExtension
         services.AddScoped<ICloudStorageService, CloudStorageService>();
         services.AddScoped<IRecipesService, RecipesService>();
         services.AddScoped<IContactsService, ContactsService>();
+        services.AddScoped<IImagesService, ImagesService>();
+        services.AddScoped<IUserManager, UserManager>();
 
         return services;
     }
@@ -54,15 +61,43 @@ public static class MiddlewareExtension
     public static IServiceCollection AddGraphQl(this IServiceCollection services)
     {
         services
-            .AddGraphQLServer()
-            .AddQueryType()
-                .AddTypeExtension<CategoriesQuery>()
-                .AddTypeExtension<ContactsQuery>()
-            .AddMutationType()
-                .AddTypeExtension<CategoriesMutation>()
-                .AddTypeExtension<ContactsMutation>()
-            .InitializeOnStartup(keepWarm: true);
-        
+             .AddGraphQLServer()
+             .AddQueryType()
+                 .AddTypeExtension<CategoriesQuery>()
+                 .AddTypeExtension<ContactsQuery>()
+             .AddMutationType()
+                 .AddTypeExtension<CategoriesMutation>()
+                 .AddTypeExtension<ContactsMutation>()
+                 .AddTypeExtension<RegisterMutation>()
+                 .AddTypeExtension<LoginMutation>()
+                 .AddTypeExtension<AccessMutation>()
+                 .AddTypeExtension<UserMutation>()
+                 .AddTypeExtension<RoleMutation>()
+             .AddAuthorization()
+             .InitializeOnStartup(keepWarm: true);
+
+
+        return services;
+    }
+
+    public static IServiceCollection AddJWTTokenAuthentication(this IServiceCollection services,
+                                                     IConfiguration configuration)
+    {
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = configuration.GetValue<bool>("JsonWebTokenKeys:ValidateIssuer"),
+                ValidateAudience = configuration.GetValue<bool>("JsonWebTokenKeys:ValidateAudience"),
+                ValidateLifetime = configuration.GetValue<bool>("JsonWebTokenKeys:ValidateLifetime"),
+                ValidateIssuerSigningKey = configuration.GetValue<bool>("JsonWebTokenKeys:ValidateIssuerSigningKey"),
+                ValidIssuer = configuration.GetValue<string>("JsonWebTokenKeys:ValidIssuer"),
+                ValidAudience = configuration.GetValue<string>("JsonWebTokenKeys:ValidAudience"),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue<string>("JsonWebTokenKeys:IssuerSigningKey"))),
+                ClockSkew = TimeSpan.Zero
+            };
+        });
 
         return services;
     }

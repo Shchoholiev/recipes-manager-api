@@ -13,11 +13,17 @@ public class ContactsRepository : BaseRepository<Contact>, IContactsRepository
 
     public async Task<Contact> GetContactAsync(ObjectId id, CancellationToken cancellationToken)
     {
-        return await (await this._collection.FindAsync(x => x.Id == id)).FirstOrDefaultAsync(cancellationToken);
+        return await (await this._collection.FindAsync(x => x.Id == id && x.IsDeleted == false)).FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task UpdateContactAsync(Contact contact, CancellationToken cancellationToken)
     {
         await this._collection.ReplaceOneAsync(Builders<Contact>.Filter.Eq(x=>x.Id, contact.Id), contact, new ReplaceOptions(), cancellationToken);
     }
+
+    public new async Task<int> GetTotalCountAsync()
+    {
+        return (int)(await this._collection.CountDocumentsAsync<Contact>(x => x.IsDeleted == false));
+    }
 }
+

@@ -28,12 +28,12 @@ public class TokensService : ITokensService
         this._logger = logger;
     }
 
-    public async Task<TokensModel> RefreshAsync(TokensModel tokensModel, CancellationToken cancellationToken)
+    public async Task<TokensModel> RefreshUserAsync(TokensModel tokensModel, CancellationToken cancellationToken)
     {
         var principal = this.GetPrincipalFromExpiredToken(tokensModel.AccessToken);
 
-        var userId = ObjectId.Parse(principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value);
-        var user = await this._usersRepository.GetUserAsync(userId, cancellationToken);
+        var userId = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value.ToString();
+        var user = await this._usersRepository.GetUserAsync(u => u.Email == userId, cancellationToken);
         if (user == null || user?.RefreshToken != tokensModel.RefreshToken
             || user?.RefreshTokenExpiryDate <= DateTime.Now)
         {
@@ -46,6 +46,58 @@ public class TokensService : ITokensService
         await this._usersRepository.UpdateUserAsync(user, cancellationToken);
 
         this._logger.LogInformation($"Refreshed user tokens.");
+
+        return new TokensModel
+        {
+            AccessToken = newAccessToken,
+            RefreshToken = newRefreshToken
+        };
+    }
+
+    public async Task<TokensModel> RefreshAppleGuestAsync(TokensModel tokensModel, CancellationToken cancellationToken)
+    {
+        var principal = this.GetPrincipalFromExpiredToken(tokensModel.AccessToken);
+
+        var userId = Guid.Parse(principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
+        var user = await this._usersRepository.GetUserAsync(u => u.AppleDeviceId == userId, cancellationToken);
+        if (user == null || user?.RefreshToken != tokensModel.RefreshToken
+            || user?.RefreshTokenExpiryDate <= DateTime.Now)
+        {
+            throw new SecurityTokenExpiredException();
+        }
+
+        var newAccessToken = this.GenerateAccessToken(principal.Claims);
+        var newRefreshToken = this.GenerateRefreshToken();
+        user.RefreshToken = newRefreshToken;
+        await this._usersRepository.UpdateUserAsync(user, cancellationToken);
+
+        this._logger.LogInformation($"Refreshed apple guest tokens.");
+
+        return new TokensModel
+        {
+            AccessToken = newAccessToken,
+            RefreshToken = newRefreshToken
+        };
+    }
+
+    public async Task<TokensModel> RefreshWebGuestAsync(TokensModel tokensModel, CancellationToken cancellationToken)
+    {
+        var principal = this.GetPrincipalFromExpiredToken(tokensModel.AccessToken);
+
+        var userId = Guid.Parse(principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
+        var user = await this._usersRepository.GetUserAsync(u => u.WebId == userId, cancellationToken);
+        if (user == null || user?.RefreshToken != tokensModel.RefreshToken
+            || user?.RefreshTokenExpiryDate <= DateTime.Now)
+        {
+            throw new SecurityTokenExpiredException();
+        }
+
+        var newAccessToken = this.GenerateAccessToken(principal.Claims);
+        var newRefreshToken = this.GenerateRefreshToken();
+        user.RefreshToken = newRefreshToken;
+        await this._usersRepository.UpdateUserAsync(user, cancellationToken);
+
+        this._logger.LogInformation($"Refreshed web guest tokens.");
 
         return new TokensModel
         {
@@ -111,7 +163,7 @@ public class TokensService : ITokensService
         var tokenOptions = new JwtSecurityToken(
             issuer: _configuration.GetValue<string>("JsonWebTokenKeys:ValidIssuer"),
             audience: _configuration.GetValue<string>("JsonWebTokenKeys:ValidAudience"),
-            expires: DateTime.Now.AddMinutes(5),
+            expires: DateTime.UtcNow.AddMinutes(5),
             claims: claims,
             signingCredentials: signinCredentials
         );

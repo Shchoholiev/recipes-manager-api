@@ -15,7 +15,7 @@ public class ContactsMutation
         [Service] IContactsService service)
         => service.UpdateContactAsync(contact, cancellationToken);
 
-    public Task<ContactDto> DeleteContactAsync(ContactDto contact, CancellationToken cancellationToken,
+    public Task DeleteContactAsync(ContactDto contact, CancellationToken cancellationToken,
         [Service] IContactsService service)
         => service.DeleteContactAsync(contact, cancellationToken);
     

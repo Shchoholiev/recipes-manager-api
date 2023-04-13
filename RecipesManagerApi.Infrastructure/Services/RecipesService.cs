@@ -1,6 +1,5 @@
 using AutoMapper;
 using MongoDB.Bson;
-using MongoDB.Driver;
 using RecipesManagerApi.Application.IServices;
 using RecipesManagerApi.Application.IRepositories;
 using RecipesManagerApi.Application.Models;
@@ -13,18 +12,34 @@ namespace RecipesManagerApi.Infrastructure.Services;
 public class RecipesService : IRecipesService
 {
     private readonly IRecipesRepository _recipesRepository;
+
     private readonly IMapper _mapper;
 
-    public RecipesService(IMapper mapper, IRecipesRepository recipesRepository)
+    private readonly IImagesService _imagesService;
+
+    public RecipesService(
+        IMapper mapper, 
+        IRecipesRepository recipesRepository,
+        IImagesService imagesService)
     {
         this._mapper = mapper;
         this._recipesRepository = recipesRepository;
+        this._imagesService = imagesService;
     }
 
-    public async Task AddRecipeAsync(RecipeDto dto, CancellationToken cancellationToken)
+    public async Task AddRecipeAsync(RecipeCreateDto dto, CancellationToken cancellationToken)
     {
         var entity = this._mapper.Map<Recipe>(dto);
-        await this._recipesRepository.AddAsync(entity, cancellationToken);
+        var recipe = await this._recipesRepository.AddAsync(entity, cancellationToken);
+        if (dto.Thumbnail != null)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                await dto.Thumbnail.CopyToAsync(memoryStream, cancellationToken);
+                var extension = System.IO.Path.GetExtension(dto.Thumbnail.FileName).Substring(1).ToLower();
+                Task.Run(() => _imagesService.AddRecipeImageAsync(memoryStream.ToArray(), extension, recipe.Id, cancellationToken));
+            }
+        }
     }
 
     public async Task<PagedList<RecipeDto>> GetSearchPageAsync(int pageNumber, int pageSize, RecipesSearchTypes recipeSearchType, ObjectId userId, CancellationToken cancellationToken)

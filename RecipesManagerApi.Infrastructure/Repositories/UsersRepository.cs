@@ -9,15 +9,21 @@ using System.Linq.Expressions;
 namespace RecipesManagerApi.Infrastructure.Repositories;
 public class UsersRepository : BaseRepository<User>, IUsersRepository
 {
-    public UsersRepository(MongoDbContext db) : base(db, "Users") { } 
+    public UsersRepository(MongoDbContext db) : base(db, "Users") { }
 
     public async Task<User> GetUserAsync(ObjectId id, CancellationToken cancellationToken)
     {
         return await (await this._collection.FindAsync(x => x.Id == id)).FirstOrDefaultAsync(cancellationToken);
     }
 
+    public async Task<User> GetUserAsync(Expression<Func<User, bool>> predicate, CancellationToken cancellationToken)
+    {
+        return await(await this._collection.FindAsync(predicate)).FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task UpdateUserAsync(User user, CancellationToken cancellationToken)
     {
         await this._collection.ReplaceOneAsync(x => x.Id == user.Id, user, new ReplaceOptions(), cancellationToken);
     }
+
 }

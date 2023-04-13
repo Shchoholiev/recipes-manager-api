@@ -13,9 +13,9 @@ public class User : EntityBase
 
     public string? PasswordHash { get; set; }
 
-    public string? RefreshToken { get; set; }
+    public string RefreshToken { get; set; }
 
-    public DateTime? RefreshTokenExpiryDate { get; set; }
+    public DateTime RefreshTokenExpiryDate { get; set; }
 
     public Guid? AppleDeviceId { get; set; }
 

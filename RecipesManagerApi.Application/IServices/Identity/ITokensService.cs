@@ -9,5 +9,9 @@ public interface ITokensService
 
     string GenerateRefreshToken();
 
-    Task<TokensModel> RefreshAsync(TokensModel tokensModel, CancellationToken cancellationToken);
+    Task<TokensModel> RefreshUserAsync(TokensModel tokensModel, CancellationToken cancellationToken);
+
+    Task<TokensModel> RefreshAppleGuestAsync(TokensModel tokensModel, CancellationToken cancellationToken);
+
+    Task<TokensModel> RefreshWebGuestAsync(TokensModel tokensModel, CancellationToken cancellationToken);
 }

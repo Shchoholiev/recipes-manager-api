@@ -43,7 +43,7 @@ public class UsersService : IUsersService
         var entity = await this._repository.GetUserAsync(objectId, cancellationToken);
         if (entity == null)
         {
-            throw new EntityNotFoundException<User>();
+            throw new EntityNotFoundException();
         }
 
         return this._mapper.Map<UserDto>(entity);

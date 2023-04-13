@@ -43,7 +43,7 @@ public class RolesService : IRolesService
         var entity = await this._repository.GetRoleAsync(x => x.Id == objectId, cancellationToken);
         if (entity == null)
         {
-            throw new EntityNotFoundException<Role>();
+            throw new EntityNotFoundException();
         }
         return this._mapper.Map<RoleDto>(entity);
     }

@@ -37,7 +37,7 @@ namespace RecipesManagerApi.Infrastructure.Services
             var recipe = await _recipesRepository.GetRecipeAsync(recipeId, cancellationToken);
             if (recipe == null)
             {
-                throw new EntityNotFoundException<Recipe>();
+                throw new EntityNotFoundException();
             }
 
             var md5Hash = this.GetMd5Hash(image);

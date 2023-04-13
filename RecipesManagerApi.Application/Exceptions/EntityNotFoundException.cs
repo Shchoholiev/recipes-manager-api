@@ -2,10 +2,12 @@ using RecipesManagerApi.Domain.Common;
 
 namespace RecipesManagerApi.Application.Exceptions;
 
-public class EntityNotFoundException<TEntity> : Exception where TEntity : EntityBase
+public class EntityNotFoundException : Exception
 {
-    public EntityNotFoundException()
-        : base($"\"{typeof(TEntity).Name}\" was not found.") { }
+    public EntityNotFoundException() {}
+
+    public EntityNotFoundException(string entityName)
+        : base($"\"{entityName}\" was not found.") { }
 
     public EntityNotFoundException(string message, Exception innerException)
         : base(message, innerException) { }

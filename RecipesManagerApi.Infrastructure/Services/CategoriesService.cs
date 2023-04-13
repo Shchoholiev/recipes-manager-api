@@ -39,7 +39,7 @@ namespace RecipesManagerApi.Infrastructure.Services
             var entity = await this._repository.GetCategoryAsync(objectId, cancellationToken);
             if (entity == null)
             {
-                throw new EntityNotFoundException<Category>();
+                throw new EntityNotFoundException();
             }
 
             return this._mapper.Map<CategoryDto>(entity);

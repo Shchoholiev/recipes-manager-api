@@ -70,8 +70,8 @@ public static class MiddlewareExtension
                 .AddTypeExtension<UserMutation>()
                 .AddTypeExtension<RoleMutation>()
             .AddAuthorization()
-            .InitializeOnStartup(keepWarm: true);
-        
+            .InitializeOnStartup(keepWarm: true);      
+
 
         return services;
     }

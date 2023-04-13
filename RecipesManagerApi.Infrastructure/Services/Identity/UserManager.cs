@@ -45,7 +45,7 @@ public class UserManager : IUserManager
         var user = await this._usersRepository.GetUserAsync(x => x.Email == login.Email, cancellationToken);
         if (user == null)
         {
-            throw new EntityNotFoundException<User>();
+            throw new EntityNotFoundException();
         }
 
         if (!this._passwordHasher.Check(login.Password, user.PasswordHash))
@@ -69,7 +69,7 @@ public class UserManager : IUserManager
 
         if (await this._usersRepository.ExistsAsync(u => u.Email == register.Email, cancellationToken))
         {
-            throw new EntityAlreadyExistsException<User>("user email", register.Email);
+            throw new EntityAlreadyExistsException(register.Name, "user email", register.Email);
         }
 
         var role = await this._rolesRepository.GetRoleAsync(r => r.Name == "User", cancellationToken);
@@ -165,13 +165,13 @@ public class UserManager : IUserManager
         var role = await this._rolesRepository.GetRoleAsync(r => r.Name == roleName, cancellationToken);
         if (role == null)
         {
-            throw new EntityNotFoundException<Role>();
+            throw new EntityNotFoundException();
         }
 
         var user = await this._usersRepository.GetUserAsync(x => x.Email == email, cancellationToken);
         if (user == null)
         {
-            throw new EntityNotFoundException<User>();
+            throw new EntityNotFoundException();
         }
 
         user.Roles.Add(role);
@@ -188,13 +188,13 @@ public class UserManager : IUserManager
         var role = await this._rolesRepository.GetRoleAsync(r => r.Name == roleName, cancellationToken);
         if (role == null)
         {
-            throw new EntityNotFoundException<Role>();
+            throw new EntityNotFoundException();
         }
 
         var user = await this._usersRepository.GetUserAsync(x => x.Email == email, cancellationToken);
         if (user == null)
         {
-            throw new EntityNotFoundException<User>();
+            throw new EntityNotFoundException();
         }
 
         var deletedRole = user.Roles.Find(x => x.Name == role.Name);
@@ -213,13 +213,13 @@ public class UserManager : IUserManager
         var user = await this._usersRepository.GetUserAsync(x => x.Email == email, cancellationToken);
         if (user == null)
         {
-            throw new EntityNotFoundException<User>();
+            throw new EntityNotFoundException();
         }
 
         if (email != userDto.Email
             && await this._usersRepository.GetUserAsync(x => x.Email == userDto.Email, cancellationToken) != null)
         {
-            throw new EntityAlreadyExistsException<User>("email", userDto.Email);
+            throw new EntityAlreadyExistsException(userDto.Name, "email", userDto.Email);
         }
 
         this._mapper.Map(userDto, user);

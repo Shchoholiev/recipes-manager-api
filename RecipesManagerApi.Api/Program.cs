@@ -32,6 +32,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 app.UseAuthentication();
+app.AddExceptionHandler();
 app.ConfogureGlobalUserMiddleware();
 
 app.MapGraphQL();

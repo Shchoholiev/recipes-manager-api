@@ -1,4 +1,4 @@
-﻿namespace RecipesManagerApi.Application.Models.Access;
+﻿namespace RecipesManagerApi.Application.Models.Identity;
 public class AccessAppleGuestModel
 {
     public string Name { get; set; }

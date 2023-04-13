@@ -7,10 +7,7 @@ using RecipesManagerApi.Application.Interfaces.Identity;
 using RecipesManagerApi.Application.IRepositories;
 using RecipesManagerApi.Application.IServices.Identity;
 using RecipesManagerApi.Application.Models;
-using RecipesManagerApi.Application.Models.Access;
 using RecipesManagerApi.Application.Models.Identity;
-using RecipesManagerApi.Application.Models.Login;
-using RecipesManagerApi.Application.Models.Register;
 using RecipesManagerApi.Domain.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -290,6 +287,7 @@ public class UserManager : IUserManager
     {
         var claims = new List<Claim>
             {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Name),
                 new Claim(ClaimTypes.Email, user.Email),
             };
@@ -308,8 +306,9 @@ public class UserManager : IUserManager
     {
         var claims = new List<Claim>
             {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Name),
-                new Claim(ClaimTypes.NameIdentifier, user.AppleDeviceId.ToString()),
+                new Claim("AppleId", user.AppleDeviceId.ToString()),
             };
 
         foreach (var role in user.Roles)
@@ -326,8 +325,9 @@ public class UserManager : IUserManager
     {
         var claims = new List<Claim>
             {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Name),
-                new Claim(ClaimTypes.NameIdentifier, user.WebId.ToString()),
+                new Claim("WebId", user.WebId.ToString()),
             };
 
         foreach (var role in user.Roles)

@@ -8,7 +8,6 @@ using RecipesManagerApi.Application.Models;
 using RecipesManagerApi.Application.Models.CreateDtos;
 using RecipesManagerApi.Application.Models.Access;
 using RecipesManagerApi.Application.Models.Identity;
-using RecipesManagerApi.Application.Models.Register;
 using RecipesManagerApi.Application.Paging;
 using HotChocolate.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -75,20 +74,6 @@ public class WeatherForecastController : ControllerBase
         Console.WriteLine(await this._cloudStorageService.UploadFileAsync(file, Guid.NewGuid(), file.FileName.Split(".").Last(), cancellationToken));
     }
 
-
-    [HttpPost("test-contact-create")]
-    public async void TestContatcAdd(CancellationToken cancellationToken)
-    {
-        var contact = await this._contactService.AddContactAsync(new ContactCreateDto() {Name = "Willy"}, cancellationToken);
-        Console.WriteLine(contact.Id);
-    }    
-
-    [HttpGet("test-contact-get")]
-    public async void TestGetContact(string id, CancellationToken cancellationToken)
-    {
-        await this._contactService.GetContactAsync(id, cancellationToken);
-    }
-    
     [HttpPost("recipes")]
     public async Task CreateRecipeAsync([FromForm]RecipeCreateDto dto, CancellationToken cancellationToken)
     {

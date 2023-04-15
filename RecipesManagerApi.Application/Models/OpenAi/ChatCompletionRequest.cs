@@ -9,4 +9,6 @@ public class ChatCompletionRequest
     public double Temperature { get; set; } = 0.7;
 
     public int MaxTokens { get; set; } = 256;
+
+    public bool Stream { get; set; } = false;
 }

@@ -30,6 +30,7 @@ public static class MiddlewareExtension
         services.AddScoped<IRolesRepository, RolesRepository>();
         services.AddScoped<IRecipesRepository, RecipesRepository>();
         services.AddScoped<IImagesRepository, ImagesRepository>();
+        services.AddScoped<IOpenAiLogsRepository, OpenAiLogsRepository>();
         services.AddScoped<ISharedRecipesRepository, SharedRecipeRepository>();
 
         return services;
@@ -46,6 +47,7 @@ public static class MiddlewareExtension
         services.AddScoped<IRecipesService, RecipesService>();
         services.AddScoped<IImagesService, ImagesService>();
         services.AddScoped<IUserManager, UserManager>();
+        services.AddScoped<IOpenAiService, OpenAiService>();
         services.AddScoped<ISharedRecipesService, SharedRecipesService>();
 
         return services;
@@ -95,6 +97,17 @@ public static class MiddlewareExtension
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue<string>("JsonWebTokenKeys:IssuerSigningKey"))),
                 ClockSkew = TimeSpan.Zero
             };
+        });
+
+        return services;
+    }
+
+    public static IServiceCollection AddHttpClients(this IServiceCollection services, IConfiguration configuration)
+    {
+        var openAiApiKey = configuration.GetSection("OpenAi")?.GetValue<string>("ApiKey");
+        services.AddHttpClient("OpenAiHttpClient", client => {
+            client.BaseAddress = new Uri("https://api.openai.com/v1/");
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {openAiApiKey}");
         });
 
         return services;

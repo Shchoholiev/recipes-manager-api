@@ -6,6 +6,7 @@ using RecipesManagerApi.Infrastructure.Queries;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddJWTTokenAuthentication(builder.Configuration);
+builder.Services.AddHttpClients(builder.Configuration);
 builder.Services.AddInfrastructure();
 builder.Services.AddMapper();
 builder.Services.AddServices();

@@ -1,4 +1,4 @@
-﻿using Amazon.SecurityToken.Model;
+using Amazon.SecurityToken.Model;
 using AutoMapper;
 using DnsClient;
 using Microsoft.Extensions.Logging;

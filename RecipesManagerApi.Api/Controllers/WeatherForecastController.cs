@@ -3,7 +3,13 @@ using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
 using System.IO;
 using RecipesManagerApi.Application.IServices;
+using RecipesManagerApi.Application.IServices.Identity;
 using RecipesManagerApi.Application.Models;
+using RecipesManagerApi.Application.Models.Identity;
+using RecipesManagerApi.Application.Paging;
+using HotChocolate.Authorization;
+using Microsoft.AspNetCore.Authorization;
+using RecipesManagerApi.Application.Interfaces.Identity;
 
 namespace RecipesManagerApi.Api.Controllers;
 
@@ -24,12 +30,16 @@ public class WeatherForecastController : ControllerBase
 
     private readonly ICloudStorageService _cloudStorageService;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger, IUsersService usersService, IRolesService rolesService, ICloudStorageService cloudStorageService)
+    private readonly IRecipesService _recipesService;
+
+    public WeatherForecastController(ILogger<WeatherForecastController> logger, IUsersService usersService, IRolesService rolesService, ICloudStorageService cloudStorageService,
+        IRecipesService recipesService)
     {
         _rolesService = rolesService;
         _usersService = usersService;
         _logger = logger;
         this._cloudStorageService = cloudStorageService;
+        _recipesService = recipesService;
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
@@ -44,13 +54,6 @@ public class WeatherForecastController : ControllerBase
         .ToArray();
     }
 
-    [HttpGet("test-user-add")]
-    public async void TestUserAdding(CancellationToken cancellationToken)
-    {
-        var role = await this._rolesService.GetRoleAsync("640cfe0bb72023aa1124c0ca", cancellationToken);
-        await this._usersService.AddUserAsync(new UserDto() { Name = "larry", Phone = "5465456321", Email = " asdfsdf@gmail.com", RefreshToken = "yes", RefreshTokenExpiryDate = DateTime.Now, AppleDeviceId = new Guid(), WebId = Guid.NewGuid(), Roles = new List<RoleDto>() { role} }, cancellationToken);
-    }
-
     [HttpDelete("test-object-delete")]
     public async void TestCloudStorageDelete(string objectGuid, string fileExtension, CancellationToken cancellationToken)
     {
@@ -63,5 +66,11 @@ public class WeatherForecastController : ControllerBase
     public async void TestCloudStorageAdd(IFormFile file, CancellationToken cancellationToken)
     {
         Console.WriteLine(await this._cloudStorageService.UploadFileAsync(file, Guid.NewGuid(), file.FileName.Split(".").Last(), cancellationToken));
+    }
+
+    [HttpPost("recipes")]
+    public async Task CreateRecipeAsync([FromForm]RecipeCreateDto dto, CancellationToken cancellationToken)
+    {
+        await _recipesService.AddRecipeAsync(dto, cancellationToken);
     }
 }

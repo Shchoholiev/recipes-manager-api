@@ -30,6 +30,7 @@ public static class MiddlewareExtension
         services.AddScoped<IRolesRepository, RolesRepository>();
         services.AddScoped<IRecipesRepository, RecipesRepository>();
         services.AddScoped<IImagesRepository, ImagesRepository>();
+        services.AddScoped<ISharedRecipesRepository, SharedRecipeRepository>();
 
         return services;
     }
@@ -45,6 +46,7 @@ public static class MiddlewareExtension
         services.AddScoped<IRecipesService, RecipesService>();
         services.AddScoped<IImagesService, ImagesService>();
         services.AddScoped<IUserManager, UserManager>();
+        services.AddScoped<ISharedRecipesService, SharedRecipesService>();
 
         return services;
     }

@@ -10,10 +10,8 @@ namespace RecipesManagerApi.Application.MappingProfiles
     {
         public CategoryProfile()
         {
-            CreateMap<Category, CategoryDto>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToString()));            
-            CreateMap<CategoryDto, Category>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => ObjectId.Parse(src.Id)));            
+            CreateMap<Category, CategoryDto>().ReverseMap();
+
             CreateMap<CategoryCreateDto, Category>();         
         }
     }

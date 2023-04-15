@@ -10,10 +10,8 @@ public class ContactProfile : Profile
 {
     public ContactProfile()
     {
-        CreateMap<Contact, ContactDto>()
-        .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToString()));            
-        CreateMap<ContactDto, Contact>()
-        .ForMember(dest => dest.Id, opt => opt.MapFrom(src => ObjectId.Parse(src.Id)));
+        CreateMap<Contact, ContactDto>().ReverseMap();
+
         CreateMap<ContactCreateDto, Contact>();
     }
 }

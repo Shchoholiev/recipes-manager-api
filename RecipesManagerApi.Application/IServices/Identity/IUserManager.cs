@@ -1,4 +1,4 @@
-﻿using RecipesManagerApi.Application.Models;
+using RecipesManagerApi.Application.Models;
 using RecipesManagerApi.Application.Models.Identity;
 
 namespace RecipesManagerApi.Application.IServices.Identity;

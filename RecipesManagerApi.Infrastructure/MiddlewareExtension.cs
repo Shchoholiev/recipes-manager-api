@@ -105,7 +105,6 @@ public static class MiddlewareExtension
         var openAiApiKey = configuration.GetSection("OpenAi")?.GetValue<string>("ApiKey");
         services.AddHttpClient("OpenAiHttpClient", client => {
             client.BaseAddress = new Uri("https://api.openai.com/v1/");
-            // move api key to config
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {openAiApiKey}");
         });
 

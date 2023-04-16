@@ -6,5 +6,5 @@ public interface IOpenAiService
 {
     Task<OpenAiResponse?> GetChatCompletion(ChatCompletionRequest chat, CancellationToken cancellationToken);
 
-    Task<Stream> GetChatCompletionStream(ChatCompletionRequest chat, CancellationToken cancellationToken);
+    IAsyncEnumerable<OpenAiResponse> GetChatCompletionStream(ChatCompletionRequest chat, CancellationToken cancellationToken);
 }

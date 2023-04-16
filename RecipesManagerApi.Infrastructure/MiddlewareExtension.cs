@@ -47,6 +47,7 @@ public static class MiddlewareExtension
         services.AddScoped<IImagesService, ImagesService>();
         services.AddScoped<IUserManager, UserManager>();
         services.AddScoped<IOpenAiService, OpenAiService>();
+        services.AddScoped<IIngredientsService, IngredientsService>();
 
         return services;
     }
@@ -64,6 +65,7 @@ public static class MiddlewareExtension
             .AddGraphQLServer()
             .AddQueryType()
                 .AddTypeExtension<CategoriesQuery>()
+                .AddTypeExtension<ContactsQuery>()
             .AddMutationType()
                 .AddTypeExtension<CategoriesMutation>()
                 .AddTypeExtension<RegisterMutation>()
@@ -71,6 +73,7 @@ public static class MiddlewareExtension
                 .AddTypeExtension<AccessMutation>()
                 .AddTypeExtension<UserMutation>()
                 .AddTypeExtension<RoleMutation>()
+                .AddTypeExtension<ContactsMutation>()
             .AddAuthorization()
             .InitializeOnStartup(keepWarm: true);
         

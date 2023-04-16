@@ -4,7 +4,6 @@ using RecipesManagerApi.Application.Exceptions;
 using RecipesManagerApi.Application.IRepositories;
 using RecipesManagerApi.Application.IServices;
 using RecipesManagerApi.Application.Models;
-using RecipesManagerApi.Application.Paging;
 using RecipesManagerApi.Domain.Entities;
 
 namespace RecipesManagerApi.Infrastructure.Services;
@@ -19,6 +18,15 @@ public class SharedRecipesService : ISharedRecipesService
     {
         this._mapper = mapper;
         this._repository = repository;
+    }
+
+    public async Task<SharedRecipeDto> AccessSharedRecipeAsync(SharedRecipeDto dto, CancellationToken cancellationToken)
+    {
+        var entity = this._mapper.Map<SharedRecipe>(dto);
+        entity.VisitsCount++;
+        await this._repository.UpdateSharedRecipeAsync(entity, cancellationToken);
+        var result = this._mapper.Map<SharedRecipeDto>(entity);
+        return result;
     }
 
     public async Task AddSharedRecipeAsync(SharedRecipeDto dto, CancellationToken cancellationToken)
@@ -40,14 +48,6 @@ public class SharedRecipesService : ISharedRecipesService
             throw new EntityNotFoundException<Role>();
         }
         return this._mapper.Map<SharedRecipeDto>(entity);
-    }
-
-    public async Task<PagedList<SharedRecipeDto>> GetSharedRecipesPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
-    {
-        var entities = await this._repository.GetPageAsync(pageNumber, pageSize, cancellationToken);
-        var dtos = this._mapper.Map<List<SharedRecipeDto>>(entities);
-        var count = await this._repository.GetTotalCountAsync();
-        return new PagedList<SharedRecipeDto>(dtos, pageNumber, pageSize, count);
     }
 
     public async Task UpdateSharedRecipeAsync(SharedRecipeDto dto, CancellationToken cancellationToken)

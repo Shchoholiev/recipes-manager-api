@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: 'develop'
+      name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
@@ -52,6 +52,6 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'sh-recipes-manager-api-dev'
-          slot-name: 'production'
-          publish-profile: ${{ secrets.AzureAppService_PublishProfile_2377486256af4f4db3b30ceb3102bb7d }}
+          slot-name: 'Production'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_251DFA61FAA1474B946FF3DDF33108CA }}
           package: .

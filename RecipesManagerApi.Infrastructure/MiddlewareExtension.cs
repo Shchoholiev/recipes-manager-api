@@ -17,51 +17,52 @@ namespace RecipesManagerApi.Infrastructure;
 
 public static class MiddlewareExtension
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services)
-    {
-        services.AddSingleton<MongoDbContext>();
-        
-        services.AddScoped<ICategoriesRepository, CategoriesRepository>();
-        services.AddScoped<IUsersRepository, UsersRepository>();
-        services.AddScoped<IRolesRepository, RolesRepository>();
-        services.AddScoped<IRecipesRepository, RecipesRepository>();
-        services.AddScoped<IImagesRepository, ImagesRepository>();
+	public static IServiceCollection AddInfrastructure(this IServiceCollection services)
+	{
+		services.AddSingleton<MongoDbContext>();
+		
+		services.AddScoped<ICategoriesRepository, CategoriesRepository>();
+		services.AddScoped<IUsersRepository, UsersRepository>();
+		services.AddScoped<IRolesRepository, RolesRepository>();
+		services.AddScoped<IRecipesRepository, RecipesRepository>();
+		services.AddScoped<IImagesRepository, ImagesRepository>();
 
-        return services;
-    }
+		return services;
+	}
 
-    public static IServiceCollection AddServices(this IServiceCollection services)
-    {
-        services.AddScoped<ICategoriesService, CategoriesService>();
-        services.AddScoped<IRolesService, RolesService>();
-        services.AddScoped<IUsersService, UsersService>();
-        services.AddScoped<IPasswordHasher, PasswordHasher>();
-        services.AddScoped<ITokensService, TokensService>();
-        services.AddScoped<ICloudStorageService, CloudStorageService>();
-        services.AddScoped<IRecipesService, RecipesService>();
-        services.AddScoped<IImagesService, ImagesService>();
+	public static IServiceCollection AddServices(this IServiceCollection services)
+	{
+		services.AddScoped<ICategoriesService, CategoriesService>();
+		services.AddScoped<IRolesService, RolesService>();
+		services.AddScoped<IUsersService, UsersService>();
+		services.AddScoped<IPasswordHasher, PasswordHasher>();
+		services.AddScoped<ITokensService, TokensService>();
+		services.AddScoped<ICloudStorageService, CloudStorageService>();
+		services.AddScoped<IRecipesService, RecipesService>();
+		services.AddScoped<IImagesService, ImagesService>();
+		services.AddScoped<IEmailsService, EmailsService>();
 
-        return services;
-    }
+		return services;
+	}
 
-    public static IServiceCollection AddMapper(this IServiceCollection services)
-    {
-        services.AddAutoMapper(Assembly.GetAssembly(typeof(CategoryProfile)));
+	public static IServiceCollection AddMapper(this IServiceCollection services)
+	{
+		services.AddAutoMapper(Assembly.GetAssembly(typeof(CategoryProfile)));
 
-        return services;
-    }
+		return services;
+	}
 
-    public static IServiceCollection AddGraphQl(this IServiceCollection services)
-    {
-        services
-            .AddGraphQLServer()
-            .AddQueryType()
-                .AddTypeExtension<CategoriesQuery>()
-            .AddMutationType()
-                .AddTypeExtension<CategoriesMutation>()
-            .InitializeOnStartup(keepWarm: true);
-        
+	public static IServiceCollection AddGraphQl(this IServiceCollection services)
+	{
+		services
+			.AddGraphQLServer()
+			.AddQueryType()
+				.AddTypeExtension<CategoriesQuery>()
+			.AddMutationType()
+				.AddTypeExtension<CategoriesMutation>()
+			.InitializeOnStartup(keepWarm: true);
+		
 
-        return services;
-    }
+		return services;
+	}
 }

@@ -51,7 +51,7 @@ public class EmailsService : IEmailsService
 		}
 		catch (Exception ex)
 		{
-			throw new EmailsServiceException("Failed to send email message", ex);
+			throw new EmailSendException("Failed to send email message", ex);
 		}
 	}
 }

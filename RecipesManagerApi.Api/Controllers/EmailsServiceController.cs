@@ -10,24 +10,22 @@ namespace RecipesManagerApi.Api.Controllers;
 [Route("[controller]")]
 public class EmailsServiceController : ControllerBase
 {
-	private readonly IEmailsService _emailService;
-	private readonly IConfiguration _configuration;
+	private readonly IEmailsService _emailsService;
 
-	public EmailsServiceController(IConfiguration configuration)
+	public EmailsServiceController(IEmailsService emailsService)
 	{
-		_configuration = configuration;
-		_emailService = new EmailsService(_configuration);
+		_emailsService = emailsService;
 	}
 
 	[HttpPost("send")]
-	public async Task<IActionResult> SendEmailAsync([FromBody] EmailMessage emailMessage)
+	public async Task<IActionResult> SendEmailAsync([FromBody] EmailMessage emailMessage, CancellationToken cancellationToken)
 	{
 		try
 		{
-            await _emailService.SendEmailMessageAsync(emailMessage, new CancellationToken());
+            await _emailsService.SendEmailMessageAsync(emailMessage, cancellationToken);
 			return Ok();
 		}
-		catch(EmailsServiceException ex)
+		catch(EmailSendException ex)
 		{
 			return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }

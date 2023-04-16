@@ -3,7 +3,7 @@
 namespace RecipesManagerApi.Application.Models;
 public class UserDto
 {
-    public ObjectId Id { get; set; }
+    public string Id { get; set; }
 
     public string? Name { get; set; }
 

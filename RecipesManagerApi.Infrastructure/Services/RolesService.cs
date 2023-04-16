@@ -40,7 +40,7 @@ public class RolesService : IRolesService
             throw new InvalidDataException("Provided id is invalid.");
         }
 
-        var entity = await this._repository.GetRoleAsync(objectId, cancellationToken);
+        var entity = await this._repository.GetRoleAsync(x => x.Id == objectId, cancellationToken);
         if (entity == null)
         {
             throw new EntityNotFoundException<Role>();

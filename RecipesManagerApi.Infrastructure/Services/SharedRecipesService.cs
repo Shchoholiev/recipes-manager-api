@@ -20,9 +20,13 @@ public class SharedRecipesService : ISharedRecipesService
         this._repository = repository;
     }
 
-    public async Task<SharedRecipeDto> AccessSharedRecipeAsync(SharedRecipeDto dto, CancellationToken cancellationToken)
+    public async Task<SharedRecipeDto> AccessSharedRecipeAsync(string id, CancellationToken cancellationToken)
     {
-        var entity = this._mapper.Map<SharedRecipe>(dto);
+        if (!ObjectId.TryParse(id, out var objectId))
+        {
+            throw new InvalidDataException("Provided id is invalid.");
+        }
+        var entity = await this._repository.GetSharedRecipeAsync(objectId, cancellationToken);
         entity.VisitsCount++;
         await this._repository.UpdateSharedRecipeAsync(entity, cancellationToken);
         var result = this._mapper.Map<SharedRecipeDto>(entity);

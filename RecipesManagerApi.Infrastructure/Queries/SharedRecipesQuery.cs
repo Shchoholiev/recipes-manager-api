@@ -6,9 +6,9 @@ namespace RecipesManagerApi.Infrastructure.Queries;
 [ExtendObjectType(OperationTypeNames.Query)]
 public class SharedRecipesQuery
 {
-    public Task<SharedRecipeDto> AccessSharedRecipeAsync(SharedRecipeDto dto, CancellationToken cancellationToken,
+    public Task<SharedRecipeDto> AccessSharedRecipeAsync(string id, CancellationToken cancellationToken,
     [Service] ISharedRecipesService recipesService)
-    => recipesService.AccessSharedRecipeAsync(dto, cancellationToken);
+    => recipesService.AccessSharedRecipeAsync(id, cancellationToken);
 
     public Task<SharedRecipeDto> GetSharedRecipeAsync(string id, CancellationToken cancellationToken,
     [Service] ISharedRecipesService recipesService)

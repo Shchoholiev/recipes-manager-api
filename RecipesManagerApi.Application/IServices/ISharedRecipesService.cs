@@ -11,5 +11,5 @@ public interface ISharedRecipesService
 
     Task<SharedRecipeDto> GetSharedRecipeAsync(string id, CancellationToken cancellationToken);
 
-    Task<SharedRecipeDto> AccessSharedRecipeAsync(SharedRecipeDto dto, CancellationToken cancellationToken);
+    Task<SharedRecipeDto> AccessSharedRecipeAsync(string id, CancellationToken cancellationToken);
 }

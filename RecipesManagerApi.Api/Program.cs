@@ -11,6 +11,7 @@ builder.Services.AddInfrastructure();
 builder.Services.AddMapper();
 builder.Services.AddServices();
 builder.Services.AddGraphQl();
+builder.Services.ConfigureCors();
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -28,6 +29,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("allowAnyOrigin");
 
 app.UseHttpsRedirection();
 

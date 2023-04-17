@@ -67,34 +67,22 @@ public class OpenAiService : IOpenAiService
         }, cancellationToken);
 
         var httpResponse = await _httpClient.PostAsync("chat/completions", body, cancellationToken);
-        var stream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
 
         var allData = string.Empty;
-        var lastIndex = 0;
+        using var streamReader = new StreamReader(await httpResponse.Content.ReadAsStreamAsync(cancellationToken));
+        while (!streamReader.EndOfStream)
+        {
+            var line = await streamReader.ReadLineAsync();
+            allData += line + "\n\n";
+            if (string.IsNullOrEmpty(line)) continue;
+            
+            var json = line?.Substring(6, line.Length - 6);
+            if (json == "[DONE]") yield break;
 
-        var buffer = new byte[256];
-		var bytesRead = 0;
-		while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
-		{
-			var chunk = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-            allData += chunk;
-
-            var endIndex = allData.IndexOf("\n\n", lastIndex);
-            while (endIndex > -1)
-            {
-                var json = allData.Substring(lastIndex + 6, endIndex - lastIndex - 6);
-                if (json == "[DONE]") {
-                    endIndex = -1;
-                    continue;
-                }
-                var openAiResponse = JsonConvert.DeserializeObject<OpenAiResponse>(json, _jsonSettings);
-                yield return openAiResponse;
-
-                lastIndex = endIndex + 2;
-                endIndex = allData.IndexOf("\n\n", lastIndex);
-            }
-		}
-
+            var openAiResponse = JsonConvert.DeserializeObject<OpenAiResponse>(json, _jsonSettings);
+            yield return openAiResponse;
+        }
+        
         log.Response = allData;
         Task.Run(() => _openAiLogsRepository.UpdateAsync(log, cancellationToken));
     }

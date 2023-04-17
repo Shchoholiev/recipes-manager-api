@@ -29,11 +29,8 @@ public class IngredientsController : Controller
         await foreach (var ingredient in ingredients)
         {
             var chunk = JsonConvert.SerializeObject(ingredient);
-            var hexadecimalLength = Encoding.UTF8.GetByteCount(chunk).ToString("X");
-            await writer.WriteAsync($"{hexadecimalLength}\r\n{chunk}\r\n");
+            await writer.WriteAsync($"data: {chunk}\n\n");
             await writer.FlushAsync();
         }
-        await writer.WriteAsync("0\r\n\r\n");
-        await writer.FlushAsync();
     }
 }

@@ -22,15 +22,15 @@ public class IngredientsController : Controller
         Response.Headers.Add("Content-Type", "text/event-stream");
         Response.Headers.Add("Cache-Control", "no-cache");
         Response.Headers.Add("Connection", "keep-alive");
+        await Response.Body.FlushAsync(cancellationToken);
 
         var ingredients = _ingredientsService.ParseIngredientsAsync(input.Text, cancellationToken);
-        var writer = new HttpResponseStreamWriter(Response.Body, Encoding.UTF8);
 
         await foreach (var ingredient in ingredients)
         {
             var chunk = JsonConvert.SerializeObject(ingredient);
-            await writer.WriteAsync($"data: {chunk}\n\n");
-            await writer.FlushAsync();
+            await Response.WriteAsync($"data: {chunk}\n\n", cancellationToken);
+            await Response.Body.FlushAsync(cancellationToken);
         }
     }
 }

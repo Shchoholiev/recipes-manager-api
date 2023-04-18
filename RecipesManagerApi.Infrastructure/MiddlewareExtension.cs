@@ -31,9 +31,9 @@ public static class MiddlewareExtension
         services.AddScoped<IRecipesRepository, RecipesRepository>();
         services.AddScoped<IImagesRepository, ImagesRepository>();
         services.AddScoped<IOpenAiLogsRepository, OpenAiLogsRepository>();
-
-        return services;
-    }
+      
+		return services;
+	}
 
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
@@ -45,18 +45,20 @@ public static class MiddlewareExtension
         services.AddScoped<ICloudStorageService, CloudStorageService>();
         services.AddScoped<IRecipesService, RecipesService>();
         services.AddScoped<IImagesService, ImagesService>();
+        services.AddScoped<IEmailsService, EmailsService>();
         services.AddScoped<IUserManager, UserManager>();
         services.AddScoped<IOpenAiService, OpenAiService>();
+        services.AddScoped<IIngredientsService, IngredientsService>();
 
-        return services;
-    }
+		return services;
+	}
 
-    public static IServiceCollection AddMapper(this IServiceCollection services)
-    {
-        services.AddAutoMapper(Assembly.GetAssembly(typeof(CategoryProfile)));
+	public static IServiceCollection AddMapper(this IServiceCollection services)
+	{
+		services.AddAutoMapper(Assembly.GetAssembly(typeof(CategoryProfile)));
 
-        return services;
-    }
+		return services;
+	}
 
     public static IServiceCollection AddGraphQl(this IServiceCollection services)
     {
@@ -64,6 +66,7 @@ public static class MiddlewareExtension
             .AddGraphQLServer()
             .AddQueryType()
                 .AddTypeExtension<CategoriesQuery>()
+                .AddTypeExtension<ContactsQuery>()
             .AddMutationType()
                 .AddTypeExtension<CategoriesMutation>()
                 .AddTypeExtension<RegisterMutation>()
@@ -71,6 +74,7 @@ public static class MiddlewareExtension
                 .AddTypeExtension<AccessMutation>()
                 .AddTypeExtension<UserMutation>()
                 .AddTypeExtension<RoleMutation>()
+                .AddTypeExtension<ContactsMutation>()
             .AddAuthorization()
             .InitializeOnStartup(keepWarm: true);
         

@@ -31,6 +31,7 @@ public static class MiddlewareExtension
         services.AddScoped<IRecipesRepository, RecipesRepository>();
         services.AddScoped<IImagesRepository, ImagesRepository>();
         services.AddScoped<IOpenAiLogsRepository, OpenAiLogsRepository>();
+        services.AddScoped<IMenusRepository, MenusRepository>();
       
 		return services;
 	}
@@ -49,6 +50,7 @@ public static class MiddlewareExtension
         services.AddScoped<IUserManager, UserManager>();
         services.AddScoped<IOpenAiService, OpenAiService>();
         services.AddScoped<IIngredientsService, IngredientsService>();
+        services.AddScoped<IMenusService, MenusService>();
 
 		return services;
 	}

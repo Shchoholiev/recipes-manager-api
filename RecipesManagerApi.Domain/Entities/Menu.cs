@@ -11,7 +11,7 @@ public class Menu : EntityBase
 	
 	public string? Notes { get; set; }
 	
-	//public List<Contact>? SentTo { get; set; }
+	public List<Contact>? SentTo { get; set; }
 	
 	public bool IsDeleted { get; set; }
 	

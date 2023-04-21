@@ -1,4 +1,4 @@
-﻿namespace RecipesManagerApi.Infrastructure.Email
+namespace RecipesManagerApi.Application.Models.EmailModels
 {
     public class EmailAttachment
     {

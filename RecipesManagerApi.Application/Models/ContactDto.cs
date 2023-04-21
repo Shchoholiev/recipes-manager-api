@@ -2,7 +2,6 @@ using HotChocolate;
 
 namespace RecipesManagerApi.Application.Models;
 
-[GraphQLName("Contact")]
 public class ContactDto
 {
     public string Id { get; set; }

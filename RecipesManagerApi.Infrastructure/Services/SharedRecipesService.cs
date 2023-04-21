@@ -4,6 +4,8 @@ using RecipesManagerApi.Application.Exceptions;
 using RecipesManagerApi.Application.IRepositories;
 using RecipesManagerApi.Application.IServices;
 using RecipesManagerApi.Application.Models;
+using RecipesManagerApi.Application.Models.CreateDtos;
+using RecipesManagerApi.Application.Models.Operations;
 using RecipesManagerApi.Domain.Entities;
 
 namespace RecipesManagerApi.Infrastructure.Services;
@@ -33,10 +35,11 @@ public class SharedRecipesService : ISharedRecipesService
         return result;
     }
 
-    public async Task AddSharedRecipeAsync(SharedRecipeDto dto, CancellationToken cancellationToken)
+    public async Task<SharedRecipeDto> AddSharedRecipeAsync(SharedRecipeCreateDto dto, CancellationToken cancellationToken)
     {
         var entity = this._mapper.Map<SharedRecipe>(dto);
         await this._repository.AddAsync(entity, cancellationToken);
+        return this._mapper.Map<SharedRecipeDto>(entity);
     }
 
     public async Task<SharedRecipeDto> GetSharedRecipeAsync(string id, CancellationToken cancellationToken)
@@ -54,9 +57,10 @@ public class SharedRecipesService : ISharedRecipesService
         return this._mapper.Map<SharedRecipeDto>(entity);
     }
 
-    public async Task UpdateSharedRecipeAsync(SharedRecipeDto dto, CancellationToken cancellationToken)
+    public async Task<OperationDetails> UpdateSharedRecipeAsync(SharedRecipeDto dto, CancellationToken cancellationToken)
     {
         var entity = this._mapper.Map<SharedRecipe>(dto);
         await this._repository.UpdateSharedRecipeAsync(entity, cancellationToken);
+        return new OperationDetails() { IsSuccessful = true, Time = DateTime.UtcNow};
     }
 }

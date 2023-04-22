@@ -9,10 +9,7 @@ namespace RecipesManagerApi.Application.MappingProfiles
     {
         public ImageProfile()
         {
-            CreateMap<Image, ImageDto>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToString()));            
-            CreateMap<ImageDto, Image>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => ObjectId.Parse(src.Id)));
+            CreateMap<Image, ImageDto>().ReverseMap();
         }
     }
 }

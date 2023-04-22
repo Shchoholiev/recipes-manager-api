@@ -31,9 +31,10 @@ public static class MiddlewareExtension
         services.AddScoped<IRecipesRepository, RecipesRepository>();
         services.AddScoped<IImagesRepository, ImagesRepository>();
         services.AddScoped<IOpenAiLogsRepository, OpenAiLogsRepository>();
-      
-		return services;
-	}
+        services.AddScoped<ISharedRecipesRepository, SharedRecipeRepository>();
+
+        return services;
+    }
 
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
@@ -48,6 +49,7 @@ public static class MiddlewareExtension
         services.AddScoped<IEmailsService, EmailsService>();
         services.AddScoped<IUserManager, UserManager>();
         services.AddScoped<IOpenAiService, OpenAiService>();
+        services.AddScoped<ISharedRecipesService, SharedRecipesService>();
         services.AddScoped<IIngredientsService, IngredientsService>();
 
 		return services;
@@ -67,7 +69,9 @@ public static class MiddlewareExtension
             .AddQueryType()
                 .AddTypeExtension<CategoriesQuery>()
                 .AddTypeExtension<ContactsQuery>()
+                .AddTypeExtension<SharedRecipesQuery>()
             .AddMutationType()
+                .AddTypeExtension<SharedRecipesMutation>()
                 .AddTypeExtension<CategoriesMutation>()
                 .AddTypeExtension<RegisterMutation>()
                 .AddTypeExtension<LoginMutation>()

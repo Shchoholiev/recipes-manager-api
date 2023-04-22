@@ -14,5 +14,5 @@ public interface ISharedRecipesService
 
     Task<SharedRecipeDto> AccessSharedRecipeAsync(string id, CancellationToken cancellationToken);
 
-    Task<OperationDetails> DeleteSharedRecipeAsync(SharedRecipeDto, CancellationToken cancellationToken);
+    Task<OperationDetails> DeleteSharedRecipeAsync(SharedRecipeDto dto, CancellationToken cancellationToken);
 }

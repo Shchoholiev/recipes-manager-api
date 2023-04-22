@@ -31,8 +31,10 @@ public static class MiddlewareExtension
         services.AddScoped<IRecipesRepository, RecipesRepository>();
         services.AddScoped<IImagesRepository, ImagesRepository>();
         services.AddScoped<IOpenAiLogsRepository, OpenAiLogsRepository>();
-      
-		return services;
+        services.AddScoped<ISubscriptionsRepository, SubscriptionsRepository>();
+        services.AddScoped<ISavedRecipesRepository, SavedRecipesRepository>();
+
+        return services;
 	}
 
     public static IServiceCollection AddServices(this IServiceCollection services)

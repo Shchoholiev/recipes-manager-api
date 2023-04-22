@@ -11,16 +11,11 @@ public class SubscriptionsRepository : BaseRepository<Subscription>, ISubscripti
 {
     public SubscriptionsRepository(MongoDbContext db) : base(db, "Subscriptions"){ }
 
-    public async Task<List<Subscription>> GetAllAsync(ObjectId id, CancellationToken cancellationToken)
+    public async Task<List<Subscription>> GetUsersSubscriptionsAsync(ObjectId id, CancellationToken cancellationToken)
     {
-        return await (await this._collection.FindAsync(x => x.UserId == id)).ToListAsync();
+        return await (await this._collection.FindAsync(x => x.CreatedById == id)).ToListAsync();
     }
 
-    public async Task<int> GetTotalCountAsync(Expression<Func<Subscription, bool>> predicate)
-    {
-        var filter = Builders<Subscription>.Filter.Where(predicate);
-        return (int)(await this._collection.CountDocumentsAsync(filter));
-    }
 }
 
 

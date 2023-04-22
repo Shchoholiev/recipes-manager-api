@@ -13,5 +13,5 @@ public interface IRecipesService
 
     Task<RecipeDto> GetRecipeAsync(ObjectId id, CancellationToken cancellationToken);    
 
-    Task<PagedList<RecipeDto>> GetSearchPageAsync(int pageNumber, int pageSize, string searchString, RecipesSearchTypes? recipeSearchType, ObjectId userId, CancellationToken cancellationToken;
+    Task<PagedList<RecipeDto>> GetSearchPageAsync(int pageNumber, int pageSize, string searchString, RecipesSearchTypes? recipeSearchType, ObjectId userId, CancellationToken cancellationToken);
 }

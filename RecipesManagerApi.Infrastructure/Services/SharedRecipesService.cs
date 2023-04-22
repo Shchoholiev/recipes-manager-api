@@ -42,6 +42,14 @@ public class SharedRecipesService : ISharedRecipesService
         return this._mapper.Map<SharedRecipeDto>(entity);
     }
 
+    public async Task<OperationDetails> DeleteSharedRecipeAsync(SharedRecipeDto dto, CancellationToken cancellationToken)
+    {
+        var entity = this._mapper.Map<SharedRecipe>(dto);
+        entity.IsDeleted = true;
+        await this._repository.UpdateSharedRecipeAsync(entity, cancellationToken);
+        return new OperationDetails() { IsSuccessful = true, TimestampUtc = DateTime.UtcNow };
+    }
+
     public async Task<SharedRecipeDto> GetSharedRecipeAsync(string id, CancellationToken cancellationToken)
     {
         if (!ObjectId.TryParse(id, out var objectId))
@@ -57,10 +65,10 @@ public class SharedRecipesService : ISharedRecipesService
         return this._mapper.Map<SharedRecipeDto>(entity);
     }
 
-    public async Task<OperationDetails> UpdateSharedRecipeAsync(SharedRecipeDto dto, CancellationToken cancellationToken)
+    public async Task<SharedRecipeDto> UpdateSharedRecipeAsync(SharedRecipeDto dto, CancellationToken cancellationToken)
     {
         var entity = this._mapper.Map<SharedRecipe>(dto);
         await this._repository.UpdateSharedRecipeAsync(entity, cancellationToken);
-        return new OperationDetails() { IsSuccessful = true, Time = DateTime.UtcNow};
+        return this._mapper.Map<SharedRecipeDto>(entity);
     }
 }

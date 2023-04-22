@@ -6,5 +6,5 @@ public class OperationDetails
 {
     public bool IsSuccessful { get; set; }
 
-    public DateTime Time { get; set; }
+    public DateTime TimestampUtc { get; set; }
 }

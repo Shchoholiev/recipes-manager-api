@@ -12,7 +12,10 @@ public class SharedRecipesMutation
     [Service] ISharedRecipesService recipesService)
     => recipesService.AddSharedRecipeAsync(dto, cancellationToken);
 
-    public Task<OperationDetails> UpdateSharedRecipeAsync(SharedRecipeDto dto, CancellationToken cancellationToken,
+    public Task<SharedRecipeDto> UpdateSharedRecipeAsync(SharedRecipeDto dto, CancellationToken cancellationToken,
     [Service] ISharedRecipesService recipesService)
     => recipesService.UpdateSharedRecipeAsync(dto, cancellationToken);
+    public Task<OperationDetails> DeleteSharedRecipeAsync(SharedRecipeDto dto, CancellationToken cancellationToken,
+    [Service] ISharedRecipesService recipesService)
+    => recipesService.DeleteSharedRecipeAsync(dto, cancellationToken);
 }

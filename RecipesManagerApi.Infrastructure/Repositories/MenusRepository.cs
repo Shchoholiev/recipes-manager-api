@@ -12,7 +12,7 @@ public class MenusRepository : BaseRepository<Menu>, IMenusRepository
 	public MenusRepository(MongoDbContext db) : base (db, "Menus"){ }
 	public async Task<Menu> GetMenuAsync(ObjectId id, CancellationToken cancellationToken)
 	{
-		return await (await this._collection.FindAsync(x => x.Id == id)).FirstOrDefaultAsync(cancellationToken);
+		return await (await this._collection.FindAsync(x => x.Id == id && !x.IsDeleted)).FirstOrDefaultAsync(cancellationToken);
 	}
 
     public async Task<int> GetTotalCountAsync(Expression<Func<Menu, bool>> predicate)

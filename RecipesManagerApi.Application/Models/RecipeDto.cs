@@ -1,3 +1,5 @@
+using RecipesManagerApi.Application.Models.Dtos;
+
 namespace RecipesManagerApi.Application.Models;
 
 public class RecipeDto

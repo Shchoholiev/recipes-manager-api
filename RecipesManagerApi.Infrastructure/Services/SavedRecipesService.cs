@@ -27,7 +27,7 @@ public class SavedRecipesService : ISavedRecipesService
     public async Task<SavedRecipeDto> AddSavedRecipeAsync(SavedRecipeCreateDto dto, CancellationToken cancellationToken)
     {
         var entity = this._mapper.Map<SavedRecipe>(dto);
-        entity.CreatedById = (ObjectId)GlobalUser.Id;
+        entity.CreatedById = GlobalUser.Id.Value;
         entity.CreatedDateUtc = DateTime.UtcNow;
         await this._repository.AddAsync(entity, cancellationToken);
         return this._mapper.Map<SavedRecipeDto>(entity);

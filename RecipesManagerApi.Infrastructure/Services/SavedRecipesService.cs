@@ -8,6 +8,7 @@ using RecipesManagerApi.Application.Models;
 using RecipesManagerApi.Application.Models.CreateDtos;
 using RecipesManagerApi.Application.Models.Operations;
 using RecipesManagerApi.Domain.Entities;
+using RecipesManagerApi.Application.GlodalInstances;
 
 namespace RecipesManagerApi.Infrastructure.Services;
 
@@ -26,6 +27,8 @@ public class SavedRecipesService : ISavedRecipesService
     public async Task<SavedRecipeDto> AddSavedRecipeAsync(SavedRecipeCreateDto dto, CancellationToken cancellationToken)
     {
         var entity = this._mapper.Map<SavedRecipe>(dto);
+        entity.CreatedById = (ObjectId)GlobalUser.Id;
+        entity.CreatedDateUtc = DateTime.UtcNow;
         await this._repository.AddAsync(entity, cancellationToken);
         return this._mapper.Map<SavedRecipeDto>(entity);
     }

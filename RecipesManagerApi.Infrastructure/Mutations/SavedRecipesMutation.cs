@@ -1,8 +1,8 @@
 ﻿using RecipesManagerApi.Application.IServices;
-using RecipesManagerApi.Application.Models;
 using RecipesManagerApi.Application.Models.CreateDtos;
 using RecipesManagerApi.Application.Models.Operations;
 using HotChocolate.Authorization;
+using RecipesManagerApi.Application.Models.Dtos;
 
 namespace RecipesManagerApi.Infrastructure.Mutations;
 

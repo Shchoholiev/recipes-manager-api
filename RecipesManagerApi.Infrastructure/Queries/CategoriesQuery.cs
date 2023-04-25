@@ -1,7 +1,7 @@
 using HotChocolate.Authorization;
 using MongoDB.Bson;
 using RecipesManagerApi.Application.IServices;
-using RecipesManagerApi.Application.Models;
+using RecipesManagerApi.Application.Models.Dtos;
 using RecipesManagerApi.Application.Paging;
 
 namespace RecipesManagerApi.Infrastructure.Queries;

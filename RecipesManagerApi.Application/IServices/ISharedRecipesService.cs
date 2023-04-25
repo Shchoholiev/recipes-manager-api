@@ -1,5 +1,5 @@
-﻿using RecipesManagerApi.Application.Models;
-using RecipesManagerApi.Application.Models.CreateDtos;
+﻿using RecipesManagerApi.Application.Models.CreateDtos;
+using RecipesManagerApi.Application.Models.Dtos;
 using RecipesManagerApi.Application.Models.Operations;
 
 namespace RecipesManagerApi.Application.IServices;

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using MongoDB.Bson;
-using RecipesManagerApi.Application.Models;
 using RecipesManagerApi.Application.Models.CreateDtos;
+using RecipesManagerApi.Application.Models.Dtos;
 using RecipesManagerApi.Domain.Entities;
 
 namespace RecipesManagerApi.Application.MappingProfiles

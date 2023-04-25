@@ -6,6 +6,7 @@ using RecipesManagerApi.Application.Models;
 using RecipesManagerApi.Application.Paging;
 using RecipesManagerApi.Domain.Enums;
 using RecipesManagerApi.Domain.Entities;
+using RecipesManagerApi.Application.Models.Dtos;
 
 namespace RecipesManagerApi.Infrastructure.Services;
 

@@ -7,11 +7,14 @@ using RecipesManagerApi.Application.Interfaces.Identity;
 using RecipesManagerApi.Application.IRepositories;
 using RecipesManagerApi.Application.IServices.Identity;
 using RecipesManagerApi.Application.Models;
+using RecipesManagerApi.Application.Models.Dtos;
 using RecipesManagerApi.Application.Models.Identity;
+using RecipesManagerApi.Application.Models.Operations;
 using RecipesManagerApi.Domain.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
+using ZstdSharp.Unsafe;
 
 namespace RecipesManagerApi.Infrastructure.Services.Identity;
 
@@ -208,28 +211,78 @@ public class UserManager : IUserManager
         return tokens;
     }
 
-    public async Task<TokensModel> UpdateAsync(string email, UserDto userDto, CancellationToken cancellationToken)
+    public async Task<UpdateUserModel> UpdateAsync(string email, UserDto userDto, CancellationToken cancellationToken)
     {
-        var user = await this._usersRepository.GetUserAsync(x => x.Email == email, cancellationToken);
+        string hash = "";
+        TokensModel tokens;
+        User user;
+        
+        if(userDto.Roles.Any(x => x.Name == "Guest"))
+        {
+            if(userDto.Password != null && (userDto.Email != null || userDto.Phone != null))
+            {
+                userDto.Roles.RemoveAll(x => x.Name == "Guest");
+                var roleEntity = await this._rolesRepository.GetRoleAsync(x => x.Name == "User", cancellationToken);
+                var roleDto = this._mapper.Map<RoleDto>(roleEntity);
+                userDto.Roles.Add(roleDto);
+                ValidatePassword(userDto.Password);
+                hash = this._passwordHasher.Hash(userDto.Password);
+            }
+        }
+        if (userDto.Password != null)
+        {
+            hash = this._passwordHasher.Hash(userDto.Password);
+        }
+        if (userDto.AppleDeviceId != null && (userDto.Email == null || userDto.Phone == null))
+        {
+            user = await this._usersRepository.GetUserAsync(x => x.AppleDeviceId == userDto.AppleDeviceId, cancellationToken);
+        }
+        else if (userDto.WebId != null && (userDto.Email == null || userDto.Phone == null))
+        {
+            user = await this._usersRepository.GetUserAsync(x => x.WebId == userDto.WebId, cancellationToken);
+        }
+        else
+        {
+            user = await this._usersRepository.GetUserAsync(x => x.Email == email, cancellationToken);
+        }
+
         if (user == null)
         {
             throw new EntityNotFoundException<User>();
         }
 
-        if (email != userDto.Email
-            && await this._usersRepository.GetUserAsync(x => x.Email == userDto.Email, cancellationToken) != null)
+        if (!userDto.Roles.Any(x => x.Name == "Guest"))
         {
-            throw new EntityAlreadyExistsException<User>("email", userDto.Email);
+            if (email != userDto.Email
+                && await this._usersRepository.GetUserAsync(x => x.Email == userDto.Email, cancellationToken) != null)
+            {
+                throw new EntityAlreadyExistsException<User>("email", userDto.Email);
+            }
         }
 
         this._mapper.Map(userDto, user);
+        if(hash != "")
+        {
+            user.PasswordHash = hash;
+        }
         user.RefreshToken = this.GetRefreshToken();
         await this._usersRepository.UpdateUserAsync(user, cancellationToken);
-        var tokens = this.GetUserTokens(user);
+        if (user.PasswordHash == null && user.AppleDeviceId != null)
+        {
+            tokens = this.GetAppleGuestTokens(user);
+        }
+        else if (user.PasswordHash == null && user.WebId != null)
+        {
+            tokens = this.GetWebGuestTokens(user);
+        }
+        else
+        {
+            tokens = this.GetUserTokens(user);
+        }
 
         this._logger.LogInformation($"Update user with email: {email}.");
 
-        return tokens;
+        return new UpdateUserModel() {Tokens = tokens, User = this._mapper.Map<UserDto>(user) };
     }
 
     private string GetRefreshToken()

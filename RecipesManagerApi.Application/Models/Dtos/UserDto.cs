@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson;
 
-namespace RecipesManagerApi.Application.Models;
+namespace RecipesManagerApi.Application.Models.Dtos;
 public class UserDto
 {
     public string Id { get; set; }
@@ -12,6 +12,8 @@ public class UserDto
     public string? Phone { get; set; }
 
     public string? RefreshToken { get; set; }
+
+    public string? Password { get; set; }
 
     public DateTime? RefreshTokenExpiryDate { get; set; }
 

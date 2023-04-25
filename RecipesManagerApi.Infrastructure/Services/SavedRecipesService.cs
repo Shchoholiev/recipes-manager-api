@@ -4,11 +4,11 @@ using RecipesManagerApi.Application.Exceptions;
 using RecipesManagerApi.Application.IRepositories;
 using RecipesManagerApi.Application.IServices;
 using RecipesManagerApi.Application.Paging;
-using RecipesManagerApi.Application.Models;
 using RecipesManagerApi.Application.Models.CreateDtos;
 using RecipesManagerApi.Application.Models.Operations;
 using RecipesManagerApi.Domain.Entities;
 using RecipesManagerApi.Application.GlodalInstances;
+using RecipesManagerApi.Application.Models.Dtos;
 
 namespace RecipesManagerApi.Infrastructure.Services;
 

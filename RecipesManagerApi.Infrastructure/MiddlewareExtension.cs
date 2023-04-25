@@ -32,6 +32,7 @@ public static class MiddlewareExtension
         services.AddScoped<IImagesRepository, ImagesRepository>();
         services.AddScoped<IOpenAiLogsRepository, OpenAiLogsRepository>();
         services.AddScoped<ISharedRecipesRepository, SharedRecipeRepository>();
+        services.AddScoped<ISavedRecipesRepository, SavedRecipesRepository>();
 
         return services;
     }
@@ -51,6 +52,7 @@ public static class MiddlewareExtension
         services.AddScoped<IOpenAiService, OpenAiService>();
         services.AddScoped<ISharedRecipesService, SharedRecipesService>();
         services.AddScoped<IIngredientsService, IngredientsService>();
+        services.AddScoped<ISavedRecipesService, SavedRecipesService>();
 
 		return services;
 	}
@@ -70,6 +72,7 @@ public static class MiddlewareExtension
                 .AddTypeExtension<CategoriesQuery>()
                 .AddTypeExtension<ContactsQuery>()
                 .AddTypeExtension<SharedRecipesQuery>()
+                .AddTypeExtension<SavedRecipesQuery>()
             .AddMutationType()
                 .AddTypeExtension<SharedRecipesMutation>()
                 .AddTypeExtension<CategoriesMutation>()
@@ -79,6 +82,7 @@ public static class MiddlewareExtension
                 .AddTypeExtension<UserMutation>()
                 .AddTypeExtension<RoleMutation>()
                 .AddTypeExtension<ContactsMutation>()
+                .AddTypeExtension<SavedRecipesMutation>()
             .AddAuthorization()
             .InitializeOnStartup(keepWarm: true);
         

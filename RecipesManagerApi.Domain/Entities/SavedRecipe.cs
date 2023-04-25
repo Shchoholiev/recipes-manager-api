@@ -8,4 +8,6 @@ public class SavedRecipe : EntityBase
     public ObjectId UserId { get; set; }
 
     public ObjectId RecipeId { get; set; }
+
+    public bool IsDeleted { get; set; }
 }

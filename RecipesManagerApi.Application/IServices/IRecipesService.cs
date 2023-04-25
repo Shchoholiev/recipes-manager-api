@@ -11,8 +11,12 @@ public interface IRecipesService
 
     Task UpdateRecipeAsync(RecipeDto dto, CancellationToken cancellationToken);
 
-    Task<RecipeDto> GetRecipeAsync(ObjectId id, CancellationToken cancellationToken);    
+    Task DeleteRecipeAsync(RecipeDto dto, CancellationToken cancellationToken);
 
-    Task<PagedList<RecipeDto>> GetSearchPageAsync(int pageNumber, int pageSize, string searchString, ObjectId? authorId,
-        CategoryDto[]? categories, RecipesSearchTypes? recipeSearchType, ObjectId userId, CancellationToken cancellationToken);
+    Task<RecipeDto> GetRecipeAsync(string id, CancellationToken cancellationToken);
+
+    Task<PagedList<RecipeDto>> GetRecipesPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken);
+
+    Task<PagedList<RecipeDto>> GetSearchPageAsync(int pageNumber, int pageSize, string searchString, string? authorId,
+        CategoryDto[]? categories, RecipesSearchTypes? recipeSearchType, CancellationToken cancellationToken);
 }

@@ -50,12 +50,20 @@ public class RecipesService : IRecipesService
         }
     }
 
-    public async Task<PagedList<RecipeDto>> GetSearchPageAsync(int pageNumber, int pageSize, string searchString, ObjectId? authorId,
-        CategoryDto[]? categoriesDtos, RecipesSearchTypes? recipeSearchType, ObjectId userId, CancellationToken cancellationToken)
+    public async Task<PagedList<RecipeDto>> GetSearchPageAsync(int pageNumber, int pageSize, string searchString, string? authorsId,
+        CategoryDto[]? categoriesDtos, RecipesSearchTypes? recipeSearchType, CancellationToken cancellationToken)
     {
         List<Recipe>? entities;
         List<RecipeDto>? dtos;
         List<Category>? filterList = this._mapper.Map<List<Category>>(categoriesDtos);
+
+        if (!ObjectId.TryParse(authorsId, out var authorId))
+        {
+            throw new InvalidDataException("Provided id is invalid.");
+        }
+
+        var userId = (ObjectId)GlobalUser.Id;
+
         int count;
         switch (recipeSearchType)
         {
@@ -110,9 +118,13 @@ public class RecipesService : IRecipesService
         throw new NotImplementedException();
     }
 
-    public async Task<RecipeDto> GetRecipeAsync(ObjectId id, CancellationToken cancellationToken)
+    public async Task<RecipeDto> GetRecipeAsync(string id, CancellationToken cancellationToken)
     {
-        var entity = await this._recipesRepository.GetRecipeAsync(id, cancellationToken);
+        if (!ObjectId.TryParse(id, out var objectId))
+        {
+            throw new InvalidDataException("Provided id is invalid.");
+        }
+        var entity = await this._recipesRepository.GetRecipeAsync(objectId, cancellationToken);
         return this._mapper.Map<RecipeDto>(entity);
     }
 
@@ -123,7 +135,7 @@ public class RecipesService : IRecipesService
         if (GlobalUser.Id != null)
         {
             entity.LastModifiedById = (ObjectId)GlobalUser.Id;
-            entity.LastModifiedDateUtc = DateTime.UtcNow;s
+            entity.LastModifiedDateUtc = DateTime.UtcNow;
         }
 
         await this._recipesRepository.UpdateRecipeAsync(entity, cancellationToken);
@@ -165,6 +177,21 @@ public class RecipesService : IRecipesService
             || x.Text != null && x.Text.Contains(searchString) || x.IngredientsText != null && x.IngredientsText.Contains(searchString)
             && x.CreatedById == authorId && x.Categories.Any(c => filterList.Contains(c)), cancellationToken);
 
+    }
+
+    public async Task DeleteRecipeAsync(RecipeDto dto, CancellationToken cancellationToken)
+    {
+        var entity = this._mapper.Map<Recipe>(dto);
+        entity.IsDeleted = true;
+        await this._recipesRepository.UpdateRecipeAsync(entity, cancellationToken);
+    }
+
+    public async Task<PagedList<RecipeDto>> GetRecipesPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
+    {
+        var entities = await this._recipesRepository.GetPageAsync(pageNumber, pageSize, x => x.IsDeleted == false, cancellationToken);
+        var dtos = this._mapper.Map<List<RecipeDto>>(entities);
+        var count = await this._recipesRepository.GetTotalCountAsync();
+        return new PagedList<RecipeDto>(dtos, pageNumber, pageSize, count);
     }
 }
 

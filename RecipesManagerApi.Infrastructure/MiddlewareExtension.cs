@@ -69,6 +69,7 @@ public static class MiddlewareExtension
             .AddQueryType()
                 .AddTypeExtension<CategoriesQuery>()
                 .AddTypeExtension<ContactsQuery>()
+                .AddTypeExtension<RecipesQuery>()
             .AddMutationType()
                 .AddTypeExtension<CategoriesMutation>()
                 .AddTypeExtension<RegisterMutation>()
@@ -77,6 +78,7 @@ public static class MiddlewareExtension
                 .AddTypeExtension<UserMutation>()
                 .AddTypeExtension<RoleMutation>()
                 .AddTypeExtension<ContactsMutation>()
+                .AddTypeExtension<RecipesMutation>()
             .AddAuthorization()
             .InitializeOnStartup(keepWarm: true);
         

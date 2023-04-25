@@ -68,9 +68,15 @@ public class WeatherForecastController : ControllerBase
         Console.WriteLine(await this._cloudStorageService.UploadFileAsync(file, Guid.NewGuid(), file.FileName.Split(".").Last(), cancellationToken));
     }
 
-    [HttpPost("recipes")]
+    [HttpPost("recipe-add")]
     public async Task CreateRecipeAsync([FromForm]RecipeCreateDto dto, CancellationToken cancellationToken)
     {
         await _recipesService.AddRecipeAsync(dto, cancellationToken);
+    }
+
+    [HttpPost("recipe-update")]
+    public async Task UpdateRecipeAsync([FromForm] RecipeDto dto, CancellationToken cancellationToken)
+    {
+        await _recipesService.UpdateRecipeAsync(dto, cancellationToken);
     }
 }

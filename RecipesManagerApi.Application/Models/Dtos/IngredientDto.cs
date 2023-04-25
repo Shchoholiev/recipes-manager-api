@@ -1,4 +1,4 @@
-namespace RecipesManagerApi.Application.Models;
+namespace RecipesManagerApi.Application.Models.Dtos;
 
 public class IngredientDto
 {
@@ -9,4 +9,8 @@ public class IngredientDto
     public string? Units { get; set; }
 
     public Double? Amount { get; set; }
+
+    public int? CaloriesPerUnit { get; set; }
+
+    public int? TotalCalories { get; set; }
 }

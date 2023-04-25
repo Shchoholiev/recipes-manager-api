@@ -10,9 +10,7 @@ public class RecipeProfile : Profile
     public RecipeProfile()
     {
         CreateMap<Recipe, RecipeDto>().ReverseMap();
-
-        CreateMap<Ingredient, IngredientDto>().ReverseMap();
-
+        
         CreateMap<RecipeCreateDto, Recipe>()
             .ForMember(dest => dest.Thumbnail, opt => opt.Ignore());
     }

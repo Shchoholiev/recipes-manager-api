@@ -2,7 +2,7 @@ namespace RecipesManagerApi.Application.Models.Dtos;
 
 public class IngredientDto
 {
-    public string Id { get; set; }
+    public string? Id { get; set; }
 
     public string Name { get; set; }
 

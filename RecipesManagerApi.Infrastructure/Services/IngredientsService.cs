@@ -59,6 +59,7 @@ public class IngredientsService : IIngredientsService
 	public async IAsyncEnumerable<IngredientDto> EstimateIngredientsCaloriesAsync(List<IngredientDto> ingredients, CancellationToken cancellationToken) {
 		var inputIngredients = _mapper.Map<List<IngredientShortDto>>(ingredients);
 		var ingredientsJson = JsonConvert.SerializeObject(ingredients, new JsonSerializerSettings { Formatting = Formatting.None });
+		ingredientsJson = ingredientsJson.Replace("},", "},\n");
 		var chat = new ChatCompletionRequest {
 			MaxTokens = 1024,
 			Messages = new List<OpenAiMessage> {
@@ -68,7 +69,7 @@ public class IngredientsService : IIngredientsService
 				},
 				new OpenAiMessage {
 					Role = "user",
-					Content = $"Estimate calories per unit of ingredient. Add CaloriesPerUnit property to json. Return array.\n\n " + 
+					Content = $"Estimate calories per unit of ingredient. Add CaloriesPerUnit property to json. CaloriesPerUnit must be integer. Return array.\n\n " + 
 						$"Ingredients:\n {ingredientsJson} \n\nThe JSON response:"
 				}
 			}
@@ -88,8 +89,8 @@ public class IngredientsService : IIngredientsService
 				var newIngredient = JsonConvert.DeserializeObject<IngredientDto>(ingredientJson);
 				json.Clear();
 				var ingredient = ingredients[index];
-				ingredient.CaloriesPerUnit = newIngredient.CaloriesPerUnit;
-				ingredient.TotalCalories = (int)(newIngredient.CaloriesPerUnit * ingredient.Amount);
+				ingredient.CaloriesPerUnit = newIngredient?.CaloriesPerUnit ?? 0;
+				ingredient.TotalCalories = (int)(ingredient.CaloriesPerUnit * ingredient.Amount ?? 0);
 				index++;
 
 				yield return ingredient;

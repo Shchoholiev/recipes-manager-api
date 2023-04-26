@@ -13,6 +13,8 @@ builder.Services.AddServices();
 builder.Services.AddGraphQl();
 builder.Services.ConfigureCors();
 builder.Services.AddControllers();
+builder.Services.AddHealthChecks(builder.Configuration);
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -41,5 +43,7 @@ app.ConfogureGlobalUserMiddleware();
 app.MapGraphQL();
 
 app.MapControllers();
+
+app.MapHealthChecks("/health");
 
 app.Run();

@@ -63,7 +63,29 @@ public class SubscriptionsService : ISubscriptionService
 
     public async Task<PagedList<SubscriptionDto>> GetSubscriptionsPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
     {
-        var entities = await this._repository.GetPageAsync(pageNumber, pageSize, x => x.IsDeleted == false, cancellationToken);
+        var userId = GlobalUser.Id.Value;
+        var entities = await this._repository.GetPageAsync(pageNumber, pageSize, x => x.AuthorId == userId && x.IsDeleted == false, cancellationToken);
+        var dtos = this._mapper.Map<List<SubscriptionDto>>(entities);
+        var count = await this._repository.GetTotalCountAsync(x => x.IsDeleted == false);
+        return new PagedList<SubscriptionDto>(dtos, pageNumber, pageSize, count);
+    }
+
+    public async Task<PagedList<SubscriptionDto>> GetOwnSubscriptionsPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
+    {
+        var userId = GlobalUser.Id.Value;
+        var entities = await this._repository.GetPageAsync(pageNumber, pageSize, x => x.CreatedById == userId && x.IsDeleted == false, cancellationToken);
+        var dtos = this._mapper.Map<List<SubscriptionDto>>(entities);
+        var count = await this._repository.GetTotalCountAsync(x => x.IsDeleted == false);
+        return new PagedList<SubscriptionDto>(dtos, pageNumber, pageSize, count);
+    }
+
+    public async Task<PagedList<SubscriptionDto>> GetSubscriptionsPageAsync(int pageNumber, int pageSize, string userId, CancellationToken cancellationToken)
+    {
+        if (!ObjectId.TryParse(userId, out var objectId))
+        {
+            throw new InvalidDataException("Provided id is invalid.");
+        }
+        var entities = await this._repository.GetPageAsync(pageNumber, pageSize, x => x.CreatedById == objectId && x.IsDeleted == false, cancellationToken);
         var dtos = this._mapper.Map<List<SubscriptionDto>>(entities);
         var count = await this._repository.GetTotalCountAsync(x => x.IsDeleted == false);
         return new PagedList<SubscriptionDto>(dtos, pageNumber, pageSize, count);

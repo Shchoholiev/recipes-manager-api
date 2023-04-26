@@ -15,6 +15,10 @@ public interface ISubscriptionService
 
     Task<PagedList<SubscriptionDto>> GetSubscriptionsPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken);
 
+    Task<PagedList<SubscriptionDto>> GetSubscriptionsPageAsync(int pageNumber, int pageSize, string userId, CancellationToken cancellationToken);
+
+    Task<PagedList<SubscriptionDto>> GetOwnSubscriptionsPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken);
+
     Task<SubscriptionDto> UpdateSubscriptionAsync(SubscriptionDto dto, CancellationToken cancellationToken);
 
     Task<OperationDetails> DeleteSubscriptionAsync(SubscriptionDto dto, CancellationToken cancellationToken);

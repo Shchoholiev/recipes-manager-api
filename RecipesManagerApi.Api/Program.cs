@@ -34,8 +34,8 @@ app.UseCors("allowAnyOrigin");
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
 app.UseAuthentication();
+app.UseAuthorization();
 app.ConfogureGlobalUserMiddleware();
 
 app.MapGraphQL();

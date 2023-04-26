@@ -34,9 +34,19 @@ public class SubscriptionsService : ISubscriptionService
         return this._mapper.Map<SubscriptionDto>(entity);
     }
 
-    public async Task<OperationDetails> DeleteSubscriptionAsync(SubscriptionDto dto, CancellationToken cancellationToken)
+    public async Task<OperationDetails> DeleteSubscriptionAsync(string id, CancellationToken cancellationToken)
     {
-        var entity = this._mapper.Map<Subscription>(dto);
+        if (!ObjectId.TryParse(id, out var objectId))
+        {
+            throw new InvalidDataException("Provided id is invalid.");
+        }
+        var entity = await this._repository.GetSubscriptionAsync(objectId, cancellationToken);
+
+        if (entity == null)
+        {
+            throw new EntityNotFoundException<SavedRecipe>();
+        }
+
         entity.IsDeleted = true;
         await this._repository.UpdateSubscriptionAsync(entity, cancellationToken);
         return new OperationDetails() { IsSuccessful = true, TimestampUtc = DateTime.UtcNow };
@@ -50,13 +60,9 @@ public class SubscriptionsService : ISubscriptionService
         }
 
         var entity = await this._repository.GetSubscriptionAsync(objectId, cancellationToken);
-        if (entity == null)
+        if (entity == null || entity.IsDeleted == true)
         {
-            throw new EntityNotFoundException<SavedRecipe>();
-        }
-        if (entity.IsDeleted == true)
-        {
-            throw new EntityIsDeletedException<SavedRecipe>();
+            throw new EntityNotFoundException<Subscription>();
         }
         return this._mapper.Map<SubscriptionDto>(entity);
     }

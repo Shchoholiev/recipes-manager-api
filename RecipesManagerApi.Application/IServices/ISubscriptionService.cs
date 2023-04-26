@@ -21,6 +21,6 @@ public interface ISubscriptionService
 
     Task<SubscriptionDto> UpdateSubscriptionAsync(SubscriptionDto dto, CancellationToken cancellationToken);
 
-    Task<OperationDetails> DeleteSubscriptionAsync(SubscriptionDto dto, CancellationToken cancellationToken);
+    Task<OperationDetails> DeleteSubscriptionAsync(string id, CancellationToken cancellationToken);
 }
 

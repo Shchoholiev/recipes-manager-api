@@ -16,7 +16,7 @@ public class SubscriptionsQuery
     [Authorize]
     public Task<PagedList<SubscriptionDto>> GetOwnSubscriptionsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken,
        [Service] ISubscriptionService service)
-       => service.GetSubscriptionsPageAsync(pageNumber, pageSize, cancellationToken);
+       => service.GetOwnSubscriptionsPageAsync(pageNumber, pageSize, cancellationToken);
 
     [Authorize]
     public Task<PagedList<SubscriptionDto>> GetAuthorsSubscriptionsAsync(int pageNumber, int pageSize, string userId, CancellationToken cancellationToken,

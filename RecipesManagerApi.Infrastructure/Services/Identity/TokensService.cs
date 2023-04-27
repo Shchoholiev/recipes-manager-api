@@ -32,9 +32,13 @@ public class TokensService : ITokensService
     {
         var principal = this.GetPrincipalFromExpiredToken(tokensModel.AccessToken);
 
-        var userId = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value.ToString();
-        var user = await this._usersRepository.GetUserAsync(u => u.Email == userId, cancellationToken);
-        if (user == null || user?.RefreshToken != tokensModel.RefreshToken
+        var userId = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        if (!ObjectId.TryParse(userId, out var objectId))
+        {
+            throw new InvalidDataException("Provided id is invalid.");
+        }
+
+        var user = await this._usersRepository.GetUserAsync(objectId, cancellationToken); if (user == null || user?.RefreshToken != tokensModel.RefreshToken
             || user?.RefreshTokenExpiryDate <= DateTime.Now)
         {
             throw new SecurityTokenExpiredException();

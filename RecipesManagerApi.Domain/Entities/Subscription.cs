@@ -5,7 +5,9 @@ namespace RecipesManagerApi.Domain.Entities;
 
 public class Subscription : EntityBase
 {
-    public ObjectId UserId { get; set; }
+    public ObjectId AuthorId { get; set; }
     
     public bool IsAccessFull { get; set; }
+
+    public bool IsDeleted { get; set; }
 }

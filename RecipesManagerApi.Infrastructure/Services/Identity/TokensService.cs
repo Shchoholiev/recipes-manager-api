@@ -54,69 +54,6 @@ public class TokensService : ITokensService
         };
     }
 
-    public async Task<TokensModel> RefreshAppleGuestAsync(TokensModel tokensModel, CancellationToken cancellationToken)
-    {
-        var principal = this.GetPrincipalFromExpiredToken(tokensModel.AccessToken);
-
-        var userId = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-        if (!ObjectId.TryParse(userId, out var objectId))
-        {
-            throw new InvalidDataException("Provided id is invalid.");
-        }
-
-        var user = await this._usersRepository.GetUserAsync(objectId, cancellationToken);
-        if (user == null || user?.RefreshToken != tokensModel.RefreshToken
-            || user?.RefreshTokenExpiryDate <= DateTime.Now)
-        {
-            throw new SecurityTokenExpiredException();
-        }
-
-        var newAccessToken = this.GenerateAccessToken(principal.Claims);
-        var newRefreshToken = this.GenerateRefreshToken();
-        user.RefreshToken = newRefreshToken;
-        await this._usersRepository.UpdateUserAsync(user, cancellationToken);
-
-        this._logger.LogInformation($"Refreshed apple guest tokens.");
-
-        return new TokensModel
-        {
-            AccessToken = newAccessToken,
-            RefreshToken = newRefreshToken
-        };
-    }
-
-    public async Task<TokensModel> RefreshWebGuestAsync(TokensModel tokensModel, CancellationToken cancellationToken)
-    {
-        var principal = this.GetPrincipalFromExpiredToken(tokensModel.AccessToken);
-        var userId = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-        if (!ObjectId.TryParse(userId, out var objectId))
-        {
-            throw new InvalidDataException("Provided id is invalid.");
-        }
-
-        var user = await this._usersRepository.GetUserAsync(objectId, cancellationToken);
-        if (user == null || user?.RefreshToken != tokensModel.RefreshToken
-            || user?.RefreshTokenExpiryDate <= DateTime.Now)
-        {
-            throw new SecurityTokenExpiredException();
-        }
-
-        var newAccessToken = this.GenerateAccessToken(principal.Claims);
-        var newRefreshToken = this.GenerateRefreshToken();
-        user.RefreshToken = newRefreshToken;
-        await this._usersRepository.UpdateUserAsync(user, cancellationToken);
-
-        this._logger.LogInformation($"Refreshed web guest tokens.");
-
-        return new TokensModel
-        {
-            AccessToken = newAccessToken,
-            RefreshToken = newRefreshToken
-        };
-    }
-
     public string GenerateAccessToken(IEnumerable<Claim> claims)
     {
         var tokenOptions = GetTokenOptions(claims);

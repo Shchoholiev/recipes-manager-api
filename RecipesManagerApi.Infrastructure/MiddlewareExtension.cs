@@ -33,6 +33,7 @@ public static class MiddlewareExtension
         services.AddScoped<IOpenAiLogsRepository, OpenAiLogsRepository>();
         services.AddScoped<ISharedRecipesRepository, SharedRecipeRepository>();
         services.AddScoped<ISavedRecipesRepository, SavedRecipesRepository>();
+        services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
 
         return services;
     }
@@ -53,8 +54,9 @@ public static class MiddlewareExtension
         services.AddScoped<ISharedRecipesService, SharedRecipesService>();
         services.AddScoped<IIngredientsService, IngredientsService>();
         services.AddScoped<ISavedRecipesService, SavedRecipesService>();
+        services.AddScoped<ISubscriptionService, SubscriptionsService>();
 
-		return services;
+        return services;
 	}
 
 	public static IServiceCollection AddMapper(this IServiceCollection services)
@@ -74,6 +76,7 @@ public static class MiddlewareExtension
                 .AddTypeExtension<SharedRecipesQuery>()
                 .AddTypeExtension<SavedRecipesQuery>()
                 .AddTypeExtension<UsersQuery>()
+                .AddTypeExtension<SubscriptionsQuery>()
             .AddMutationType()
                 .AddTypeExtension<SharedRecipesMutation>()
                 .AddTypeExtension<CategoriesMutation>()
@@ -84,6 +87,7 @@ public static class MiddlewareExtension
                 .AddTypeExtension<RoleMutation>()
                 .AddTypeExtension<ContactsMutation>()
                 .AddTypeExtension<SavedRecipesMutation>()
+                .AddTypeExtension<SubscriptionsMutation>()
             .AddAuthorization()
             .InitializeOnStartup(keepWarm: true);
         

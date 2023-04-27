@@ -1,6 +1,5 @@
-using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
 using RecipesManagerApi.Api.Models;
 using RecipesManagerApi.Application.IServices;
@@ -8,6 +7,7 @@ using RecipesManagerApi.Application.Models.Dtos;
 
 namespace RecipesManagerApi.Api.Controllers;
 
+[Authorize]
 public class IngredientsController : ApiController
 {
     private readonly IIngredientsService _ingredientsService;

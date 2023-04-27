@@ -21,8 +21,8 @@ public class SubscriptionsMutation
     => service.UpdateSubscriptionAsync(dto, cancellationToken);
 
     [Authorize]
-    public Task<OperationDetails> DeleteSubscriptionAsync(SubscriptionDto dto, CancellationToken cancellationToken,
+    public Task<OperationDetails> DeleteSubscriptionAsync(string id, CancellationToken cancellationToken,
     [Service] ISubscriptionService service)
-    => service.DeleteSubscriptionAsync(dto, cancellationToken);
+    => service.DeleteSubscriptionAsync(id, cancellationToken);
 }
 

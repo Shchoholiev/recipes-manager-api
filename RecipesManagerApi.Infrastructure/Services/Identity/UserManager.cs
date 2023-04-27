@@ -43,16 +43,9 @@ public class UserManager : IUserManager
 
     public async Task<TokensModel> LoginAsync(LoginModel login, CancellationToken cancellationToken)
     {
-        User user;
-        if (login.Email != null)
-        {
-            user = await this._usersRepository.GetUserAsync(x => x.Email == login.Email, cancellationToken);
-        }
-        else
-        {
-            user = await this._usersRepository.GetUserAsync(x => x.Phone == login.Phone, cancellationToken);
-        }
-
+        var user = login.Email != null ? await this._usersRepository.GetUserAsync(x => x.Email == login.Email, cancellationToken) :
+                                         await this._usersRepository.GetUserAsync(x => x.Phone == login.Phone, cancellationToken);
+  
         if (user == null)
         {
             throw new EntityNotFoundException<User>();
@@ -361,12 +354,12 @@ public class UserManager : IUserManager
 
     private void ValidatePassword(string password)
     {
-        string regex = @"^(?=.*[a-zA-Z])(?=.*[\W_]).{8,}$";
+        /*string regex = @"^(?=.*[a-zA-Z])(?=.*[\W_]).{8,}$";
 
         if (!Regex.IsMatch(password, regex))
         {
             throw new InvalidPasswordException(password);
-        }
+        }*/
     }
 
     private void ValidateEmail(string email)

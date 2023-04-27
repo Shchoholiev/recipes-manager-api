@@ -9,7 +9,12 @@ namespace RecipesManagerApi.Infrastructure.Mutations;
 public class UserMutation
 {
     [Authorize]
-    public Task<UpdateUserModel> UpdateUserAsync(string email, UserDto userDto, CancellationToken cancellationToken,
-        [Service] IUserManager userManager)
-        => userManager.UpdateAsync(email, userDto, cancellationToken);
+    public Task<UpdateUserModel> UpdateUserAsync(UserDto userDto, CancellationToken cancellationToken,
+    [Service] IUserManager userManager)
+    => userManager.UpdateAsync(userDto, cancellationToken);
+
+    [Authorize]
+    public Task<UpdateUserModel> UpdateUserByAdminAsync(string id, UserDto userDto, CancellationToken cancellationToken,
+    [Service] IUserManager userManager)
+    => userManager.UpdateUserByAdminAsync(id, userDto, cancellationToken);
 }

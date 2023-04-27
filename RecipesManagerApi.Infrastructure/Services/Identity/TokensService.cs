@@ -58,8 +58,14 @@ public class TokensService : ITokensService
     {
         var principal = this.GetPrincipalFromExpiredToken(tokensModel.AccessToken);
 
-        var userId = Guid.Parse(principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
-        var user = await this._usersRepository.GetUserAsync(u => u.AppleDeviceId == userId, cancellationToken);
+        var userId = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+        if (!ObjectId.TryParse(userId, out var objectId))
+        {
+            throw new InvalidDataException("Provided id is invalid.");
+        }
+
+        var user = await this._usersRepository.GetUserAsync(objectId, cancellationToken);
         if (user == null || user?.RefreshToken != tokensModel.RefreshToken
             || user?.RefreshTokenExpiryDate <= DateTime.Now)
         {
@@ -83,9 +89,14 @@ public class TokensService : ITokensService
     public async Task<TokensModel> RefreshWebGuestAsync(TokensModel tokensModel, CancellationToken cancellationToken)
     {
         var principal = this.GetPrincipalFromExpiredToken(tokensModel.AccessToken);
+        var userId = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
-        var userId = Guid.Parse(principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
-        var user = await this._usersRepository.GetUserAsync(u => u.WebId == userId, cancellationToken);
+        if (!ObjectId.TryParse(userId, out var objectId))
+        {
+            throw new InvalidDataException("Provided id is invalid.");
+        }
+
+        var user = await this._usersRepository.GetUserAsync(objectId, cancellationToken);
         if (user == null || user?.RefreshToken != tokensModel.RefreshToken
             || user?.RefreshTokenExpiryDate <= DateTime.Now)
         {

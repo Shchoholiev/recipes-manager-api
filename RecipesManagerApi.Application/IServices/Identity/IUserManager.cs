@@ -18,5 +18,7 @@ public interface IUserManager
 
     Task<TokensModel> RemoveFromRoleAsync(string roleName, string email, CancellationToken cancellationToken);
 
-    Task<UpdateUserModel> UpdateAsync(string email, UserDto userDto, CancellationToken cancellationToken);
+    Task<UpdateUserModel> UpdateAsync(UserDto userDto, CancellationToken cancellationToken);
+
+    Task<UpdateUserModel> UpdateUserByAdminAsync(string id, UserDto userDto, CancellationToken cancellationToken);
 }

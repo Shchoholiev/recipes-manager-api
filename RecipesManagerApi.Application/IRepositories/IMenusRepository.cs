@@ -6,9 +6,13 @@ namespace RecipesManagerApi.Application.IRepositories;
 
 public interface IMenusRepository : IBaseRepository<Menu>
 {
-	Task<Menu> GetMenuAsync(ObjectId id, CancellationToken cancellationToken);
+	Task<MenuLookedUp> GetMenuAsync(ObjectId id, CancellationToken cancellationToken);
 	
-	Task UpdateMenuAsync(Menu menu, CancellationToken cancellationToken);
+	Task<List<MenuLookedUp>> GetPageAsync(int pageNumber, int pageSize, ObjectId userId, CancellationToken cancellationToken);
+	
+	Task<MenuLookedUp> UpdateMenuAsync(Menu menu, CancellationToken cancellationToken);
 	
 	Task<int> GetTotalCountAsync(Expression<Func<Menu, bool>> predicate);
+	
+	Task<MenuLookedUp> AddMenuAsync(Menu entity, CancellationToken cancellationToken);
 }

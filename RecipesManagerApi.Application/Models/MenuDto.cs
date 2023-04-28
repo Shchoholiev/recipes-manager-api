@@ -6,7 +6,7 @@ public class MenuDto
 	
 	public string Name { get; set; }
 	
-	public List<RecipeDto> Recipes { get; set; }
+	public List<RecipeDto>? Recipes { get; set; }
 	
 	public string? Notes { get; set; }
 	

@@ -3,6 +3,7 @@ using AutoMapper;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using RecipesManagerApi.Application.Exceptions;
+using RecipesManagerApi.Application.GlodalInstances;
 using RecipesManagerApi.Application.IRepositories;
 using RecipesManagerApi.Application.IServices;
 using RecipesManagerApi.Application.Models;
@@ -16,111 +17,78 @@ namespace RecipesManagerApi.Infrastructure.Services;
 public class MenusService : IMenusService
 {
 	private readonly IMenusRepository _menusRepository;
-	private readonly IRecipesRepository _recipesRepository;
 	private readonly IMapper _mapper;
 	private readonly IEmailsService _emailsService;
 	
 	public MenusService(
 		IMenusRepository menusRepository,
-		IRecipesRepository recipesRepository, 
 		IMapper mapper,
 		IEmailsService emailService)
 	{
 		this._menusRepository = menusRepository;
 		this._mapper = mapper;
 		this._emailsService = emailService;
-		this._recipesRepository = recipesRepository;
 	}
 	
-	public async Task<PagedList<MenuDto>> GetMenusPageAsync(int pageNumber, int pageSize, string userId, CancellationToken cancellationToken)
+	public async Task<PagedList<MenuDto>> GetMenusPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
 	{
-		ObjectId.TryParse(userId, out var objectId);
+		ObjectId.TryParse(GlobalUser.Id.ToString(), out var userId);
+		var entities = await this._menusRepository.GetPageAsync(pageNumber, pageSize, userId, cancellationToken);
+		var dtos = this._mapper.Map<List<MenuDto>>(entities);
+		var count = await this._menusRepository.GetTotalCountAsync(x => !x.IsDeleted && x.CreatedById == userId);
 		
-		var entities = await this._menusRepository.GetPageAsync(pageNumber, pageSize, x => x.CreatedById == objectId, cancellationToken);
-		var dtos = new List<MenuDto>(); 
-		
-		foreach(var menu in entities)
-		{
-			if (menu.RecipesIds == null)
-			{
-				dtos.Add(this._mapper.Map<MenuDto>(menu));
-			}
-			else
-			{
-				var recipesEntities = this._recipesRepository.GetPageAsync(1, 0, x => menu.RecipesIds.Contains(x.Id), cancellationToken);
-				dtos.Add(this._mapper.Map<MenuDto>(menu, opt => opt.Items["Recipes"] = _mapper.Map<List<RecipeDto>>(recipesEntities)));
-			}
-		}
-		var count = await this._menusRepository.GetTotalCountAsync(x => x.CreatedById == objectId && !x.IsDeleted);
 		return new PagedList<MenuDto>(dtos, pageNumber, pageSize, count);
 	}
 	
 	public async Task<MenuDto> GetMenuAsync(string id, CancellationToken cancellationToken)
 	{
 		ObjectId.TryParse(id, out var objectId);
+		var entity = await this._menusRepository.GetMenuAsync(objectId, cancellationToken);
 		
-		var menuEntity = await this._menusRepository.GetMenuAsync(objectId, cancellationToken);
-		MenuDto dto;
-		if (menuEntity.RecipesIds == null)
-		{
-			dto = this._mapper.Map<MenuDto>(menuEntity);
-		}
-		else
-		{
-			var recipesEntities = await this._recipesRepository.GetPageAsync(1, 0, x => menuEntity.RecipesIds.Contains(x.Id), cancellationToken);
-			dto = this._mapper.Map<MenuDto>(menuEntity, opt => opt.Items["Recipes"] = this._mapper.Map<List<RecipeDto>>(recipesEntities));
-		}
-		return dto;	
+		return this._mapper.Map<MenuDto>(entity);
 	}
 	
 	public async Task<MenuDto> AddMenuAsync(MenuCreateDto createDto, CancellationToken cancellationToken)
 	{
 		var entity = this._mapper.Map<Menu>(createDto);
-		var newEntity = await this._menusRepository.AddAsync(entity, cancellationToken);
+		var menu = await this._menusRepository.AddMenuAsync(entity, cancellationToken);
 		
-	
-		if (newEntity.RecipesIds == null)
-		{
-			return this._mapper.Map<MenuDto>(entity);
-		}
-		else
-		{
-			var recipesEntities = await this._recipesRepository.GetPageAsync(1, 0, x => newEntity.RecipesIds.Contains(x.Id), cancellationToken);
-			return this._mapper.Map<MenuDto>(entity, opt => opt.Items["Recipes"] = this._mapper.Map<List<RecipeDto>>(recipesEntities));
-		}
+		return this._mapper.Map<MenuDto>(menu);
 	}
 	
 	public async Task<MenuDto> UpdateMenuAsync(MenuDto dto, CancellationToken cancellationToken)
 	{
-		Menu entity;
-		if (dto.Recipes != null)
+		List<string> recipesIds = new List<string>();
+		if(dto.Recipes != null)
 		{
-			var recipesIds = new List<ObjectId>();
-			foreach (var recipe in dto.Recipes)
-			{
-				recipesIds.Add(ObjectId.Parse(recipe.Id));
-			}
-			entity = this._mapper.Map<Menu>(dto, opt => opt.Items["RecipesIds"] = recipesIds);
+			recipesIds = dto.Recipes.Select(x => x.Id).ToList();
 		}
-		else
+		var entity = this._mapper.Map<Menu>(dto, opt => opt.Items["RecipesIds"] =  recipesIds);
+		var newEntity = await this._menusRepository.UpdateMenuAsync(entity, cancellationToken);
+		
+		return this._mapper.Map<MenuDto>(newEntity);
+	}
+	
+	public async Task DeleteMenuAsync(MenuDto dto, CancellationToken cancellationToken)
+	{
+		List<string> recipesIds = new List<string>();
+		if(dto.Recipes != null)
 		{
-			entity = this._mapper.Map<Menu>(dto);
+			recipesIds = dto.Recipes.Select(x => x.Id).ToList();
 		}
+		var entity = this._mapper.Map<Menu>(dto, opt => opt.Items["RecipesIds"] =  recipesIds);
+		entity.IsDeleted = true;
 		
 		await this._menusRepository.UpdateMenuAsync(entity, cancellationToken);
-		
-		var recipesEntities = await this._recipesRepository.GetPageAsync(1, 0, x => entity.RecipesIds.Contains(x.Id), cancellationToken);
-		return this._mapper.Map<MenuDto>(entity, opt => opt.Items["Recipes"] = this._mapper.Map<List<RecipeDto>>(recipesEntities));
 	}
 	
 	public async Task SendMenuToEmailAsync(string menuId, List<string> emailsTo, CancellationToken cancellationToken)
 	{
 		var menuDto = await this.GetMenuAsync(menuId, cancellationToken);
-		
 		var message = new EmailMessage
 		{
 			Recipients = emailsTo,
-			Subject = $"Menu {menuDto.Name}",
+			Subject = $"Recipes for {menuDto.Name}:",
 			Body = FormMenuEmailHTMLBody(menuDto)
 		};
 		
@@ -160,14 +128,14 @@ public class MenusService : IMenusService
 				</tr>
 		");
 		
-		if(menu.Recipes != null)
+		if(menu.Recipes.Count > 0)
 		{
 			foreach (var recipe in menu.Recipes)
 			{
 				sb.Append(@$"
 				<tr>
 				<td>
-				<p style=""margin:0 0 12px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"">Ingredients for {recipe.Name}({recipe.ServingsCount} serving(s)):</p>
+				<p style=""margin:0 0 12px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"">Ingredients for {recipe.Name} for {recipe.ServingsCount} serving(s):</p>
 				");
 				
 				foreach(var ingredient in recipe.Ingredients)
@@ -182,7 +150,7 @@ public class MenusService : IMenusService
 		{
 			sb.Append(@"
 				<tr>
-					<td><p>This menu contains no recipes</p></td>
+					<td><h1 style=""color:#153643;font-size:24px;margin:0 0 20px 0;font-family:Arial,sans-serif;text-align:center"">This menu contains no recipes</h1></td>
 				</tr>
 			");
 		}
@@ -191,6 +159,33 @@ public class MenusService : IMenusService
 			</table>
 			</td>
 		  </tr>
+		  
+		  <tr>
+			<td style=""padding:30px;background:#ee4c50;"">
+			  <table role=""presentation"" style=""width:100%;border-collapse:collapse;border:0;border-spacing:0;font-size:9px;font-family:Arial,sans-serif;"">
+				<tr>
+				  <td style=""padding:0;width:50%;"" align=""left"">
+					<p style=""margin:0;font-size:14px;line-height:16px;font-family:Arial,sans-serif;color:#ffffff;"">
+					  &reg; Recipes Manager<br/><a href="""" style=""color:#ffffff;text-decoration:underline;"">Main Page</a>
+					</p>
+				  </td>
+				  <td style=""padding:0;width:50%;"" align=""right"">
+					<table role=""presentation"" style=""border-collapse:collapse;border:0;border-spacing:0;"">
+					  <tr>
+						<td style=""padding:0 0 0 10px;width:38px;"">
+						  <a href="""" style=""color:#ffffff;""><img src=""https://assets.codepen.io/210284/tw_1.png"" alt=""Twitter"" width=""38"" style=""height:auto;display:block;border:0;"" /></a>
+						</td>
+						<td style=""padding:0 0 0 10px;width:38px;"">
+						  <a href="""" style=""color:#ffffff;""><img src=""https://assets.codepen.io/210284/fb_1.png"" alt=""Facebook"" width=""38"" style=""height:auto;display:block;border:0;"" /></a>
+						</td>
+					  </tr>
+					</table>
+				  </td>
+				</tr>
+			  </table>
+			</td>
+		  </tr>
+		  
 		</table>
 	  </td>
 	</tr>
@@ -200,5 +195,5 @@ public class MenusService : IMenusService
 		");
 		
 		return sb.ToString();
-	} 
+	}
 }

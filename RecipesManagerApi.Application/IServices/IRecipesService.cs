@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using RecipesManagerApi.Application.Models;
+using RecipesManagerApi.Application.Models.Dtos;
 using RecipesManagerApi.Application.Paging;
 using RecipesManagerApi.Domain.Enums;
 

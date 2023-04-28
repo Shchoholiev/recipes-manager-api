@@ -1,5 +1,5 @@
 using RecipesManagerApi.Application.IServices;
-using RecipesManagerApi.Application.Models;
+using RecipesManagerApi.Application.Models.Dtos;
 using RecipesManagerApi.Application.Models.CreateDtos;
 
 namespace RecipesManagerApi.Infrastructure.Mutations;

@@ -18,12 +18,4 @@ public class AccessMutation
     public Task<TokensModel> RefreshUserTokenAsync(TokensModel model, CancellationToken cancellationToken,
     [Service] ITokensService tokensService)
     => tokensService.RefreshUserAsync(model, cancellationToken);
-
-    public Task<TokensModel> RefreshAppleGuestTokenAsync(TokensModel model, CancellationToken cancellationToken,
-    [Service] ITokensService tokensService)
-    => tokensService.RefreshAppleGuestAsync(model, cancellationToken);
-
-    public Task<TokensModel> RefreshWebGuestTokenAsync(TokensModel model, CancellationToken cancellationToken,
-    [Service] ITokensService tokensService)
-    => tokensService.RefreshWebGuestAsync(model, cancellationToken);
 }

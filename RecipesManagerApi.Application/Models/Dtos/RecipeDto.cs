@@ -1,6 +1,4 @@
-using RecipesManagerApi.Application.Models.Dtos;
-
-namespace RecipesManagerApi.Application.Models;
+namespace RecipesManagerApi.Application.Models.Dtos;
 
 public class RecipeDto
 {
@@ -12,7 +10,7 @@ public class RecipeDto
 
     public List<IngredientDto>? Ingredients { get; set; }
 
-    public string? IngredientsText {get; set;}
+    public string? IngredientsText { get; set; }
 
     public List<CategoryDto> Categories { get; set; }
 

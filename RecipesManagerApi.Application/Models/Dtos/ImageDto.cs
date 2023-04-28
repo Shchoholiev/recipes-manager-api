@@ -1,6 +1,6 @@
 using RecipesManagerApi.Domain.Enums;
 
-namespace RecipesManagerApi.Application.Models;
+namespace RecipesManagerApi.Application.Models.Dtos;
 
 public class ImageDto
 {

@@ -75,6 +75,7 @@ public static class MiddlewareExtension
                 .AddTypeExtension<ContactsQuery>()
                 .AddTypeExtension<SharedRecipesQuery>()
                 .AddTypeExtension<SavedRecipesQuery>()
+                .AddTypeExtension<UsersQuery>()
                 .AddTypeExtension<SubscriptionsQuery>()
             .AddMutationType()
                 .AddTypeExtension<SharedRecipesMutation>()

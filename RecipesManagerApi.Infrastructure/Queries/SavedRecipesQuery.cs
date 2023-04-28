@@ -1,7 +1,7 @@
 ﻿using RecipesManagerApi.Application.IServices;
-using RecipesManagerApi.Application.Models;
 using RecipesManagerApi.Application.Paging;
 using HotChocolate.Authorization;
+using RecipesManagerApi.Application.Models.Dtos;
 
 namespace RecipesManagerApi.Infrastructure.Queries;
 

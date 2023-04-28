@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson;
 
-namespace RecipesManagerApi.Application.Models;
+namespace RecipesManagerApi.Application.Models.Dtos;
 public class RoleDto
 {
     public string Id { get; set; }

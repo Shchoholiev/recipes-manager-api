@@ -2,7 +2,7 @@ using MongoDB.Bson;
 using AutoMapper;
 using RecipesManagerApi.Application.IServices;
 using RecipesManagerApi.Application.IRepositories;
-using RecipesManagerApi.Application.Models;
+using RecipesManagerApi.Application.Models.Dtos;
 using RecipesManagerApi.Application.Exceptions;
 using RecipesManagerApi.Application.Paging;
 using RecipesManagerApi.Domain.Entities;

@@ -3,8 +3,8 @@ using MongoDB.Bson;
 using RecipesManagerApi.Application.Exceptions;
 using RecipesManagerApi.Application.IRepositories;
 using RecipesManagerApi.Application.IServices;
-using RecipesManagerApi.Application.Models;
 using RecipesManagerApi.Application.Models.CreateDtos;
+using RecipesManagerApi.Application.Models.Dtos;
 using RecipesManagerApi.Application.Models.Operations;
 using RecipesManagerApi.Domain.Entities;
 

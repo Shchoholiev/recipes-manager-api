@@ -31,7 +31,7 @@ public static class MiddlewareExtension
         services.AddScoped<IRecipesRepository, RecipesRepository>();
         services.AddScoped<IImagesRepository, ImagesRepository>();
         services.AddScoped<IOpenAiLogsRepository, OpenAiLogsRepository>();
-        services.AddScoped<IMenusRepository, MenusRepository>();
+<<<<<<<<< Temporary merge branch 1
         services.AddScoped<ISharedRecipesRepository, SharedRecipeRepository>();
         services.AddScoped<ISavedRecipesRepository, SavedRecipesRepository>();
         services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
@@ -58,8 +58,8 @@ public static class MiddlewareExtension
         services.AddScoped<ISavedRecipesService, SavedRecipesService>();
         services.AddScoped<ISubscriptionService, SubscriptionsService>();
 
-        return services;
-	}
+		return services;
+	  }
 
 	public static IServiceCollection AddMapper(this IServiceCollection services)
 	{
@@ -75,7 +75,7 @@ public static class MiddlewareExtension
             .AddQueryType()
                 .AddTypeExtension<CategoriesQuery>()
                 .AddTypeExtension<ContactsQuery>()
-                .AddTypeExtension<MenusQuery>()
+<<<<<<<<< Temporary merge branch 1
                 .AddTypeExtension<SharedRecipesQuery>()
                 .AddTypeExtension<SavedRecipesQuery>()
                 .AddTypeExtension<UsersQuery>()
@@ -96,39 +96,39 @@ public static class MiddlewareExtension
             .InitializeOnStartup(keepWarm: true);
         
 
-        return services;
-    }
+		return services;
+	}
 
-    public static IServiceCollection AddJWTTokenAuthentication(this IServiceCollection services,
-                                                     IConfiguration configuration)
-    {
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = configuration.GetValue<bool>("JsonWebTokenKeys:ValidateIssuer"),
-                ValidateAudience = configuration.GetValue<bool>("JsonWebTokenKeys:ValidateAudience"),
-                ValidateLifetime = configuration.GetValue<bool>("JsonWebTokenKeys:ValidateLifetime"),
-                ValidateIssuerSigningKey = configuration.GetValue<bool>("JsonWebTokenKeys:ValidateIssuerSigningKey"),
-                ValidIssuer = configuration.GetValue<string>("JsonWebTokenKeys:ValidIssuer"),
-                ValidAudience = configuration.GetValue<string>("JsonWebTokenKeys:ValidAudience"),
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue<string>("JsonWebTokenKeys:IssuerSigningKey"))),
-                ClockSkew = TimeSpan.Zero
-            };
-        });
+	public static IServiceCollection AddJWTTokenAuthentication(this IServiceCollection services,
+													 IConfiguration configuration)
+	{
+		services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+		.AddJwtBearer(options =>
+		{
+			options.TokenValidationParameters = new TokenValidationParameters
+			{
+				ValidateIssuer = configuration.GetValue<bool>("JsonWebTokenKeys:ValidateIssuer"),
+				ValidateAudience = configuration.GetValue<bool>("JsonWebTokenKeys:ValidateAudience"),
+				ValidateLifetime = configuration.GetValue<bool>("JsonWebTokenKeys:ValidateLifetime"),
+				ValidateIssuerSigningKey = configuration.GetValue<bool>("JsonWebTokenKeys:ValidateIssuerSigningKey"),
+				ValidIssuer = configuration.GetValue<string>("JsonWebTokenKeys:ValidIssuer"),
+				ValidAudience = configuration.GetValue<string>("JsonWebTokenKeys:ValidAudience"),
+				IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue<string>("JsonWebTokenKeys:IssuerSigningKey"))),
+				ClockSkew = TimeSpan.Zero
+			};
+		});
 
-        return services;
-    }
+		return services;
+	}
 
-    public static IServiceCollection AddHttpClients(this IServiceCollection services, IConfiguration configuration)
-    {
-        var openAiApiKey = configuration.GetSection("OpenAi")?.GetValue<string>("ApiKey");
-        services.AddHttpClient("OpenAiHttpClient", client => {
-            client.BaseAddress = new Uri("https://api.openai.com/v1/");
-            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {openAiApiKey}");
-        });
+	public static IServiceCollection AddHttpClients(this IServiceCollection services, IConfiguration configuration)
+	{
+		var openAiApiKey = configuration.GetSection("OpenAi")?.GetValue<string>("ApiKey");
+		services.AddHttpClient("OpenAiHttpClient", client => {
+			client.BaseAddress = new Uri("https://api.openai.com/v1/");
+			client.DefaultRequestHeaders.Add("Authorization", $"Bearer {openAiApiKey}");
+		});
 
-        return services;
-    }
+		return services;
+	}
 }

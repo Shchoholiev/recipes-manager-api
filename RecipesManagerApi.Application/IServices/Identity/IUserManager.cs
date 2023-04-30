@@ -1,5 +1,6 @@
-using RecipesManagerApi.Application.Models;
+using RecipesManagerApi.Application.Models.Dtos;
 using RecipesManagerApi.Application.Models.Identity;
+using RecipesManagerApi.Application.Models.Operations;
 
 namespace RecipesManagerApi.Application.IServices.Identity;
 
@@ -17,5 +18,7 @@ public interface IUserManager
 
     Task<TokensModel> RemoveFromRoleAsync(string roleName, string email, CancellationToken cancellationToken);
 
-    Task<TokensModel> UpdateAsync(string email, UserDto userDto, CancellationToken cancellationToken);
+    Task<UpdateUserModel> UpdateAsync(UserDto userDto, CancellationToken cancellationToken);
+
+    Task<UpdateUserModel> UpdateUserByAdminAsync(string id, UserDto userDto, CancellationToken cancellationToken);
 }

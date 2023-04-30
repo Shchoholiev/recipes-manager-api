@@ -21,6 +21,11 @@ public class GlobalUserCustomMiddleware
         }
         GlobalUser.Name = httpContext.User.FindFirst(ClaimTypes.Name)?.Value;
         GlobalUser.Email = httpContext.User.FindFirst(ClaimTypes.Email)?.Value;
+        GlobalUser.Phone = httpContext.User.FindFirst(ClaimTypes.MobilePhone)?.Value;
+        foreach(var role in httpContext.User.FindAll(ClaimTypes.Role))
+        {
+            GlobalUser.Roles.Add(role.Value);
+        }
         await this._next(httpContext);
     }
 }

@@ -32,9 +32,12 @@ public static class MiddlewareExtension
         services.AddScoped<IImagesRepository, ImagesRepository>();
         services.AddScoped<IOpenAiLogsRepository, OpenAiLogsRepository>();
         services.AddScoped<IMenusRepository, MenusRepository>();
-      
-		return services;
-	}
+        services.AddScoped<ISharedRecipesRepository, SharedRecipeRepository>();
+        services.AddScoped<ISavedRecipesRepository, SavedRecipesRepository>();
+        services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+
+        return services;
+    }
 
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
@@ -49,10 +52,13 @@ public static class MiddlewareExtension
         services.AddScoped<IEmailsService, EmailsService>();
         services.AddScoped<IUserManager, UserManager>();
         services.AddScoped<IOpenAiService, OpenAiService>();
+        services.AddScoped<ISharedRecipesService, SharedRecipesService>();
         services.AddScoped<IIngredientsService, IngredientsService>();
         services.AddScoped<IMenusService, MenusService>();
+        services.AddScoped<ISavedRecipesService, SavedRecipesService>();
+        services.AddScoped<ISubscriptionService, SubscriptionsService>();
 
-		return services;
+        return services;
 	}
 
 	public static IServiceCollection AddMapper(this IServiceCollection services)
@@ -70,7 +76,12 @@ public static class MiddlewareExtension
                 .AddTypeExtension<CategoriesQuery>()
                 .AddTypeExtension<ContactsQuery>()
                 .AddTypeExtension<MenusQuery>()
+                .AddTypeExtension<SharedRecipesQuery>()
+                .AddTypeExtension<SavedRecipesQuery>()
+                .AddTypeExtension<UsersQuery>()
+                .AddTypeExtension<SubscriptionsQuery>()
             .AddMutationType()
+                .AddTypeExtension<SharedRecipesMutation>()
                 .AddTypeExtension<CategoriesMutation>()
                 .AddTypeExtension<RegisterMutation>()
                 .AddTypeExtension<LoginMutation>()
@@ -79,6 +90,8 @@ public static class MiddlewareExtension
                 .AddTypeExtension<RoleMutation>()
                 .AddTypeExtension<ContactsMutation>()
                 .AddTypeExtension<MenusMutation>()
+                .AddTypeExtension<SavedRecipesMutation>()
+                .AddTypeExtension<SubscriptionsMutation>()
             .AddAuthorization()
             .InitializeOnStartup(keepWarm: true);
         

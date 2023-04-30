@@ -1,7 +1,8 @@
 using MongoDB.Bson;
-using RecipesManagerApi.Application.Models;
+using RecipesManagerApi.Application.Models.Dtos;
 using RecipesManagerApi.Application.Models.CreateDtos;
 using RecipesManagerApi.Application.Paging;
+using RecipesManagerApi.Application.Models.Operations;
 
 namespace RecipesManagerApi.Application.IServices;
 
@@ -15,7 +16,7 @@ public interface IMenusService
 	
 	Task<MenuDto> UpdateMenuAsync(MenuDto dto, CancellationToken cancellationToken);
 	
-	Task DeleteMenuAsync (MenuDto dto, CancellationToken cancellationToken);
+	Task<OperationDetails> DeleteMenuAsync (MenuDto dto, CancellationToken cancellationToken);
 	
-	Task SendMenuToEmailAsync(string menuId, List<string> emailsTo, CancellationToken cancellationToken);
+	Task<OperationDetails> SendMenuToEmailAsync(string menuId, List<string> emailsTo, CancellationToken cancellationToken);
 }

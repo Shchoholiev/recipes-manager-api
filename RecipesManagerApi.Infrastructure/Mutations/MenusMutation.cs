@@ -1,6 +1,7 @@
 using RecipesManagerApi.Application.IServices;
-using RecipesManagerApi.Application.Models;
 using RecipesManagerApi.Application.Models.CreateDtos;
+using RecipesManagerApi.Application.Models.Dtos;
+using RecipesManagerApi.Application.Models.Operations;
 
 namespace RecipesManagerApi.Infrastructure.Mutations;
 
@@ -15,7 +16,7 @@ public class MenusMutation
 		[Service] IMenusService service)
 		=> service.UpdateMenuAsync(menuDto, cancellationToken);
 
-	public Task DeleteMenuAsync(MenuDto menuDto, CancellationToken cancellationToken,
+	public Task<OperationDetails> DeleteMenuAsync(MenuDto menuDto, CancellationToken cancellationToken,
 		[Service] IMenusService service)
 		=> service.DeleteMenuAsync(menuDto, cancellationToken);
 }

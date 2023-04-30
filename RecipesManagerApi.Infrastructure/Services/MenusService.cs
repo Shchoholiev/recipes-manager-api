@@ -6,11 +6,12 @@ using RecipesManagerApi.Application.Exceptions;
 using RecipesManagerApi.Application.GlodalInstances;
 using RecipesManagerApi.Application.IRepositories;
 using RecipesManagerApi.Application.IServices;
-using RecipesManagerApi.Application.Models;
+using RecipesManagerApi.Application.Models.Dtos;
 using RecipesManagerApi.Application.Models.CreateDtos;
 using RecipesManagerApi.Application.Models.EmailModels;
 using RecipesManagerApi.Application.Paging;
 using RecipesManagerApi.Domain.Entities;
+using RecipesManagerApi.Application.Models.Operations;
 
 namespace RecipesManagerApi.Infrastructure.Services;
 
@@ -44,7 +45,10 @@ public class MenusService : IMenusService
 	{
 		ObjectId.TryParse(id, out var objectId);
 		var entity = await this._menusRepository.GetMenuAsync(objectId, cancellationToken);
-		
+		if(entity == null)
+		{
+			throw new EntityNotFoundException<Menu>();
+		}
 		return this._mapper.Map<MenuDto>(entity);
 	}
 	
@@ -64,12 +68,12 @@ public class MenusService : IMenusService
 			recipesIds = dto.Recipes.Select(x => x.Id).ToList();
 		}
 		var entity = this._mapper.Map<Menu>(dto, opt => opt.Items["RecipesIds"] =  recipesIds);
-		var newEntity = await this._menusRepository.UpdateMenuAsync(entity, cancellationToken);
+		await this._menusRepository.UpdateMenuAsync(entity, cancellationToken);
 		
-		return this._mapper.Map<MenuDto>(newEntity);
+		return dto;
 	}
 	
-	public async Task DeleteMenuAsync(MenuDto dto, CancellationToken cancellationToken)
+	public async Task<OperationDetails> DeleteMenuAsync(MenuDto dto, CancellationToken cancellationToken)
 	{
 		List<string> recipesIds = new List<string>();
 		if(dto.Recipes != null)
@@ -78,11 +82,12 @@ public class MenusService : IMenusService
 		}
 		var entity = this._mapper.Map<Menu>(dto, opt => opt.Items["RecipesIds"] =  recipesIds);
 		entity.IsDeleted = true;
-		
 		await this._menusRepository.UpdateMenuAsync(entity, cancellationToken);
+		
+		return new OperationDetails { IsSuccessful = true, TimestampUtc = DateTime.UtcNow };
 	}
 	
-	public async Task SendMenuToEmailAsync(string menuId, List<string> emailsTo, CancellationToken cancellationToken)
+	public async Task<OperationDetails> SendMenuToEmailAsync(string menuId, List<string> emailsTo, CancellationToken cancellationToken)
 	{
 		var menuDto = await this.GetMenuAsync(menuId, cancellationToken);
 		var message = new EmailMessage
@@ -91,8 +96,9 @@ public class MenusService : IMenusService
 			Subject = $"Recipes for {menuDto.Name}:",
 			Body = FormMenuEmailHTMLBody(menuDto)
 		};
-		
 		await _emailsService.SendEmailMessageAsync(message, cancellationToken);
+		
+		return new OperationDetails { IsSuccessful = true, TimestampUtc = DateTime.UtcNow };
 	}
 	
 	private string FormMenuEmailHTMLBody(MenuDto menu)

@@ -21,43 +21,43 @@ namespace RecipesManagerApi.Infrastructure;
 
 public static class MiddlewareExtension
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services)
-    {
-        services.AddSingleton<MongoDbContext>();
-        
-        services.AddScoped<ICategoriesRepository, CategoriesRepository>();
-        services.AddScoped<IUsersRepository, UsersRepository>();
-        services.AddScoped<IRolesRepository, RolesRepository>();
-        services.AddScoped<IRecipesRepository, RecipesRepository>();
-        services.AddScoped<IImagesRepository, ImagesRepository>();
-        services.AddScoped<IOpenAiLogsRepository, OpenAiLogsRepository>();
-<<<<<<<<< Temporary merge branch 1
-        services.AddScoped<ISharedRecipesRepository, SharedRecipeRepository>();
-        services.AddScoped<ISavedRecipesRepository, SavedRecipesRepository>();
-        services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+	public static IServiceCollection AddInfrastructure(this IServiceCollection services)
+	{
+		services.AddSingleton<MongoDbContext>();
+		
+		services.AddScoped<ICategoriesRepository, CategoriesRepository>();
+		services.AddScoped<IUsersRepository, UsersRepository>();
+		services.AddScoped<IRolesRepository, RolesRepository>();
+		services.AddScoped<IRecipesRepository, RecipesRepository>();
+		services.AddScoped<IImagesRepository, ImagesRepository>();
+		services.AddScoped<IOpenAiLogsRepository, OpenAiLogsRepository>();
+		services.AddScoped<IMenusRepository, MenusRepository>();
+		services.AddScoped<ISharedRecipesRepository, SharedRecipeRepository>();
+		services.AddScoped<ISavedRecipesRepository, SavedRecipesRepository>();
+		services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
 
-        return services;
-    }
+		return services;
+	}
 
-    public static IServiceCollection AddServices(this IServiceCollection services)
-    {
-        services.AddScoped<ICategoriesService, CategoriesService>();
-        services.AddScoped<IRolesService, RolesService>();
-        services.AddScoped<IUsersService, UsersService>();
-        services.AddScoped<IPasswordHasher, PasswordHasher>();
-        services.AddScoped<ITokensService, TokensService>();
-        services.AddScoped<ICloudStorageService, CloudStorageService>();
-        services.AddScoped<IRecipesService, RecipesService>();
-        services.AddScoped<IImagesService, ImagesService>();
-        services.AddScoped<IEmailsService, EmailsService>();
-        services.AddScoped<IUserManager, UserManager>();
-        services.AddScoped<IOpenAiService, OpenAiService>();
-        services.AddScoped<ISharedRecipesService, SharedRecipesService>();
-        services.AddScoped<IIngredientsService, IngredientsService>();
-        services.AddScoped<IMenusService, MenusService>();
-        services.AddScoped<ISavedRecipesService, SavedRecipesService>();
-        services.AddScoped<ISubscriptionService, SubscriptionsService>();
-
+	public static IServiceCollection AddServices(this IServiceCollection services)
+	{
+		services.AddScoped<ICategoriesService, CategoriesService>();
+		services.AddScoped<IRolesService, RolesService>();
+		services.AddScoped<IUsersService, UsersService>();
+		services.AddScoped<IPasswordHasher, PasswordHasher>();
+		services.AddScoped<ITokensService, TokensService>();
+		services.AddScoped<ICloudStorageService, CloudStorageService>();
+		services.AddScoped<IRecipesService, RecipesService>();
+		services.AddScoped<IImagesService, ImagesService>();
+		services.AddScoped<IEmailsService, EmailsService>();
+		services.AddScoped<IUserManager, UserManager>();
+		services.AddScoped<IOpenAiService, OpenAiService>();
+		services.AddScoped<ISharedRecipesService, SharedRecipesService>();
+		services.AddScoped<IIngredientsService, IngredientsService>();
+		services.AddScoped<IMenusService, MenusService>();
+		services.AddScoped<ISavedRecipesService, SavedRecipesService>();
+		services.AddScoped<ISubscriptionService, SubscriptionsService>();
+		
 		return services;
 	  }
 
@@ -68,14 +68,14 @@ public static class MiddlewareExtension
 		return services;
 	}
 
-    public static IServiceCollection AddGraphQl(this IServiceCollection services)
-    {
-        services
+	public static IServiceCollection AddGraphQl(this IServiceCollection services)
+	{
+		services
             .AddGraphQLServer()
             .AddQueryType()
                 .AddTypeExtension<CategoriesQuery>()
                 .AddTypeExtension<ContactsQuery>()
-<<<<<<<<< Temporary merge branch 1
+                .AddTypeExtension<MenusQuery>()
                 .AddTypeExtension<SharedRecipesQuery>()
                 .AddTypeExtension<SavedRecipesQuery>()
                 .AddTypeExtension<UsersQuery>()
@@ -96,7 +96,7 @@ public static class MiddlewareExtension
             .InitializeOnStartup(keepWarm: true);
         
 
-		return services;
+        return services;
 	}
 
 	public static IServiceCollection AddJWTTokenAuthentication(this IServiceCollection services,

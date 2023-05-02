@@ -86,14 +86,15 @@ public class UserManager : IUserManager
             }
         }
 
-        var role = await this._rolesRepository.GetRoleAsync(r => r.Name == "User", cancellationToken);
+        var roleUser = await this._rolesRepository.GetRoleAsync(r => r.Name == "User", cancellationToken);
+        var roleGuest = await this._rolesRepository.GetRoleAsync(r => r.Name == "Guest", cancellationToken);
 
         var user = new User
         {
             Name = register.Name,
             Email = register.Email,
             Phone = register.Phone,
-            Roles = new List<Role> { role },
+            Roles = new List<Role> { roleUser, roleGuest },
             PasswordHash = this._passwordHasher.Hash(register.Password),
             RefreshToken = this.GetRefreshToken(),
             RefreshTokenExpiryDate = DateTime.Now.AddDays(7),
@@ -235,11 +236,10 @@ public class UserManager : IUserManager
 
     public async Task<UpdateUserModel> UpdateAsync(UserDto userDto, CancellationToken cancellationToken)
     {        
-        if(userDto.Roles.Any(x => x.Name == "Guest"))
+        if(userDto.Roles.Any(x => x.Name == "Guest") && !userDto.Roles.Any(x => x.Name == "User"))
         {
             if(userDto.Password != null && (userDto.Email != null || userDto.Phone != null))
             {
-                userDto.Roles.RemoveAll(x => x.Name == "Guest");
                 var roleEntity = await this._rolesRepository.GetRoleAsync(x => x.Name == "User", cancellationToken);
                 var roleDto = this._mapper.Map<RoleDto>(roleEntity);
                 userDto.Roles.Add(roleDto);
@@ -253,14 +253,14 @@ public class UserManager : IUserManager
             throw new EntityNotFoundException<User>();
         }
 
-        if (!userDto.Roles.Any(x => x.Name == "Guest") && userDto.Email != null)
+        if (userDto.Roles.Any(x => x.Name == "User") && userDto.Email != null)
         {
             if (await this._usersRepository.GetUserAsync(x => x.Email == userDto.Email, cancellationToken) != null)
             {
                 throw new EntityAlreadyExistsException<User>("email", userDto.Email);
             }
         }
-        if (!userDto.Roles.Any(x => x.Name == "Guest") && userDto.Phone != null)
+        if (userDto.Roles.Any(x => x.Name == "User") && userDto.Phone != null)
         {
             if (await this._usersRepository.GetUserAsync(x => x.Phone == userDto.Phone, cancellationToken) != null)
             {

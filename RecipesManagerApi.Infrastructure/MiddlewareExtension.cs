@@ -91,7 +91,6 @@ public static class MiddlewareExtension
                 .AddTypeExtension<ContactsMutation>()
                 .AddTypeExtension<SavedRecipesMutation>()
                 .AddTypeExtension<SubscriptionsMutation>()
-                .AddTypeExtension<LogsMutation>()
             .AddAuthorization()
             .InitializeOnStartup(keepWarm: true);
         

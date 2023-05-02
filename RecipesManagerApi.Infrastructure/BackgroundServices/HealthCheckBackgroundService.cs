@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using RecipesManagerApi.Application.IServices;
+using RecipesManagerApi.Application.Models.Dtos;
+using RecipesManagerApi.Domain.Enums;
 
 namespace RecipesManagerApi.Infrastructure.BackgroundServices;
 
@@ -13,14 +16,18 @@ public class HealthCheckBackgroundService : BackgroundService
 
     private readonly IHostEnvironment _environment;
 
+    private readonly ILogsService _logsService;
+
     public HealthCheckBackgroundService(
         ILogger<HealthCheckBackgroundService> logger, 
         IHttpClientFactory httpClientFactory,
-        IHostEnvironment environment)
+        IHostEnvironment environment,
+        ILogsService logsService)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _environment = environment;
+        _logsService = logsService;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -41,6 +48,7 @@ public class HealthCheckBackgroundService : BackgroundService
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Health check failed.");
+                _logsService.AddLogAsync(new LogDto { Text = ex.Message, Level = LogLevels.Critical }, stoppingToken);
             }
 
             await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);

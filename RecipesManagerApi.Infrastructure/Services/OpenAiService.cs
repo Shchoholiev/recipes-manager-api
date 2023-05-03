@@ -46,7 +46,7 @@ public class OpenAiService : IOpenAiService
         var httpResponse = await _httpClient.PostAsync("chat/completions", body, cancellationToken);
         var responseBody = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
         log.Response = responseBody;
-        Task.Run(() => _openAiLogsRepository.UpdateAsync(log, cancellationToken));
+        Task.Run(() => _openAiLogsRepository.UpdateOpenAiLogAsync(log, cancellationToken));
     
         var response = JsonConvert.DeserializeObject<OpenAiResponse>(responseBody, _jsonSettings);
 
@@ -84,6 +84,6 @@ public class OpenAiService : IOpenAiService
         }
         
         log.Response = allData;
-        Task.Run(() => _openAiLogsRepository.UpdateAsync(log, cancellationToken));
+        Task.Run(() => _openAiLogsRepository.UpdateOpenAiLogAsync(log, cancellationToken));
     }
 }

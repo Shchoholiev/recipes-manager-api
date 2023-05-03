@@ -4,6 +4,7 @@ using RecipesManagerApi.Domain.Common;
 using MongoDB.Bson;
 using System.Linq.Expressions;
 using RecipesManagerApi.Domain.Entities;
+using RecipesManagerApi.Application.IRepositories;
 
 namespace RecipesManagerApi.Infrastructure.Repositories
 {

@@ -34,6 +34,7 @@ public static class MiddlewareExtension
         services.AddScoped<ISharedRecipesRepository, SharedRecipeRepository>();
         services.AddScoped<ISavedRecipesRepository, SavedRecipesRepository>();
         services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+        services.AddTransient<ILogsRepository, LogsRepository>();
 
         return services;
     }
@@ -55,6 +56,7 @@ public static class MiddlewareExtension
         services.AddScoped<IIngredientsService, IngredientsService>();
         services.AddScoped<ISavedRecipesService, SavedRecipesService>();
         services.AddScoped<ISubscriptionService, SubscriptionsService>();
+        services.AddTransient<ILogsService, LogsService>();
 
         return services;
 	}
@@ -77,6 +79,7 @@ public static class MiddlewareExtension
                 .AddTypeExtension<SavedRecipesQuery>()
                 .AddTypeExtension<UsersQuery>()
                 .AddTypeExtension<SubscriptionsQuery>()
+                .AddTypeExtension<LogsQuery>()
             .AddMutationType()
                 .AddTypeExtension<SharedRecipesMutation>()
                 .AddTypeExtension<CategoriesMutation>()

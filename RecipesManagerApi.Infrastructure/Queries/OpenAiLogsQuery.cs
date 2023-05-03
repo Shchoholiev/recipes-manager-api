@@ -8,13 +8,18 @@ namespace RecipesManagerApi.Infrastructure.Queries;
 [ExtendObjectType(OperationTypeNames.Query)]
 public class OpenAiLogsQuery
 {
-    [Authorize]
-    public Task<PagedList<OpenAiLogDto>> GetOpenAiLogsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken,
+    [Authorize(Roles = new[] {"Admin"})]
+    public Task<PagedList<OpenAiLogDto>> GetOpenAiLogsPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken,
         [Service] IOpenAiLogsService service)
-        => service.GetOpenAiLogsPageAsync(pageNumber, pageSize, cancellationToken);
+        => service.GetLogsPageAsync(pageNumber, pageSize, cancellationToken);
 
-    [Authorize]
+    [Authorize(Roles = new[] { "Admin" })]
     public Task<OpenAiLogDto> GetOpenAiLogAsync(string id, CancellationToken cancellationToken,
         [Service] IOpenAiLogsService service)
-        => service.GetOpenAiLogAsync(id, cancellationToken);
+        => service.GetLogAsync(id, cancellationToken);
+
+    [Authorize(Roles = new[] { "Admin" })]
+    public Task<PagedList<OpenAiLogDto>> GetOpenAiLogsPageOAsync(string id, int pageNumber, int pageSize, CancellationToken cancellationToken,
+        [Service] IOpenAiLogsService service)
+        => service.GetLogsPageAsync(id, pageNumber, pageSize, cancellationToken);
 }

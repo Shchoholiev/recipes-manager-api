@@ -7,4 +7,8 @@ public class OpenAiLogDto
     public string Request { get; set; }
 
     public string Response { get; set; }
+
+    public string CreatedById { get; set; }
+
+    public DateTime CreatedDateUtc { get; set; }
 }

@@ -5,6 +5,7 @@ using Newtonsoft.Json.Serialization;
 using RecipesManagerApi.Application.GlodalInstances;
 using RecipesManagerApi.Application.IRepositories;
 using RecipesManagerApi.Application.IServices;
+using RecipesManagerApi.Application.Models.Dtos;
 using RecipesManagerApi.Application.Models.OpenAi;
 using RecipesManagerApi.Domain.Entities;
 
@@ -24,10 +25,13 @@ public class OpenAiService : IOpenAiService
 
     private readonly IOpenAiLogsRepository _openAiLogsRepository;
 
-    public OpenAiService(IHttpClientFactory httpClientFactory, IOpenAiLogsRepository openAiLogsRepository)
+    private readonly IOpenAiLogsService _openAiLogsService;
+
+    public OpenAiService(IHttpClientFactory httpClientFactory, IOpenAiLogsRepository openAiLogsRepository, IOpenAiLogsService openAiLogsService)
     {
         _httpClient = httpClientFactory.CreateClient("OpenAiHttpClient");
         _openAiLogsRepository = openAiLogsRepository;
+        _openAiLogsService = openAiLogsService;
     }
 
     public async Task<OpenAiResponse?> GetChatCompletion(ChatCompletionRequest chat, CancellationToken cancellationToken)
@@ -36,17 +40,17 @@ public class OpenAiService : IOpenAiService
         var jsonBody = JsonConvert.SerializeObject(chat, _jsonSettings);
         var body = new StringContent(jsonBody, Encoding.UTF8, "application/json");
 
-        var log = await _openAiLogsRepository.AddAsync(new OpenAiLog {
+        var log = await _openAiLogsService.AddLogAsync(new OpenAiLogDto {
             Request = jsonBody,
             Response = null,
             CreatedDateUtc = DateTime.UtcNow,
-            CreatedById = GlobalUser.Id ?? ObjectId.Empty,
+            CreatedById = GlobalUser.Id.ToString() ?? ObjectId.Empty.ToString(),
         }, cancellationToken);
 
         var httpResponse = await _httpClient.PostAsync("chat/completions", body, cancellationToken);
         var responseBody = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
         log.Response = responseBody;
-        Task.Run(() => _openAiLogsRepository.UpdateOpenAiLogAsync(log, cancellationToken));
+        Task.Run(async () => _openAiLogsService.UpdateLogAsync(log, cancellationToken));
     
         var response = JsonConvert.DeserializeObject<OpenAiResponse>(responseBody, _jsonSettings);
 
@@ -59,11 +63,11 @@ public class OpenAiService : IOpenAiService
         var jsonBody = JsonConvert.SerializeObject(chat, _jsonSettings);
         var body = new StringContent(jsonBody, Encoding.UTF8, "application/json");
 
-        var log = await _openAiLogsRepository.AddAsync(new OpenAiLog {
+        var log = await _openAiLogsService.AddLogAsync(new OpenAiLogDto {
             Request = jsonBody,
             Response = null,
             CreatedDateUtc = DateTime.UtcNow,
-            CreatedById = GlobalUser.Id ?? ObjectId.Empty,
+            CreatedById = GlobalUser.Id.ToString() ?? ObjectId.Empty.ToString(),
         }, cancellationToken);
 
         var httpResponse = await _httpClient.PostAsync("chat/completions", body, cancellationToken);
@@ -84,6 +88,6 @@ public class OpenAiService : IOpenAiService
         }
         
         log.Response = allData;
-        Task.Run(() => _openAiLogsRepository.UpdateOpenAiLogAsync(log, cancellationToken));
+        Task.Run(() => _openAiLogsService.UpdateLogAsync(log, cancellationToken));
     }
 }

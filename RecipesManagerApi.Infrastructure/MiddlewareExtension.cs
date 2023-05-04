@@ -57,6 +57,7 @@ public static class MiddlewareExtension
         services.AddScoped<ISavedRecipesService, SavedRecipesService>();
         services.AddScoped<ISubscriptionService, SubscriptionsService>();
         services.AddTransient<ILogsService, LogsService>();
+        services.AddScoped<IOpenAiLogsService, OpenAiLogsService>();
 
         return services;
 	}
@@ -80,6 +81,7 @@ public static class MiddlewareExtension
                 .AddTypeExtension<UsersQuery>()
                 .AddTypeExtension<SubscriptionsQuery>()
                 .AddTypeExtension<LogsQuery>()
+                .AddTypeExtension<OpenAiLogsQuery>()
             .AddMutationType()
                 .AddTypeExtension<SharedRecipesMutation>()
                 .AddTypeExtension<CategoriesMutation>()

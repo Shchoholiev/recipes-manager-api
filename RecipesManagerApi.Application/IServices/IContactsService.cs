@@ -11,7 +11,7 @@ public interface IContactsService
 
     Task<ContactDto> UpdateContactAsync(ContactDto dto, CancellationToken cancellationToken);
 
-    Task DeleteContactAsync(ContactDto dto, CancellationToken cancellationToken);
+    Task DeleteContactAsync(string id, CancellationToken cancellationToken);
 
     Task<ContactDto> GetContactAsync(string id, CancellationToken cancellationToken);
 

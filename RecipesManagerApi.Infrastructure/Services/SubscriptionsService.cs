@@ -100,6 +100,9 @@ public class SubscriptionsService : ISubscriptionService
     public async Task<SubscriptionDto> UpdateSubscriptionAsync(SubscriptionDto dto, CancellationToken cancellationToken)
     {
         var entity = this._mapper.Map<Subscription>(dto);
+        if (entity.AuthorId != GlobalUser.Id.Value) {
+            throw new UnauthorizedEntityUpdateException<Subscription>();
+        }
         await this._repository.UpdateSubscriptionAsync(entity, cancellationToken);
         return this._mapper.Map<SubscriptionDto>(entity);
     }

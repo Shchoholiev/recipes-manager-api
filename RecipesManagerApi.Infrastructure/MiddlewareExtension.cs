@@ -35,6 +35,7 @@ public static class MiddlewareExtension
 		services.AddScoped<ISharedRecipesRepository, SharedRecipeRepository>();
 		services.AddScoped<ISavedRecipesRepository, SavedRecipesRepository>();
 		services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+		services.AddTransient<ILogsRepository, LogsRepository>();
 
 		return services;
 	}
@@ -57,9 +58,11 @@ public static class MiddlewareExtension
 		services.AddScoped<IMenusService, MenusService>();
 		services.AddScoped<ISavedRecipesService, SavedRecipesService>();
 		services.AddScoped<ISubscriptionService, SubscriptionsService>();
-		
+		services.AddTransient<ILogsService, LogsService>();
+        services.AddScoped<IOpenAiLogsService, OpenAiLogsService>();
+
 		return services;
-	  }
+	}
 
 	public static IServiceCollection AddMapper(this IServiceCollection services)
 	{
@@ -71,32 +74,34 @@ public static class MiddlewareExtension
 	public static IServiceCollection AddGraphQl(this IServiceCollection services)
 	{
 		services
-            .AddGraphQLServer()
-            .AddQueryType()
-                .AddTypeExtension<CategoriesQuery>()
-                .AddTypeExtension<ContactsQuery>()
-                .AddTypeExtension<MenusQuery>()
-                .AddTypeExtension<SharedRecipesQuery>()
-                .AddTypeExtension<SavedRecipesQuery>()
-                .AddTypeExtension<UsersQuery>()
-                .AddTypeExtension<SubscriptionsQuery>()
-            .AddMutationType()
-                .AddTypeExtension<SharedRecipesMutation>()
-                .AddTypeExtension<CategoriesMutation>()
-                .AddTypeExtension<RegisterMutation>()
-                .AddTypeExtension<LoginMutation>()
-                .AddTypeExtension<AccessMutation>()
-                .AddTypeExtension<UserMutation>()
-                .AddTypeExtension<RoleMutation>()
-                .AddTypeExtension<ContactsMutation>()
-                .AddTypeExtension<MenusMutation>()
-                .AddTypeExtension<SavedRecipesMutation>()
-                .AddTypeExtension<SubscriptionsMutation>()
-            .AddAuthorization()
-            .InitializeOnStartup(keepWarm: true);
-        
+			.AddGraphQLServer()
+			.AddQueryType()
+				.AddTypeExtension<CategoriesQuery>()
+				.AddTypeExtension<ContactsQuery>()
+				.AddTypeExtension<MenusQuery>()
+				.AddTypeExtension<SharedRecipesQuery>()
+				.AddTypeExtension<SavedRecipesQuery>()
+				.AddTypeExtension<UsersQuery>()
+				.AddTypeExtension<SubscriptionsQuery>()
+				.AddTypeExtension<LogsQuery>()
+				.AddTypeExtension<OpenAiLogsQuery>()
+			.AddMutationType()
+				.AddTypeExtension<SharedRecipesMutation>()
+				.AddTypeExtension<CategoriesMutation>()
+				.AddTypeExtension<RegisterMutation>()
+				.AddTypeExtension<LoginMutation>()
+				.AddTypeExtension<AccessMutation>()
+				.AddTypeExtension<UserMutation>()
+				.AddTypeExtension<RoleMutation>()
+				.AddTypeExtension<ContactsMutation>()
+				.AddTypeExtension<MenusMutation>()
+				.AddTypeExtension<SavedRecipesMutation>()
+				.AddTypeExtension<SubscriptionsMutation>()
+			.AddAuthorization()
+			.InitializeOnStartup(keepWarm: true);
+		
 
-        return services;
+		return services;
 	}
 
 	public static IServiceCollection AddJWTTokenAuthentication(this IServiceCollection services,

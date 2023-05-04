@@ -9,9 +9,9 @@ namespace RecipesManagerApi.Infrastructure.Queries;
 public class SavedRecipesQuery
 {
     [Authorize]
-    public Task<PagedList<SavedRecipeDto>> GetSavedRecipesAsync(int pageNumber, int pageSize, CancellationToken cancellationToken,
+    public Task<PagedList<SavedRecipeDto>> GetSavedRecipesAsync(int pageNumber, int pageSize, string userId, CancellationToken cancellationToken,
         [Service] ISavedRecipesService service)
-        => service.GetSavedRecipesPageAsync(pageNumber, pageSize, cancellationToken);
+        => service.GetSavedRecipesPageAsync(pageNumber, pageSize, userId, cancellationToken);
 
     [Authorize]
     public Task<SavedRecipeDto> GetSavedRecipeAsync(string id, CancellationToken cancellationToken,

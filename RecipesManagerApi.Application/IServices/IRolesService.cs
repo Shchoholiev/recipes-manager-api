@@ -1,4 +1,5 @@
 ﻿using MongoDB.Bson;
+using RecipesManagerApi.Application.Models.CreateDtos;
 using RecipesManagerApi.Application.Models.Dtos;
 using RecipesManagerApi.Application.Paging;
 
@@ -6,7 +7,7 @@ namespace RecipesManagerApi.Application.IServices;
 
 public interface IRolesService
 {
-    Task AddRoleAsync(RoleDto dto, CancellationToken cancellationToken);
+    Task<RoleDto> AddRoleAsync(RoleCreateDto dto, CancellationToken cancellationToken);
 
     Task<PagedList<RoleDto>> GetRolesPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken);
 

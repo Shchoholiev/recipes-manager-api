@@ -15,8 +15,8 @@ public class SavedRecipesMutation
      => recipesService.AddSavedRecipeAsync(dto, cancellationToken);
 
     [Authorize]
-    public Task<OperationDetails> DeleteSavedRecipeAsync(SavedRecipeDto dto, CancellationToken cancellationToken,
+    public Task<OperationDetails> DeleteSavedRecipeAsync(string id, CancellationToken cancellationToken,
     [Service] ISavedRecipesService recipesService)
-    => recipesService.DeleteSavedRecipeAsync(dto, cancellationToken);
+    => recipesService.DeleteSavedRecipeAsync(id, cancellationToken);
 }
 

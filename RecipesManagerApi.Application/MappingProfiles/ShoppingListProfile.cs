@@ -9,12 +9,8 @@ public class ShoppingListProfile : Profile
 {
 	public ShoppingListProfile()
 	{
-		CreateMap<ShoppingListCreateDto, ShoppingList>();
+		CreateMap<ShoppingListCreateDto, ShoppingList>().ReverseMap();
 		
-		CreateMap<ShoppingListLookedUp, ShoppingListDto>();
-		
-		CreateMap<ShoppingListDto, ShoppingList>()
-		.ForMember(dest => dest.RecipesIds, opt => opt.MapFrom((src, dest, _, context) => 
-		context.Items.TryGetValue("RecipesIds", out var recipesIds) ? recipesIds : null));
+		CreateMap<ShoppingListLookedUp, ShoppingListDto>().ReverseMap();
 	}
 }

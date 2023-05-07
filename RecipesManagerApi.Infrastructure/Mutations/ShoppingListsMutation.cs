@@ -12,11 +12,11 @@ public class ShoppingListsMutation
 	[Service] IShoppingListsService shoppingListsService)
 	=> shoppingListsService.AddShoppingListAsync(shoppingList, cancellationToken);
 
-	public Task<ShoppingListDto> UpdateShoppingListAsync(ShoppingListDto shoppingList, CancellationToken cancellationToken,
+	public Task<ShoppingListDto> UpdateShoppingListAsync(ShoppingListCreateDto shoppingList, CancellationToken cancellationToken,
 	[Service] IShoppingListsService shoppingListsService)
 	=> shoppingListsService.UpdateShoppingListAsync(shoppingList, cancellationToken);
 
-	public Task<OperationDetails> DeleteShoppingListAsync(ShoppingListDto shoppingList, CancellationToken cancellationToken,
+	public Task<OperationDetails> DeleteShoppingListAsync(string id, CancellationToken cancellationToken,
 	[Service] IShoppingListsService shoppingListsService)
-	=> shoppingListsService.DeleteShoppingListAsync(shoppingList, cancellationToken);
+	=> shoppingListsService.DeleteShoppingListAsync(id, cancellationToken);
 }

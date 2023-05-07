@@ -1,7 +1,6 @@
 using System.Text;
 using AutoMapper;
 using MongoDB.Bson;
-using MongoDB.Driver;
 using RecipesManagerApi.Application.Exceptions;
 using RecipesManagerApi.Application.GlodalInstances;
 using RecipesManagerApi.Application.IRepositories;
@@ -33,18 +32,20 @@ public class MenusService : IMenusService
 	
 	public async Task<PagedList<MenuDto>> GetMenusPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
 	{
-		ObjectId.TryParse(GlobalUser.Id.ToString(), out var userId);
+		var userId = GlobalUser.Id.Value;
 		var entities = await this._menusRepository.GetPageAsync(pageNumber, pageSize, userId, cancellationToken);
 		var dtos = this._mapper.Map<List<MenuDto>>(entities);
 		var count = await this._menusRepository.GetTotalCountAsync(x => !x.IsDeleted && x.CreatedById == userId);
-		
 		return new PagedList<MenuDto>(dtos, pageNumber, pageSize, count);
 	}
 	
-	public async Task<MenuDto> GetMenuAsync(string id, CancellationToken cancellationToken)
+	public async Task<MenuDto> GetMenuAsync(string menuId, CancellationToken cancellationToken)
 	{
-		ObjectId.TryParse(id, out var objectId);
-		var entity = await this._menusRepository.GetMenuAsync(objectId, cancellationToken);
+		if (!ObjectId.TryParse(menuId, out var objectId))
+		{
+			throw new InvalidDataException("Provided id is invalid.");
+		}
+		var entity = await this._menusRepository.GetMenuLookedUpAsync(objectId, cancellationToken);
 		if(entity == null)
 		{
 			throw new EntityNotFoundException<Menu>();
@@ -55,49 +56,42 @@ public class MenusService : IMenusService
 	public async Task<MenuDto> AddMenuAsync(MenuCreateDto createDto, CancellationToken cancellationToken)
 	{
 		var entity = this._mapper.Map<Menu>(createDto);
+		entity.CreatedById = GlobalUser.Id.Value;
+		entity.CreatedDateUtc = DateTime.UtcNow;
 		var menu = await this._menusRepository.AddMenuAsync(entity, cancellationToken);
-		
 		return this._mapper.Map<MenuDto>(menu);
 	}
 	
-	public async Task<MenuDto> UpdateMenuAsync(MenuDto dto, CancellationToken cancellationToken)
+	public async Task<MenuDto> UpdateMenuAsync(MenuCreateDto createDto, CancellationToken cancellationToken)
 	{
-		List<string> recipesIds = new List<string>();
-		if(dto.Recipes != null)
-		{
-			recipesIds = dto.Recipes.Select(x => x.Id).ToList();
-		}
-		var entity = this._mapper.Map<Menu>(dto, opt => opt.Items["RecipesIds"] =  recipesIds);
-		await this._menusRepository.UpdateMenuAsync(entity, cancellationToken);
-		
+		var entity = this._mapper.Map<Menu>(createDto);
+		var entityLookedUp = await this._menusRepository.UpdateMenuAsync(entity, cancellationToken);
+		var dto = this._mapper.Map<MenuDto>(entityLookedUp);
 		return dto;
 	}
 	
-	public async Task<OperationDetails> DeleteMenuAsync(MenuDto dto, CancellationToken cancellationToken)
+	public async Task<OperationDetails> DeleteMenuAsync(string menuId, CancellationToken cancellationToken)
 	{
-		List<string> recipesIds = new List<string>();
-		if(dto.Recipes != null)
+		if (!ObjectId.TryParse(menuId, out var objectId))
 		{
-			recipesIds = dto.Recipes.Select(x => x.Id).ToList();
+			throw new InvalidDataException("Provided id is invalid.");
 		}
-		var entity = this._mapper.Map<Menu>(dto, opt => opt.Items["RecipesIds"] =  recipesIds);
+		var entity = await this._menusRepository.GetMenuAsync(objectId, cancellationToken);
 		entity.IsDeleted = true;
 		await this._menusRepository.UpdateMenuAsync(entity, cancellationToken);
-		
 		return new OperationDetails { IsSuccessful = true, TimestampUtc = DateTime.UtcNow };
 	}
 	
-	public async Task<OperationDetails> SendMenuToEmailAsync(string menuId, List<string> emailsTo, CancellationToken cancellationToken)
+	public async Task<OperationDetails> SendMenuToEmailsAsync(string menuId, IEnumerable<string> emailsTo, CancellationToken cancellationToken)
 	{
 		var menuDto = await this.GetMenuAsync(menuId, cancellationToken);
 		var message = new EmailMessage
 		{
-			Recipients = emailsTo,
-			Subject = $"Recipes for {menuDto.Name}:",
+			Recipients = emailsTo.ToList(),
+			Subject = $"{menuDto.Name}:",
 			Body = FormMenuEmailHTMLBody(menuDto)
 		};
 		await _emailsService.SendEmailMessageAsync(message, cancellationToken);
-		
 		return new OperationDetails { IsSuccessful = true, TimestampUtc = DateTime.UtcNow };
 	}
 	
@@ -141,14 +135,9 @@ public class MenusService : IMenusService
 				sb.Append(@$"
 				<tr>
 				<td>
-				<p style=""margin:0 0 12px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"">Ingredients for {recipe.Name} for {recipe.ServingsCount} serving(s):</p>
+				<p style=""margin:0 0 12px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"">Recipe: {recipe.Name} for {recipe.ServingsCount} serving(s):</p>
 				");
-				
-				foreach(var ingredient in recipe.Ingredients)
-				{
-					sb.Append($"<p>- {ingredient.Name}: {ingredient.Amount} {ingredient.Units}</p>");
-				}
-				
+				sb.Append($"<p>- Calories: {recipe.Calories}</p>");
 				sb.Append("</td></tr>");
 			}
 		}

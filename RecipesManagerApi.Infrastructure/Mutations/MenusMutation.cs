@@ -12,11 +12,11 @@ public class MenusMutation
 		[Service] IMenusService service)
 		=> service.AddMenuAsync(menuDto, cancellationToken);
 
-	public Task<MenuDto> UpdateMenuAsync(MenuDto menuDto, CancellationToken cancellationToken,
+	public Task<MenuDto> UpdateMenuAsync(MenuCreateDto menuDto, CancellationToken cancellationToken,
 		[Service] IMenusService service)
 		=> service.UpdateMenuAsync(menuDto, cancellationToken);
 
-	public Task<OperationDetails> DeleteMenuAsync(MenuDto menuDto, CancellationToken cancellationToken,
+	public Task<OperationDetails> DeleteMenuAsync(string menuId, CancellationToken cancellationToken,
 		[Service] IMenusService service)
-		=> service.DeleteMenuAsync(menuDto, cancellationToken);
+		=> service.DeleteMenuAsync(menuId, cancellationToken);
 }

@@ -10,9 +10,15 @@ namespace RecipesManagerApi.Infrastructure.Repositories;
 public class MenusRepository : BaseRepository<Menu>, IMenusRepository
 {
 	public MenusRepository(MongoDbContext db) : base(db, "Menus") { }
-	public async Task<MenuLookedUp> GetMenuAsync(ObjectId id, CancellationToken cancellationToken)
+	
+	public async Task<Menu> GetMenuAsync(ObjectId id, CancellationToken cancellationToken)
 	{
-		var lookup = new BsonDocument("$lookup",
+		return await (await this._collection.FindAsync(x=>x.Id == id && x.IsDeleted == false)).FirstOrDefaultAsync(cancellationToken);
+	}
+	
+	public async Task<MenuLookedUp> GetMenuLookedUpAsync(ObjectId id, CancellationToken cancellationToken)
+	{
+		var lookupRecipes = new BsonDocument("$lookup",
 			new BsonDocument
 			{
 				{ "from", "Recipes" },
@@ -20,9 +26,18 @@ public class MenusRepository : BaseRepository<Menu>, IMenusRepository
 				{ "foreignField", "_id" },
 				{ "as", "Recipes" }
 			});
-
+		var lookupContacts = new BsonDocument("$lookup",
+			new BsonDocument
+			{
+				{ "from", "Contacts" },
+				{ "localField", "SentTo" },
+				{ "foreignField", "_id" },
+				{ "as", "SentToContacts" }
+			});
+			
 		var pipeline = new BsonDocument[]{
-			lookup,
+			lookupRecipes,
+			lookupContacts,
 			new BsonDocument("$match", new BsonDocument("_id", id)),
 			new BsonDocument("$match", new BsonDocument("IsDeleted", false))
 		};
@@ -40,29 +55,12 @@ public class MenusRepository : BaseRepository<Menu>, IMenusRepository
 	public async Task<MenuLookedUp> UpdateMenuAsync(Menu menu, CancellationToken cancellationToken)
 	{
 		await this._collection.ReplaceOneAsync(x => x.Id == menu.Id, menu, new ReplaceOptions(), cancellationToken);
-		
-		var lookup = new BsonDocument("$lookup",
-			new BsonDocument
-			{
-				{ "from", "Recipes" },
-				{ "localField", "RecipesIds" },
-				{ "foreignField", "_id" },
-				{ "as", "Recipes" }
-			});
-		
-		var pipeline = new BsonDocument[]{
-			lookup,
-			new BsonDocument("$match", new BsonDocument("_id", menu.Id)),
-			new BsonDocument("$match", new BsonDocument("IsDeleted", false))
-		};
-			
-		return  await (await this._collection.AggregateAsync<MenuLookedUp>(pipeline, new AggregateOptions(), cancellationToken))
-			.FirstOrDefaultAsync(cancellationToken);
+		return await this.GetMenuLookedUpAsync(menu.Id, cancellationToken);
 	}
 
 	public async Task<List<MenuLookedUp>> GetPageAsync(int pageNumber, int pageSize, ObjectId userId, CancellationToken cancellationToken)
 	{
-		var lookup = new BsonDocument("$lookup",
+		var lookupRecipes = new BsonDocument("$lookup",
 			new BsonDocument
 			{
 				{ "from", "Recipes" },
@@ -70,10 +68,20 @@ public class MenusRepository : BaseRepository<Menu>, IMenusRepository
 				{ "foreignField", "_id" },
 				{ "as", "Recipes" }
 			});
+		
+		var lookupContacts = new BsonDocument("$lookup",
+			new BsonDocument
+			{
+				{ "from", "Contacts" },
+				{ "localField", "SentTo" },
+				{ "foreignField", "_id" },
+				{ "as", "SentToContacts" }
+			});	
 
 		var pipeline = new BsonDocument[]{
-			lookup,
-			new BsonDocument("$match", new BsonDocument("_id", userId)),
+			lookupRecipes,
+			lookupContacts,
+			new BsonDocument("$match", new BsonDocument("CreatedById", userId)),
 			new BsonDocument("$match", new BsonDocument("IsDeleted", false)),
 			new BsonDocument("$skip", (pageNumber - 1) * pageSize),
 			new BsonDocument("$limit", pageSize)
@@ -86,22 +94,6 @@ public class MenusRepository : BaseRepository<Menu>, IMenusRepository
 	public async Task<MenuLookedUp> AddMenuAsync(Menu entity, CancellationToken cancellationToken)
 	{
 		await this._collection.InsertOneAsync(entity, new InsertOneOptions() ,cancellationToken);
-		
-		var lookup = new BsonDocument("$lookup",
-			new BsonDocument
-			{
-				{ "from", "Recipes" },
-				{ "localField", "RecipesIds" },
-				{ "foreignField", "_id" },
-				{ "as", "Recipes" }
-			});
-		
-		var pipeline = new BsonDocument[]{
-			lookup,
-			new BsonDocument("$match", new BsonDocument("_id", entity.Id))
-		};
-			
-		return  await (await this._collection.AggregateAsync<MenuLookedUp>(pipeline, new AggregateOptions(), cancellationToken))
-					.FirstOrDefaultAsync(cancellationToken);
+		return await this.GetMenuLookedUpAsync(entity.Id, cancellationToken);
 	}
 }

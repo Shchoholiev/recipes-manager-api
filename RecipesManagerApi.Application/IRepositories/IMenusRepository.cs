@@ -6,7 +6,9 @@ namespace RecipesManagerApi.Application.IRepositories;
 
 public interface IMenusRepository : IBaseRepository<Menu>
 {
-	Task<MenuLookedUp> GetMenuAsync(ObjectId id, CancellationToken cancellationToken);
+	Task<MenuLookedUp> GetMenuLookedUpAsync(ObjectId id, CancellationToken cancellationToken);
+	
+	Task<Menu> GetMenuAsync(ObjectId id, CancellationToken cancellationToken);
 	
 	Task<List<MenuLookedUp>> GetPageAsync(int pageNumber, int pageSize, ObjectId userId, CancellationToken cancellationToken);
 	

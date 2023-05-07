@@ -10,13 +10,13 @@ public interface IMenusService
 {
 	Task<PagedList<MenuDto>> GetMenusPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken);
 	
-	Task<MenuDto> GetMenuAsync(string id, CancellationToken cancellationToken);
+	Task<MenuDto> GetMenuAsync(string menuId, CancellationToken cancellationToken);
 	
 	Task<MenuDto> AddMenuAsync(MenuCreateDto dto, CancellationToken cancellationToken);
 	
-	Task<MenuDto> UpdateMenuAsync(MenuDto dto, CancellationToken cancellationToken);
+	Task<MenuDto> UpdateMenuAsync(MenuCreateDto dto, CancellationToken cancellationToken);
 	
-	Task<OperationDetails> DeleteMenuAsync (MenuDto dto, CancellationToken cancellationToken);
+	Task<OperationDetails> DeleteMenuAsync (string menuId, CancellationToken cancellationToken);
 	
-	Task<OperationDetails> SendMenuToEmailAsync(string menuId, List<string> emailsTo, CancellationToken cancellationToken);
+	Task<OperationDetails> SendMenuToEmailsAsync(string menuId, IEnumerable<string> emailsTo, CancellationToken cancellationToken);
 }

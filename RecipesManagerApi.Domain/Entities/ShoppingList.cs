@@ -13,7 +13,7 @@ public class ShoppingList : EntityBase
 	
 	public String? Notes { get; set; }
 	
-	public List<Contact>? SentTo { get; set; }
+	public List<ObjectId>? SentTo { get; set; }
 	
 	public bool IsDeleted { get; set; }
 	

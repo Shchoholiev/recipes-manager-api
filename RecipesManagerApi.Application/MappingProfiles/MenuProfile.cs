@@ -10,14 +10,12 @@ public class MenuProfile : Profile
 {
 	public MenuProfile()
 	{
-		CreateMap<MenuLookedUp, MenuDto>().ReverseMap();
+		CreateMap<MenuLookedUp, MenuDto>()
+		.ForMember(dest => dest.SentTo, opt => opt.MapFrom(src => src.SentToContacts));
+		
+		CreateMap<MenuDto, MenuLookedUp>()
+		.ForMember(dest => dest.SentToContacts, opt => opt.MapFrom(src => src.SentTo));
 		
 		CreateMap<MenuCreateDto, Menu>().ReverseMap();
-		
-		CreateMap<MenuDto, Menu>()
-		.ForMember(dest => dest.RecipesIds, opt => opt.MapFrom((src, dest, _, context) => 
-		context.Items.TryGetValue("RecipesIds", out var recipesIds) ? recipesIds : null));
-		
-		CreateMap<MenuCreateDto, MenuDto>();
 	}
 }

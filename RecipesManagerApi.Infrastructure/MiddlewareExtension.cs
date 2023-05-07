@@ -35,7 +35,7 @@ public static class MiddlewareExtension
 		services.AddScoped<ISavedRecipesRepository, SavedRecipesRepository>();
 		services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
 		services.AddScoped<IShoppingListsRepository, ShoppingListsRepository>();
-
+		services.AddTransient<ILogsRepository, LogsRepository>();
 		return services;
 	}
 
@@ -57,6 +57,8 @@ public static class MiddlewareExtension
 		services.AddScoped<ISavedRecipesService, SavedRecipesService>();
 		services.AddScoped<ISubscriptionService, SubscriptionsService>();
 		services.AddScoped<IShoppingListsService, ShoppingListsService>();
+		services.AddTransient<ILogsService, LogsService>();
+		services.AddScoped<IOpenAiLogsService, OpenAiLogsService>();
 
 		return services;
 	}
@@ -80,6 +82,8 @@ public static class MiddlewareExtension
 				.AddTypeExtension<UsersQuery>()
 				.AddTypeExtension<SubscriptionsQuery>()
 				.AddTypeExtension<ShoppingListsQuery>()
+				.AddTypeExtension<LogsQuery>()
+				.AddTypeExtension<OpenAiLogsQuery>()
 			.AddMutationType()
 				.AddTypeExtension<SharedRecipesMutation>()
 				.AddTypeExtension<CategoriesMutation>()
@@ -94,9 +98,8 @@ public static class MiddlewareExtension
 				.AddTypeExtension<ShoppingListsMutation>()
 			.AddAuthorization()
 			.InitializeOnStartup(keepWarm: true);
-		
-
-		return services;
+			
+			return services;
 	}
 
 	public static IServiceCollection AddJWTTokenAuthentication(this IServiceCollection services,

@@ -33,9 +33,13 @@ public class SavedRecipesService : ISavedRecipesService
         return this._mapper.Map<SavedRecipeDto>(entity);
     }
 
-    public async Task<OperationDetails> DeleteSavedRecipeAsync(SavedRecipeDto dto, CancellationToken cancellationToken)
+    public async Task<OperationDetails> DeleteSavedRecipeAsync(string id, CancellationToken cancellationToken)
     {
-        var entity = this._mapper.Map<SavedRecipe>(dto);
+        if (!ObjectId.TryParse(id, out var objectId))
+        {
+            throw new InvalidDataException("Provided id is invalid.");
+        }
+        var entity = await this._repository.GetSavedRecipeAsync(objectId, cancellationToken);
         entity.IsDeleted = true;
         await this._repository.UpdateSavedRecipeAsync(entity, cancellationToken);
         return new OperationDetails() { IsSuccessful = true, TimestampUtc = DateTime.UtcNow };
@@ -60,11 +64,15 @@ public class SavedRecipesService : ISavedRecipesService
         return this._mapper.Map<SavedRecipeDto>(entity);
     }
 
-    public async Task<PagedList<SavedRecipeDto>> GetSavedRecipesPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
+    public async Task<PagedList<SavedRecipeDto>> GetSavedRecipesPageAsync(int pageNumber, int pageSize, string id, CancellationToken cancellationToken)
     {
-        var entities = await this._repository.GetPageAsync(pageNumber, pageSize, x => x.IsDeleted == false, cancellationToken);
+        if (!ObjectId.TryParse(id, out var objectId))
+        {
+            throw new InvalidDataException("Provided id is invalid.");
+        }
+        var entities = await this._repository.GetPageAsync(pageNumber, pageSize, x => x.IsDeleted == false && x.CreatedById == objectId, cancellationToken);
         var dtos = this._mapper.Map<List<SavedRecipeDto>>(entities);
-        var count = await this._repository.GetTotalCountAsync(x => x.IsDeleted == false);
+        var count = await this._repository.GetTotalCountAsync(x => x.IsDeleted == false && x.CreatedById == objectId);
         return new PagedList<SavedRecipeDto>(dtos, pageNumber, pageSize, count);
     }
 }

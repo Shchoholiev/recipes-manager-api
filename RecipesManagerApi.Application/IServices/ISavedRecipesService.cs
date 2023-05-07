@@ -12,8 +12,8 @@ public interface ISavedRecipesService
 
     Task<SavedRecipeDto> GetSavedRecipeAsync(string id, CancellationToken cancellationToken);
 
-    Task<PagedList<SavedRecipeDto>> GetSavedRecipesPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken);
+    Task<PagedList<SavedRecipeDto>> GetSavedRecipesPageAsync(int pageNumber, int pageSize, string id, CancellationToken cancellationToken);
 
-    Task<OperationDetails> DeleteSavedRecipeAsync(SavedRecipeDto dto, CancellationToken cancellationToken);
+    Task<OperationDetails> DeleteSavedRecipeAsync(string id, CancellationToken cancellationToken);
 }
 

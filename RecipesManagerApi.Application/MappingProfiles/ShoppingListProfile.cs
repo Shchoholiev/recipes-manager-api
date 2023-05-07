@@ -11,6 +11,7 @@ public class ShoppingListProfile : Profile
 	{
 		CreateMap<ShoppingListCreateDto, ShoppingList>().ReverseMap();
 		
-		CreateMap<ShoppingListLookedUp, ShoppingListDto>().ReverseMap();
+		CreateMap<ShoppingListLookedUp, ShoppingListDto>()
+		.ForMember(dest => dest.SentTo, opt => opt.MapFrom(src => src.SentToContacts));
 	}
 }

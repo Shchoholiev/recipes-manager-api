@@ -11,23 +11,28 @@ using RecipesManagerApi.Application.Models.EmailModels;
 using RecipesManagerApi.Application.Paging;
 using RecipesManagerApi.Domain.Entities;
 using RecipesManagerApi.Application.Models.Operations;
+using System.Linq.Expressions;
 
 namespace RecipesManagerApi.Infrastructure.Services;
 
 public class MenusService : IMenusService
 {
+	private const int ContactsChecksMaxValue = 100;
 	private readonly IMenusRepository _menusRepository;
 	private readonly IMapper _mapper;
 	private readonly IEmailsService _emailsService;
+	private readonly IContactsRepository _contactsRepository;
 	
 	public MenusService(
 		IMenusRepository menusRepository,
 		IMapper mapper,
-		IEmailsService emailService)
+		IEmailsService emailService,
+		IContactsRepository contactsRepository)
 	{
 		this._menusRepository = menusRepository;
 		this._mapper = mapper;
 		this._emailsService = emailService;
+		this._contactsRepository = contactsRepository;
 	}
 	
 	public async Task<PagedList<MenuDto>> GetMenusPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
@@ -64,8 +69,8 @@ public class MenusService : IMenusService
 	
 	public async Task<MenuDto> UpdateMenuAsync(MenuCreateDto createDto, CancellationToken cancellationToken)
 	{
-		var entity = this._mapper.Map<Menu>(createDto);
-		var entityLookedUp = await this._menusRepository.UpdateMenuAsync(entity, cancellationToken);
+		var newEntity = this._mapper.Map<Menu>(createDto);
+		var entityLookedUp = await this._menusRepository.UpdateMenuAsync(newEntity, cancellationToken);
 		var dto = this._mapper.Map<MenuDto>(entityLookedUp);
 		return dto;
 	}
@@ -84,16 +89,66 @@ public class MenusService : IMenusService
 	
 	public async Task<OperationDetails> SendMenuToEmailsAsync(string menuId, IEnumerable<string> emailsTo, CancellationToken cancellationToken)
 	{
-		var menuDto = await this.GetMenuAsync(menuId, cancellationToken);
+		if (!ObjectId.TryParse(menuId, out var objectId))
+		{
+			throw new InvalidDataException("Provided id is invalid.");
+		}
+		var menuLookedUp = await this._menusRepository.GetMenuLookedUpAsync(objectId, cancellationToken);
+		if(menuLookedUp == null)
+		{
+			throw new EntityNotFoundException<Menu>();
+		}
+		var menuDto = this._mapper.Map<MenuDto>(menuLookedUp);
 		var message = new EmailMessage
 		{
 			Recipients = emailsTo.ToList(),
 			Subject = $"{menuDto.Name}:",
 			Body = FormMenuEmailHTMLBody(menuDto)
 		};
+		
+		await this.CheckContacs(menuLookedUp, emailsTo, cancellationToken);
+		
 		await _emailsService.SendEmailMessageAsync(message, cancellationToken);
 		return new OperationDetails { IsSuccessful = true, TimestampUtc = DateTime.UtcNow };
 	}
+	
+	private async Task CheckContacs(MenuLookedUp menuLookedUp, IEnumerable<string> emailsTo, CancellationToken cancellationToken)
+	{
+		var menuEntity = this._mapper.Map<Menu>(menuLookedUp);
+		int oldContactsNumber = menuEntity.SentTo.Count();
+
+		Expression<Func<Contact, bool>> predicate = (x => x.CreatedById == GlobalUser.Id.Value && x.IsDeleted == false);
+		var contactsEntity = await this._contactsRepository.GetPageAsync(1, ContactsChecksMaxValue, predicate, cancellationToken);
+		var userContactsEmails = contactsEntity.Select(x => x.Email);
+		Contact contactEntity;
+		foreach(var email in emailsTo)
+		{
+			if(!userContactsEmails.Contains(email))
+			{
+				contactEntity = new Contact
+				{
+					Email = email,
+					CreatedById = GlobalUser.Id.Value,
+					CreatedDateUtc = DateTime.UtcNow
+				};
+				await this._contactsRepository.AddAsync(contactEntity, cancellationToken);
+			}
+			else
+			{
+				contactEntity = contactsEntity.Where(x => x.Email == email).FirstOrDefault();
+			}
+			
+			if(!menuEntity.SentTo.Contains(contactEntity.Id))
+			{
+				menuEntity.SentTo.Add(contactEntity.Id);
+			}
+		}
+		
+		if(oldContactsNumber != menuEntity.SentTo.Count())
+		{
+			await this._menusRepository.UpdateMenuAsync(menuEntity, cancellationToken);
+		}
+	}	
 	
 	private string FormMenuEmailHTMLBody(MenuDto menu)
 	{
@@ -128,7 +183,7 @@ public class MenusService : IMenusService
 				</tr>
 		");
 		
-		if(menu.Recipes.Count > 0)
+		if(menu.Recipes != null && menu.Recipes.Count > 0)
 		{
 			foreach (var recipe in menu.Recipes)
 			{

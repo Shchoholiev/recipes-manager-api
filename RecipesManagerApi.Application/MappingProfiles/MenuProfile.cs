@@ -16,6 +16,8 @@ public class MenuProfile : Profile
 		CreateMap<MenuDto, MenuLookedUp>()
 		.ForMember(dest => dest.SentToContacts, opt => opt.MapFrom(src => src.SentTo));
 		
+		CreateMap<MenuLookedUp, Menu>();
+		
 		CreateMap<MenuCreateDto, Menu>().ReverseMap();
 	}
 }

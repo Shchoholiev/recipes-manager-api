@@ -35,6 +35,7 @@ public static class MiddlewareExtension
 		services.AddScoped<ISharedRecipesRepository, SharedRecipeRepository>();
 		services.AddScoped<ISavedRecipesRepository, SavedRecipesRepository>();
 		services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+		services.AddScoped<IContactsRepository, ContactsRepository>();
 		services.AddTransient<ILogsRepository, LogsRepository>();
 
 		return services;

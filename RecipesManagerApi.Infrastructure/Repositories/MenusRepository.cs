@@ -54,6 +54,16 @@ public class MenusRepository : BaseRepository<Menu>, IMenusRepository
 
 	public async Task<MenuLookedUp> UpdateMenuAsync(Menu menu, CancellationToken cancellationToken)
 	{
+		var oldEntity = await this.GetMenuAsync(menu.Id, cancellationToken);
+		
+		menu.CreatedById = oldEntity.CreatedById;
+		menu.CreatedDateUtc = oldEntity.CreatedDateUtc;
+		
+		if(oldEntity.SentTo != null && menu.SentTo == null)
+		{
+			menu.SentTo = oldEntity.SentTo;
+		}
+		
 		await this._collection.ReplaceOneAsync(x => x.Id == menu.Id, menu, new ReplaceOptions(), cancellationToken);
 		return await this.GetMenuLookedUpAsync(menu.Id, cancellationToken);
 	}

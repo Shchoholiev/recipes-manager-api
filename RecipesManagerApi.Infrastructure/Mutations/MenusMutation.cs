@@ -19,4 +19,8 @@ public class MenusMutation
 	public Task<OperationDetails> DeleteMenuAsync(string menuId, CancellationToken cancellationToken,
 		[Service] IMenusService service)
 		=> service.DeleteMenuAsync(menuId, cancellationToken);
+		
+	public Task<OperationDetails> SendMenuToEmailsAsync(string menuId, List<string> emails, CancellationToken cancellationToken, 
+		[Service] IMenusService service)
+		=> service.SendMenuToEmailsAsync(menuId, emails, cancellationToken);	
 }

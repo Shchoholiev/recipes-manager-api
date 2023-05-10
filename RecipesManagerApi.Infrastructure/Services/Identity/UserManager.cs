@@ -98,6 +98,7 @@ public class UserManager : IUserManager
             PasswordHash = this._passwordHasher.Hash(register.Password),
             RefreshToken = this.GetRefreshToken(),
             RefreshTokenExpiryDate = DateTime.Now.AddDays(7),
+            CreatedDateUtc = DateTime.UtcNow
         };
 
         await this._usersRepository.AddAsync(user, cancellationToken);
@@ -132,6 +133,7 @@ public class UserManager : IUserManager
             Roles = new List<Role> { role },
             RefreshToken = this.GetRefreshToken(),
             RefreshTokenExpiryDate = DateTime.Now.AddDays(7),
+            CreatedDateUtc = DateTime.UtcNow
         };
 
         await this._usersRepository.AddAsync(newUser, cancellationToken);
@@ -166,6 +168,7 @@ public class UserManager : IUserManager
             Roles = new List<Role> { role },
             RefreshToken = this.GetRefreshToken(),
             RefreshTokenExpiryDate = DateTime.Now.AddDays(7),
+            CreatedDateUtc = DateTime.UtcNow
         };
 
         await this._usersRepository.AddAsync(newUser, cancellationToken);

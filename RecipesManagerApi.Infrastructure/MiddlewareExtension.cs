@@ -31,11 +31,14 @@ public static class MiddlewareExtension
 		services.AddScoped<IRecipesRepository, RecipesRepository>();
 		services.AddScoped<IImagesRepository, ImagesRepository>();
 		services.AddScoped<IOpenAiLogsRepository, OpenAiLogsRepository>();
+		services.AddScoped<IMenusRepository, MenusRepository>();
 		services.AddScoped<ISharedRecipesRepository, SharedRecipeRepository>();
 		services.AddScoped<ISavedRecipesRepository, SavedRecipesRepository>();
 		services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+		services.AddScoped<IContactsRepository, ContactsRepository>();
 		services.AddScoped<IShoppingListsRepository, ShoppingListsRepository>();
 		services.AddTransient<ILogsRepository, LogsRepository>();
+
 		return services;
 	}
 
@@ -56,7 +59,6 @@ public static class MiddlewareExtension
 		services.AddScoped<IIngredientsService, IngredientsService>();
 		services.AddScoped<ISavedRecipesService, SavedRecipesService>();
 		services.AddScoped<ISubscriptionService, SubscriptionsService>();
-		services.AddScoped<IShoppingListsService, ShoppingListsService>();
 		services.AddTransient<ILogsService, LogsService>();
 		services.AddScoped<IOpenAiLogsService, OpenAiLogsService>();
 
@@ -77,6 +79,7 @@ public static class MiddlewareExtension
 			.AddQueryType()
 				.AddTypeExtension<CategoriesQuery>()
 				.AddTypeExtension<ContactsQuery>()
+				.AddTypeExtension<MenusQuery>()
 				.AddTypeExtension<SharedRecipesQuery>()
 				.AddTypeExtension<SavedRecipesQuery>()
 				.AddTypeExtension<UsersQuery>()
@@ -93,13 +96,15 @@ public static class MiddlewareExtension
 				.AddTypeExtension<UserMutation>()
 				.AddTypeExtension<RoleMutation>()
 				.AddTypeExtension<ContactsMutation>()
+				.AddTypeExtension<MenusMutation>()
 				.AddTypeExtension<SavedRecipesMutation>()
 				.AddTypeExtension<SubscriptionsMutation>()
 				.AddTypeExtension<ShoppingListsMutation>()
 			.AddAuthorization()
 			.InitializeOnStartup(keepWarm: true);
-			
-			return services;
+		
+
+		return services;
 	}
 
 	public static IServiceCollection AddJWTTokenAuthentication(this IServiceCollection services,

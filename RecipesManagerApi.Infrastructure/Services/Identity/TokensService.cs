@@ -115,7 +115,7 @@ public class TokensService : ITokensService
         var tokenOptions = new JwtSecurityToken(
             issuer: _configuration.GetValue<string>("JsonWebTokenKeys:ValidIssuer"),
             audience: _configuration.GetValue<string>("JsonWebTokenKeys:ValidAudience"),
-            expires: DateTime.UtcNow.AddMinutes(60),
+            expires: DateTime.UtcNow.AddMinutes(5),
             claims: claims,
             signingCredentials: signinCredentials
         );

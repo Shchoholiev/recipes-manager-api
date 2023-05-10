@@ -106,48 +106,39 @@ public class MenusService : IMenusService
 			Body = FormMenuEmailHTMLBody(menuDto)
 		};
 		
-		await this.CheckContacs(menuLookedUp, emailsTo, cancellationToken);
-		
-		await _emailsService.SendEmailMessageAsync(message, cancellationToken);
+		await Task.WhenAll(
+			this.CheckContacs(menuLookedUp, emailsTo, cancellationToken),
+			_emailsService.SendEmailMessageAsync(message, cancellationToken)
+		);
+
 		return new OperationDetails { IsSuccessful = true, TimestampUtc = DateTime.UtcNow };
 	}
 	
 	private async Task CheckContacs(MenuLookedUp menuLookedUp, IEnumerable<string> emailsTo, CancellationToken cancellationToken)
 	{
-		var menuEntity = this._mapper.Map<Menu>(menuLookedUp);
-		int oldContactsNumber = menuEntity.SentTo.Count();
+		if (!emailsTo.Any()) return;
 
-		Expression<Func<Contact, bool>> predicate = (x => x.CreatedById == GlobalUser.Id.Value && x.IsDeleted == false);
-		var contactsEntity = await this._contactsRepository.GetPageAsync(1, ContactsChecksMaxValue, predicate, cancellationToken);
-		var userContactsEmails = contactsEntity.Select(x => x.Email);
-		Contact contactEntity;
-		foreach(var email in emailsTo)
+		var menu = this._mapper.Map<Menu>(menuLookedUp);
+		var existingContacts = await this._contactsRepository.GetPageAsync(1, 100, 
+			c => c.CreatedById == GlobalUser.Id.Value && c.IsDeleted == false && emailsTo.Contains(c.Email), cancellationToken);
+
+		foreach (var email in emailsTo)
 		{
-			if(!userContactsEmails.Contains(email))
+			var contact = existingContacts.Where(x => x.Email == email).FirstOrDefault();
+			if (contact == null)
 			{
-				contactEntity = new Contact
+				contact = new Contact
 				{
 					Email = email,
 					CreatedById = GlobalUser.Id.Value,
 					CreatedDateUtc = DateTime.UtcNow
 				};
-				await this._contactsRepository.AddAsync(contactEntity, cancellationToken);
+				await this._contactsRepository.AddAsync(contact, cancellationToken);
 			}
-			else
-			{
-				contactEntity = contactsEntity.Where(x => x.Email == email).FirstOrDefault();
-			}
-			
-			if(!menuEntity.SentTo.Contains(contactEntity.Id))
-			{
-				menuEntity.SentTo.Add(contactEntity.Id);
-			}
+			menu.SentTo.Add(contact.Id);
 		}
 		
-		if(oldContactsNumber != menuEntity.SentTo.Count())
-		{
-			await this._menusRepository.UpdateMenuAsync(menuEntity, cancellationToken);
-		}
+		await this._menusRepository.UpdateMenuAsync(menu, cancellationToken);
 	}	
 	
 	private string FormMenuEmailHTMLBody(MenuDto menu)

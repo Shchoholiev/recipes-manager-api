@@ -7,6 +7,9 @@ using RecipesManagerApi.Application.Paging;
 using RecipesManagerApi.Domain.Enums;
 using RecipesManagerApi.Domain.Entities;
 using RecipesManagerApi.Application.GlodalInstances;
+using RecipesManagerApi.Application.Models.Dtos;
+using MongoDB.Driver;
+using System.Linq.Expressions;
 
 namespace RecipesManagerApi.Infrastructure.Services;
 
@@ -18,23 +21,35 @@ public class RecipesService : IRecipesService
 
     private readonly IImagesService _imagesService;
 
+    private readonly ISubscriptionsRepository _subscriptionsRepository;
+
+    private readonly ISavedRecipesRepository _savedRecipesRepository;
+
+    private readonly ICategoriesRepository _categoriesRepository;
+
     public RecipesService(
         IMapper mapper,
         IRecipesRepository recipesRepository,
-        IImagesService imagesService)
+        IImagesService imagesService,
+        ISubscriptionsRepository subscriptionsRepository,
+        ISavedRecipesRepository savedRecipesRepository,
+        ICategoriesRepository categoriesRepository)
     {
         this._mapper = mapper;
         this._recipesRepository = recipesRepository;
         this._imagesService = imagesService;
+        this._savedRecipesRepository = savedRecipesRepository;
+        this._subscriptionsRepository = subscriptionsRepository;
+        this._categoriesRepository = categoriesRepository;
     }
 
     public async Task AddRecipeAsync(RecipeCreateDto dto, CancellationToken cancellationToken)
     {
         var entity = this._mapper.Map<Recipe>(dto);
 
-        if(GlobalUser.Id != null)
+        if(GlobalUser.Id.Value != null)
         {
-            entity.CreatedById = (ObjectId)GlobalUser.Id;
+            entity.CreatedById = GlobalUser.Id.Value;
             entity.CreatedDateUtc = DateTime.UtcNow;
         }
 
@@ -51,28 +66,42 @@ public class RecipesService : IRecipesService
     }
 
     public async Task<PagedList<RecipeDto>> GetSearchPageAsync(int pageNumber, int pageSize, string searchString, string? authorsId,
-        CategoryDto[]? categoriesDtos, RecipesSearchTypes? recipeSearchType, CancellationToken cancellationToken)
+        List<string>? categoriesIds, RecipesSearchTypes? recipeSearchType, CancellationToken cancellationToken)
     {
         List<Recipe>? entities;
         List<RecipeDto>? dtos;
-        List<Category>? filterList = this._mapper.Map<List<Category>>(categoriesDtos);
+        List<Category> filterList = new List<Category>();
 
-        if (!ObjectId.TryParse(authorsId, out var authorId))
+        foreach (var c in categoriesIds)
+        {
+            if (!ObjectId.TryParse(c, out var id))
+            {
+                throw new InvalidDataException("Provided id is invalid.");
+            }
+            var category = await this._categoriesRepository.GetCategoryAsync(id, cancellationToken);
+            if (category != null)
+            {
+                filterList.Add(category);
+            }
+        }
+
+        if (!ObjectId.TryParse(authorsId, out var authorId) && authorsId != string.Empty)
         {
             throw new InvalidDataException("Provided id is invalid.");
         }
 
-        var userId = (ObjectId)GlobalUser.Id;
+        var userId = GlobalUser.Id.Value;
 
         int count;
+
         switch (recipeSearchType)
         {
             case RecipesSearchTypes.Personal:
-                entities = await this.GetPersonalRecipesPageAsync(pageNumber, pageSize, searchString, userId, authorId, filterList, cancellationToken);
+                entities = await this.GetPersonalRecipesPageAsync(pageNumber, pageSize, searchString, userId, filterList, cancellationToken);
                 dtos = this._mapper.Map<List<RecipeDto>>(entities);
                 count = await this._recipesRepository.GetTotalCountAsync(x => x.IsPublic != true && x.CreatedById == userId
-                    && x.Name.Contains(searchString) || x.Categories.Exists(c => c.Name.Contains(searchString))
-                    || x.Text != null && x.Text.Contains(searchString) || x.IngredientsText != null && x.IngredientsText.Contains(searchString)
+                    && (x.Name.Contains(searchString) || x.Categories.Any(c => c.Name.Contains(searchString))
+                    || x.Text != null && x.Text.Contains(searchString) || x.IngredientsText != null && x.IngredientsText.Contains(searchString))
                     && x.CreatedById == authorId && x.Categories.Any(c => filterList.Contains(c)));
                 return new PagedList<RecipeDto>(dtos, pageNumber, pageSize, count);
 
@@ -80,39 +109,41 @@ public class RecipesService : IRecipesService
                 entities = await this.GetPublicRecipesPageAsync(pageNumber, pageSize, searchString, userId, authorId, filterList, cancellationToken);
                 dtos = this._mapper.Map<List<RecipeDto>>(entities);
                 count = await this._recipesRepository.GetTotalCountAsync(x => x.IsPublic == true && x.CreatedById != userId
-                    && x.Name.Contains(searchString) || x.Categories.Exists(c => c.Name.Contains(searchString))
+                    && (x.Name.Contains(searchString) || x.Categories.Any(c => c.Name.Contains(searchString)) || x.Categories.Any(c => filterList.Contains(c))
                     || x.Text != null && x.Text.Contains(searchString) || x.IngredientsText != null && x.IngredientsText.Contains(searchString)
-                    && x.CreatedById == authorId && x.Categories.Any(c => filterList.Contains(c)));
+                    || x.CreatedById == authorId));
                 return new PagedList<RecipeDto>(dtos, pageNumber, pageSize, count);
 
             case RecipesSearchTypes.Subscribed:
-                entities = await this.GetSubscribedRecipesPageAsync(pageNumber, pageSize, searchString, userId, authorId, filterList, cancellationToken);
+                var subscriptions = await this._subscriptionsRepository.GetUsersSubscriptionsAsync(userId, cancellationToken);
+                entities = await this.GetSubscribedRecipesPageAsync(pageNumber, pageSize, subscriptions, searchString, userId, authorId, filterList, cancellationToken);
                 dtos = this._mapper.Map<List<RecipeDto>>(entities);
-                count = await this._recipesRepository.GetSubscriptionsCountAsync(userId, x => x.Name.Contains(searchString)
-                    || x.Categories.Exists(c => c.Name.Contains(searchString)) || x.Text != null && x.Text.Contains(searchString)
-                    || x.IngredientsText != null && x.IngredientsText.Contains(searchString)
-                    && x.CreatedById == authorId && x.Categories.Any(c => filterList.Contains(c)), cancellationToken);
+                count = await this._recipesRepository.GetSubscriptionsCountAsync(x => x.Name.Contains(searchString)
+                    || x.Categories.Any(c => c.Name.Contains(searchString)) || (x.Text != null && x.Text.Contains(searchString))
+                    || (x.IngredientsText != null && x.IngredientsText.Contains(searchString))
+                    || x.Categories.Any(c => filterList.Contains(c)), subscriptions, cancellationToken);
                 return new PagedList<RecipeDto>(dtos, pageNumber, pageSize, count);
 
             case RecipesSearchTypes.Saved:
-                entities = await this.GetSavedRecipesPageAsync(pageNumber, pageSize, searchString, userId, authorId, filterList, cancellationToken);
+                var saves = await this._savedRecipesRepository.GetUsersSavesAsync(userId, cancellationToken);
+                entities = await this.GetSavedRecipesPageAsync(pageNumber, pageSize, saves, searchString, userId, authorId, filterList, cancellationToken);
                 dtos = this._mapper.Map<List<RecipeDto>>(entities);
-                count = await this._recipesRepository.GetSavedRecipesCountAsync(userId, x => x.Name.Contains(searchString)
-                    || x.Categories.Exists(c => c.Name.Contains(searchString)) || x.Text != null && x.Text.Contains(searchString)
-                    || x.IngredientsText != null && x.IngredientsText.Contains(searchString)
-                    && x.CreatedById == authorId && x.Categories.Any(c => filterList.Contains(c)), cancellationToken);
+                count = await this._recipesRepository.GetSavedRecipesCountAsync(x => x.Name.Contains(searchString)
+                    || x.Categories.Any(c => c.Name.Contains(searchString)) || (x.Text != null && x.Text.Contains(searchString))
+                    || (x.IngredientsText != null && x.IngredientsText.Contains(searchString))
+                    || x.Categories.Any(c => filterList.Contains(c)) || x.CreatedById == authorId, saves, cancellationToken);
                 return new PagedList<RecipeDto>(dtos, pageNumber, pageSize, count);
 
             default:
                 entities = await this._recipesRepository.GetPageAsync(pageNumber, pageSize, x => x.Name.Contains(searchString)
-                    || x.Categories.Exists(c => c.Name.Contains(searchString)) || x.Text != null && x.Text.Contains(searchString)
-                    || x.IngredientsText != null && x.IngredientsText.Contains(searchString)
-                    && x.CreatedById == authorId && x.Categories.Any(c => filterList.Contains(c)), cancellationToken);
+                    || x.Categories.Exists(c => c.Name.Contains(searchString)) || (x.Text != null && x.Text.Contains(searchString))
+                    || (x.IngredientsText != null && x.IngredientsText.Contains(searchString))
+                    && x.CreatedById == authorId || x.Categories.Any(c => filterList.Contains(c)), cancellationToken);
                 dtos = this._mapper.Map<List<RecipeDto>>(entities);
                 count = await this._recipesRepository.GetTotalCountAsync(x => x.Name.Contains(searchString)
-                    || x.Categories.Exists(c => c.Name.Contains(searchString)) || x.Text != null && x.Text.Contains(searchString)
-                    || x.IngredientsText != null && x.IngredientsText.Contains(searchString)
-                    && x.CreatedById == authorId && x.Categories.Any(c => filterList.Contains(c)));
+                    || x.Categories.Exists(c => c.Name.Contains(searchString)) || (x.Text != null && x.Text.Contains(searchString))
+                    || (x.IngredientsText != null && x.IngredientsText.Contains(searchString))
+                    && x.CreatedById == authorId || x.Categories.Any(c => filterList.Contains(c)));
                 return new PagedList<RecipeDto>(dtos, pageNumber, pageSize, count);
         }
         throw new NotImplementedException();
@@ -134,7 +165,7 @@ public class RecipesService : IRecipesService
 
         if (GlobalUser.Id != null)
         {
-            entity.LastModifiedById = (ObjectId)GlobalUser.Id;
+            entity.LastModifiedById = GlobalUser.Id.Value;
             entity.LastModifiedDateUtc = DateTime.UtcNow;
         }
 
@@ -145,37 +176,36 @@ public class RecipesService : IRecipesService
         List<Category>? filterList, CancellationToken cancellationToken)
     {
         return await this._recipesRepository.GetPageAsync(pageNumber, pageSize, x => x.IsPublic == true && x.CreatedById != userId
-            && x.Name.Contains(searchString) || x.Categories.Exists(c => c.Name.Contains(searchString))
-            || x.Text != null && x.Text.Contains(searchString) || x.IngredientsText != null && x.IngredientsText.Contains(searchString)
-            && x.CreatedById == authorId && x.Categories.Any(c => filterList.Contains(c)), cancellationToken);
+            && (x.Name.Contains(searchString) || x.Categories.Any(c => c.Name.Contains(searchString)) || x.Categories.Any(c => filterList.Contains(c))
+            || (x.Text != null && x.Text.Contains(searchString)) || (x.IngredientsText != null && x.IngredientsText.Contains(searchString))
+            || x.CreatedById == authorId), cancellationToken);
     }
 
-    private async Task<List<Recipe>> GetPersonalRecipesPageAsync(int pageNumber, int pageSize, string searchString, ObjectId userId, ObjectId? authorId,
+    private async Task<List<Recipe>> GetPersonalRecipesPageAsync(int pageNumber, int pageSize, string searchString, ObjectId userId,
         List<Category>? filterList, CancellationToken cancellationToken)
     {
         return await this._recipesRepository.GetPageAsync(pageNumber, pageSize, x => x.IsPublic != true && x.CreatedById == userId
-            && x.Name.Contains(searchString) || x.Categories.Exists(c => c.Name.Contains(searchString))
-            || x.Text != null && x.Text.Contains(searchString) || x.IngredientsText != null && x.IngredientsText.Contains(searchString)
-            && x.CreatedById == authorId && x.Categories.Any(c => filterList.Contains(c)), cancellationToken);
+            && (x.Name.Contains(searchString) || x.Categories.Any(c => c.Name.Contains(searchString)) || x.Categories.Any(c => filterList.Contains(c))
+            || (x.Text != null && x.Text.Contains(searchString)) || (x.IngredientsText != null && x.IngredientsText.Contains(searchString))), cancellationToken);
     }
 
-    private async Task<List<Recipe>> GetSubscribedRecipesPageAsync(int pageNumber, int pageSize, string searchString, ObjectId userId, ObjectId? authorId,
+    private async Task<List<Recipe>> GetSubscribedRecipesPageAsync(int pageNumber, int pageSize, List<Subscription> subscriptions, string searchString, ObjectId userId, ObjectId? authorId,
         List<Category>? filterList, CancellationToken cancellationToken)
     {
-        return await this._recipesRepository.GetSubscribedRecipesAsync(pageNumber, pageSize, userId, x => x.Name.Contains(searchString)
-            || x.Categories.Exists(c => c.Name.Contains(searchString)) || x.Text != null && x.Text.Contains(searchString)
-            || x.IngredientsText != null && x.IngredientsText.Contains(searchString)
-            && x.CreatedById == authorId && x.Categories.Any(c => filterList.Contains(c)), cancellationToken);
+        return await this._recipesRepository.GetSubscribedRecipesAsync(pageNumber, pageSize, subscriptions, x => x.Name.Contains(searchString)
+            || x.Categories.Any(c => c.Name.Contains(searchString)) || (x.Text != null && x.Text.Contains(searchString))
+            || (x.IngredientsText != null && x.IngredientsText.Contains(searchString))
+            || x.Categories.Any(c => filterList.Contains(c)), cancellationToken);
     }
 
 
-    private async Task<List<Recipe>> GetSavedRecipesPageAsync(int pageNumber, int pageSize, string searchString, ObjectId userId, ObjectId? authorId,
+    private async Task<List<Recipe>> GetSavedRecipesPageAsync(int pageNumber, int pageSize, List<SavedRecipe> saves, string searchString, ObjectId userId, ObjectId? authorId,
         List<Category>? filterList, CancellationToken cancellationToken)
     {
-        return await this._recipesRepository.GetSavedRecipesAsync(pageNumber, pageSize, userId, x => x.IsPublic != true
-            && x.Name.Contains(searchString) || x.Categories.Exists(c => c.Name.Contains(searchString))
-            || x.Text != null && x.Text.Contains(searchString) || x.IngredientsText != null && x.IngredientsText.Contains(searchString)
-            && x.CreatedById == authorId && x.Categories.Any(c => filterList.Contains(c)), cancellationToken);
+        return await this._recipesRepository.GetSavedRecipesAsync(pageNumber, pageSize, x => x.Name.Contains(searchString)
+            || x.Categories.Any(c => c.Name.Contains(searchString)) || (x.Text != null && x.Text.Contains(searchString))
+            || (x.IngredientsText != null && x.IngredientsText.Contains(searchString))
+            || x.Categories.Any(c => filterList.Contains(c)) || x.CreatedById == authorId, saves, cancellationToken);
 
     }
 

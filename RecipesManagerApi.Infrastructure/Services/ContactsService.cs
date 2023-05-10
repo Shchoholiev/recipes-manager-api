@@ -2,7 +2,7 @@ using MongoDB.Bson;
 using AutoMapper;
 using RecipesManagerApi.Application.IServices;
 using RecipesManagerApi.Application.IRepositories;
-using RecipesManagerApi.Application.Models;
+using RecipesManagerApi.Application.Models.Dtos;
 using RecipesManagerApi.Application.Exceptions;
 using RecipesManagerApi.Application.Paging;
 using RecipesManagerApi.Domain.Entities;
@@ -29,9 +29,13 @@ public class ContactsService : IContactsService
         return this._mapper.Map<ContactDto>(newEntity);
     }
 
-    public async Task DeleteContactAsync(ContactDto dto, CancellationToken cancellationToken)
+    public async Task DeleteContactAsync(string id, CancellationToken cancellationToken)
     {
-        var entity = this._mapper.Map<Contact>(dto);
+        if (!ObjectId.TryParse(id, out var objectId))
+        {
+            throw new InvalidDataException("Provided id is invalid.");
+        }
+        var entity = await this._contactsRepository.GetContactAsync(objectId, cancellationToken);
         entity.IsDeleted = true;
         await this._contactsRepository.UpdateContactAsync(entity, cancellationToken);
     }

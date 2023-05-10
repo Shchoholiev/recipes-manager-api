@@ -12,37 +12,12 @@ namespace RecipesManagerApi.Infrastructure.Repositories;
 
 public class RecipesRepository : BaseRepository<Recipe>, IRecipesRepository
 {
-    private readonly ISubscriptionsRepository _subscriptionsRepository;
-
-    private readonly ISavedRecipesRepository _savedRecipesRepository;
-
-    public RecipesRepository(MongoDbContext db, ISubscriptionsRepository subscriptionsRepository, ISavedRecipesRepository savedRecipesRepository)
-        : base(db, "Recipes"){
-        this._subscriptionsRepository = subscriptionsRepository;
-        this._savedRecipesRepository = savedRecipesRepository;
-    }
+    public RecipesRepository(MongoDbContext db)
+        : base(db, "Recipes") { }
 
     public async Task<Recipe> GetRecipeAsync(ObjectId id, CancellationToken cancellationToken)
     {
         return await (await this._collection.FindAsync(x => x.Id == id)).FirstOrDefaultAsync(cancellationToken);
-    }
-
-    public async Task<List<Recipe>> GetSubscribedRecipesAsync(int pageNumber, int pageSize, ObjectId id, Expression<Func<Recipe, bool>> predicate, CancellationToken cancellationToken)
-    {
-        var subscriptions = await this._subscriptionsRepository.GetUsersSubscriptionsAsync(id, cancellationToken);
-        IEnumerable<ObjectId> subscriptionsIds = new List<ObjectId>();
-
-        foreach(var s in subscriptions)
-        {
-            subscriptionsIds.Append<ObjectId>(s.Id);
-        }
-
-        var filter = Builders<Recipe>.Filter.In(Recipe => Recipe.CreatedById, subscriptionsIds) & Builders<Recipe>.Filter.Where(predicate);
-
-        return await this._collection.Find(filter)
-                                         .Skip((pageNumber - 1) * pageSize)
-                                         .Limit(pageSize)
-                                         .ToListAsync(cancellationToken);
     }
 
     public async Task UpdateRecipeAsync(Recipe recipe, CancellationToken cancellationToken)
@@ -56,50 +31,74 @@ public class RecipesRepository : BaseRepository<Recipe>, IRecipesRepository
         return (int)(await this._collection.CountDocumentsAsync(filter));
     }
 
-    public async Task<int> GetSubscriptionsCountAsync(ObjectId userId, Expression<Func<Recipe, bool>> predicate, CancellationToken cancellationToken)
+    public async Task<List<Recipe>> GetSubscribedRecipesAsync(int pageNumber, int pageSize, List<Subscription> subscriptions,
+        Expression<Func<Recipe, bool>> predicate, CancellationToken cancellationToken)
     {
-        var subscriptions = await this._subscriptionsRepository.GetUsersSubscriptionsAsync(userId, cancellationToken);
-        IEnumerable<ObjectId> subscriptionsIds = new List<ObjectId>();
+        List<ObjectId> subscriptionsIds = new List<ObjectId>();
 
         foreach (var s in subscriptions)
         {
-            subscriptionsIds.Append<ObjectId>(s.Id);
+            subscriptionsIds.Add(s.AuthorId);
         }
 
-        var filterSubscriptions = Builders<Recipe>.Filter.In(Recipe => Recipe.CreatedById, subscriptionsIds) & Builders<Recipe>.Filter.Where(predicate);
-        return (int)(await this._collection.CountDocumentsAsync(filterSubscriptions));
+        var filterSubscribed = Builders<Recipe>.Filter.In(Recipe => Recipe.CreatedById, subscriptionsIds);
+        var filterPredicate = Builders<Recipe>.Filter.Where(predicate);
+        var filter = Builders<Recipe>.Filter.And(filterSubscribed, filterPredicate);
+
+        return await this._collection.Find(filter)
+                                         .Skip((pageNumber - 1) * pageSize)
+                                         .Limit(pageSize)
+                                         .ToListAsync(cancellationToken);
     }
 
-    public async Task<List<Recipe>> GetSavedRecipesAsync(int pageNumber, int pageSize, ObjectId userId, Expression<Func<Recipe, bool>> predicate, CancellationToken cancellationToken)
+    public async Task<int> GetSubscriptionsCountAsync(Expression<Func<Recipe, bool>> predicate, List<Subscription> subscriptions, CancellationToken cancellationToken)
     {
-        var saves = await this._savedRecipesRepository.GetUsersSavesAsync(userId, cancellationToken);
-        IEnumerable<ObjectId> savedRecipesIds = new List<ObjectId>();
+        List<ObjectId> subscriptionsIds = new List<ObjectId>();
+
+        foreach (var s in subscriptions)
+        {
+            subscriptionsIds.Add(s.Id);
+        }
+
+        var filterSubscribed = Builders<Recipe>.Filter.In(Recipe => Recipe.CreatedById, subscriptionsIds);
+        var filterPredicate = Builders<Recipe>.Filter.Where(predicate);
+        var filter = Builders<Recipe>.Filter.And(filterSubscribed, filterPredicate);
+
+        return (int)(await this._collection.CountDocumentsAsync(filter));
+    }
+
+    public async Task<List<Recipe>> GetSavedRecipesAsync(int pageNumber, int pageSize,Expression<Func<Recipe, bool>> predicate, List<SavedRecipe> saves, CancellationToken cancellationToken)
+    {
+        List<ObjectId> savedRecipesIds = new List<ObjectId>();
 
         foreach(var s in saves)
         {
-            savedRecipesIds.Append(s.RecipeId);
+            savedRecipesIds.Add(s.RecipeId);
         }
 
-        var filterSavedRecipes = Builders<Recipe>.Filter.In(Recipe => Recipe.Id, savedRecipesIds) & Builders<Recipe>.Filter.Where(predicate);
+        var filterSavedRecipes = Builders<Recipe>.Filter.In(Recipe => Recipe.Id, savedRecipesIds);
+        var filterPredicate = Builders<Recipe>.Filter.Where(predicate);
+        var filter = Builders<Recipe>.Filter.And(filterSavedRecipes, filterPredicate);
 
-        return await this._collection.Find(filterSavedRecipes)
+        return await this._collection.Find(filter)
                                         .Skip((pageNumber - 1) * pageSize)
                                         .Limit(pageSize)
                                         .ToListAsync(cancellationToken);
     }
 
-    public async Task<int> GetSavedRecipesCountAsync(ObjectId userId, Expression<Func<Recipe, bool>> predicate, CancellationToken cancellationToken)
+    public async Task<int> GetSavedRecipesCountAsync(Expression<Func<Recipe, bool>> predicate, List<SavedRecipe> saves, CancellationToken cancellationToken)
     {
-        var saves = await this._savedRecipesRepository.GetUsersSavesAsync(userId, cancellationToken);
-        IEnumerable<ObjectId> savedRecipesIds = new List<ObjectId>();
+        List<ObjectId> savedRecipesIds = new List<ObjectId>();
 
         foreach (var s in saves)
         {
-            savedRecipesIds.Append(s.RecipeId);
+            savedRecipesIds.Add(s.RecipeId);
         }
 
-        var filterSavedRecipes = Builders<Recipe>.Filter.In(Recipe => Recipe.Id, savedRecipesIds) & Builders<Recipe>.Filter.Where(predicate);
+        var filterSavedRecipes = Builders<Recipe>.Filter.In(Recipe => Recipe.Id, savedRecipesIds);
+        var filterPredicate = Builders<Recipe>.Filter.Where(predicate);
+        var filter = Builders<Recipe>.Filter.And(filterSavedRecipes, filterPredicate);
 
-        return (int)(await this._collection.CountDocumentsAsync(filterSavedRecipes));
+        return (int)(await this._collection.CountDocumentsAsync(filter));
     }
 }

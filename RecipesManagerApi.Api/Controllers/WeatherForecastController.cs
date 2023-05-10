@@ -4,12 +4,12 @@ using MongoDB.Bson;
 using System.IO;
 using RecipesManagerApi.Application.IServices;
 using RecipesManagerApi.Application.IServices.Identity;
-using RecipesManagerApi.Application.Models;
+using RecipesManagerApi.Application.Models.Dtos;
 using RecipesManagerApi.Application.Models.Identity;
 using RecipesManagerApi.Application.Paging;
-using HotChocolate.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using RecipesManagerApi.Application.Interfaces.Identity;
+using RecipesManagerApi.Application.Models;
 
 namespace RecipesManagerApi.Api.Controllers;
 
@@ -41,19 +41,7 @@ public class WeatherForecastController : ControllerBase
         this._cloudStorageService = cloudStorageService;
         _recipesService = recipesService;
     }
-
-    [HttpGet(Name = "GetWeatherForecast")]
-    public IEnumerable<WeatherForecast> Get()
-    {
-        return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-        {
-            Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-        })
-        .ToArray();
-    }
-
+   
     [HttpDelete("test-object-delete")]
     public async void TestCloudStorageDelete(string objectGuid, string fileExtension, CancellationToken cancellationToken)
     {
@@ -68,7 +56,8 @@ public class WeatherForecastController : ControllerBase
         Console.WriteLine(await this._cloudStorageService.UploadFileAsync(file, Guid.NewGuid(), file.FileName.Split(".").Last(), cancellationToken));
     }
 
-    [HttpPost("recipe-add")]
+    [Authorize]
+    [HttpPost("recipe-add")]  
     public async Task CreateRecipeAsync([FromForm]RecipeCreateDto dto, CancellationToken cancellationToken)
     {
         await _recipesService.AddRecipeAsync(dto, cancellationToken);

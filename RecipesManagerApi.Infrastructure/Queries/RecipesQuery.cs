@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson;
 using RecipesManagerApi.Application.IServices;
-using RecipesManagerApi.Application.Models;
+using RecipesManagerApi.Application.Models.Dtos;
 using RecipesManagerApi.Application.Paging;
 using RecipesManagerApi.Domain.Enums;
 
@@ -18,8 +18,8 @@ public class RecipesQuery
         => service.GetRecipesPageAsync(pageNumber, pageSize, cancellationToken);
 
     public Task<PagedList<RecipeDto>> GetRecipeSearchResultAsync(int pageNumber, int pageSize, string searchString, string? authorId,
-        CategoryDto[]? categoriesDtos, RecipesSearchTypes? recipeSearchType, CancellationToken cancellationToken,
-        [Service] IRecipesService service)
-        => service.GetSearchPageAsync(pageNumber, pageSize, searchString, authorId, categoriesDtos, recipeSearchType, cancellationToken);
+     List<string>? categoriesIds, RecipesSearchTypes? recipeSearchType, CancellationToken cancellationToken,
+    [Service] IRecipesService service)
+        => service.GetSearchPageAsync(pageNumber, pageSize, searchString, authorId, categoriesIds, recipeSearchType, cancellationToken);
 }
 

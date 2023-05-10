@@ -1,6 +1,6 @@
 ﻿using HotChocolate;
 
-namespace RecipesManagerApi.Application.Models
+namespace RecipesManagerApi.Application.Models.Dtos
 {
     [GraphQLName("Category")]
     public class CategoryDto

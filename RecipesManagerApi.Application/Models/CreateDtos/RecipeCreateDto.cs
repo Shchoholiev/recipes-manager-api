@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using RecipesManagerApi.Application.Models.Dtos;
 
 namespace RecipesManagerApi.Application.Models;
 
@@ -17,4 +18,6 @@ public class RecipeCreateDto
     public int? Calories { get; set; }
 
     public int? ServingsCount { get; set; }
+
+    public bool IsPublic { get; set; }
 }

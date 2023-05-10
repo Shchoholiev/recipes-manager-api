@@ -61,6 +61,7 @@ public static class MiddlewareExtension
 		services.AddScoped<ISubscriptionService, SubscriptionsService>();
 		services.AddTransient<ILogsService, LogsService>();
 		services.AddScoped<IOpenAiLogsService, OpenAiLogsService>();
+		services.AddScoped<IShoppingListsService, ShoppingListsService>();
 
 		return services;
 	}

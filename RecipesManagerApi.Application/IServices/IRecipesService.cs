@@ -19,5 +19,5 @@ public interface IRecipesService
     Task<PagedList<RecipeDto>> GetRecipesPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken);
 
     Task<PagedList<RecipeDto>> GetSearchPageAsync(int pageNumber, int pageSize, string searchString, string? authorId,
-        List<string>? categoriesIds, RecipesSearchTypes? recipeSearchType, CancellationToken cancellationToken);
+        List<string>? categoriesIds, RecipesSearchTypes recipeSearchType, CancellationToken cancellationToken);
 }

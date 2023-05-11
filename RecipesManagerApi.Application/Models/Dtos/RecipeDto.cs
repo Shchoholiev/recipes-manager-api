@@ -20,7 +20,11 @@ public class RecipeDto
 
     public bool IsPublic { get; set; }
 
+    public bool IsSaved { get; set; }
+
     public string CreatedById { get; set; }
+
+    public UserDto CreatedBy { get; set; }
 
     public DateTime CreatedDateUtc { get; set; }
 }

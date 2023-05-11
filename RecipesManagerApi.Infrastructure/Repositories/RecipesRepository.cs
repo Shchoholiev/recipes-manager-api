@@ -7,6 +7,7 @@ using MongoDB.Driver;
 using System.Threading;
 using static Amazon.S3.Util.S3EventNotification;
 using Amazon.S3.Model;
+using RecipesManagerApi.Application.Models.LookUps;
 
 namespace RecipesManagerApi.Infrastructure.Repositories;
 
@@ -20,85 +21,166 @@ public class RecipesRepository : BaseRepository<Recipe>, IRecipesRepository
         return await (await this._collection.FindAsync(x => x.Id == id)).FirstOrDefaultAsync(cancellationToken);
     }
 
+    public async Task<List<RecipeLookUp>> GetRecipesPageAsync(int pageNumber, int pageSize, Expression<Func<Recipe, bool>> predicate, CancellationToken cancellationToken)
+    {
+        var recipes = await _collection.Aggregate()
+            .Match(Builders<Recipe>.Filter.Where(predicate))
+            .Lookup("Users", "CreatedById", "_id", "CreatedBy")
+            .AppendStage<RecipeLookUp>("{ $addFields: { CreatedBy: { $arrayElemAt: ['$CreatedBy', 0] } } }")
+            .Skip((pageNumber - 1) * pageSize)
+            .Limit(pageSize)
+            .As<RecipeLookUp>()
+            .ToListAsync(cancellationToken);
+
+        return recipes;
+    }
+
+    public async Task<List<RecipeLookUp>> GetSavedRecipesAsync(int pageNumber, int pageSize, ObjectId userId, Expression<Func<Recipe, bool>> predicate, CancellationToken cancellationToken)
+    {
+        var recipes = await _collection.Aggregate()
+            .Match(Builders<Recipe>.Filter.Where(predicate))
+            .Lookup("Users", "CreatedById", "_id", "CreatedBy")
+            .AppendStage<RecipeLookUp>("{ $addFields: { CreatedBy: { $arrayElemAt: ['$CreatedBy', 0] } } }")
+            .Lookup("SavedRecipes", "_id", "RecipeId", "SavedRecipe")
+            .AppendStage<RecipeLookUp>(new BsonDocument("$match", new BsonDocument("SavedRecipe.CreatedById", userId)))
+            .AppendStage<RecipeLookUp>(new BsonDocument("$match", new BsonDocument("SavedRecipe.IsDeleted", false)))
+            .AppendStage<RecipeLookUp>(new BsonDocument("$project", new BsonDocument("SavedRecipe", 0)))
+            .Skip((pageNumber - 1) * pageSize)
+            .Limit(pageSize)
+            .As<RecipeLookUp>()
+            .ToListAsync(cancellationToken);
+
+        return recipes;
+    }
+
+    public async Task<int> GetSavedRecipesCountAsync(Expression<Func<Recipe, bool>> predicate, ObjectId userId, CancellationToken cancellationToken)
+    {
+        var pipeline = await _collection.Aggregate()
+            .Match(Builders<Recipe>.Filter.Where(predicate))
+            .Lookup("Users", "CreatedById", "_id", "CreatedBy")
+            .AppendStage<RecipeLookUp>("{ $addFields: { CreatedBy: { $arrayElemAt: ['$CreatedBy', 0] } } }")
+            .Lookup("SavedRecipes", "_id", "RecipeId", "SavedRecipe")
+            .AppendStage<RecipeLookUp>(new BsonDocument("$match", new BsonDocument("SavedRecipe.CreatedById", userId)))
+            .AppendStage<RecipeLookUp>(new BsonDocument("$match", new BsonDocument("SavedRecipe.IsDeleted", false)))
+            .AppendStage<RecipeLookUp>(new BsonDocument("$project", new BsonDocument("SavedRecipe", 0)))
+            .Count()
+            .FirstOrDefaultAsync(cancellationToken);
+        
+
+        return (int)pipeline.Count;
+    }
+
+    public async Task<List<RecipeLookUp>> GetSubscribedRecipesAsync(int pageNumber, int pageSize, ObjectId userId,
+        Expression<Func<Recipe, bool>> predicate, CancellationToken cancellationToken)
+    {
+        var recipes = await _collection.Aggregate()
+            .Match(Builders<Recipe>.Filter.Where(predicate))
+            .Lookup("Users", "CreatedById", "_id", "CreatedBy")
+            .AppendStage<RecipeLookUp>("{ $addFields: { CreatedBy: { $arrayElemAt: ['$CreatedBy', 0] } } }")
+            .AppendStage<BsonDocument>(@"
+            { 
+                $lookup: { 
+                    from: 'Subscriptions',
+                    localField: 'CreatedById',
+                    foreignField: 'AuthorId',
+                    as: 'Subscription',
+                    pipeline: [
+                        { 
+                            $match: { 
+                                $and: [
+                                    { CreatedById: { $eq: ObjectId('" + userId.ToString() + @"') } },
+                                    { IsDeleted: false }
+                                ]
+                            } 
+                        }
+                    ]
+                }
+            }")
+            .AppendStage<BsonDocument>(@"
+            {
+                $match: {
+                    Subscription: { $ne: [] } 
+                }
+            }")
+            .AppendStage<BsonDocument>(@"
+            { 
+                $match: {
+                    $expr: {
+                        $cond: {
+                            if: { $eq: [{ $arrayElemAt: ['$Subscription.IsAccessFull', 0] }, true] },
+                            then: [],
+                            else: { $eq: ['$$ROOT.IsPublic', true] }
+                        }
+                    }
+                }
+            }")
+            .AppendStage<RecipeLookUp>(new BsonDocument("$project", new BsonDocument("Subscription", 0)))
+            .Skip((pageNumber - 1) * pageSize)
+            .Limit(pageSize)
+            .As<RecipeLookUp>()
+            .ToListAsync(cancellationToken);
+
+        return recipes;
+    }
+
+    public async Task<int> GetSubscriptionsCountAsync(Expression<Func<Recipe, bool>> predicate, ObjectId userId, CancellationToken cancellationToken)
+    {
+        var pipeline = await _collection.Aggregate()
+            .Match(Builders<Recipe>.Filter.Where(predicate))
+            .Lookup("Users", "CreatedById", "_id", "CreatedBy")
+            .AppendStage<RecipeLookUp>("{ $addFields: { CreatedBy: { $arrayElemAt: ['$CreatedBy', 0] } } }")
+            .AppendStage<BsonDocument>(@"
+            { 
+                $lookup: { 
+                    from: 'Subscriptions',
+                    localField: 'CreatedById',
+                    foreignField: 'AuthorId',
+                    as: 'Subscription',
+                    pipeline: [
+                        { 
+                            $match: { 
+                                $and: [
+                                    { CreatedById: { $eq: ObjectId('" + userId.ToString() + @"') } },
+                                    { IsDeleted: false }
+                                ]
+                            } 
+                        }
+                    ]
+                }
+            }")
+            .AppendStage<BsonDocument>(@"
+            {
+                $match: {
+                    Subscription: { $ne: [] } 
+                }
+            }")
+            .AppendStage<BsonDocument>(@"
+            { 
+                $match: {
+                    $expr: {
+                        $cond: {
+                            if: { $eq: [{ $arrayElemAt: ['$Subscription.IsAccessFull', 0] }, true] },
+                            then: [],
+                            else: { $eq: ['$$ROOT.IsPublic', true] }
+                        }
+                    }
+                }
+            }")
+            .Count()
+            .FirstOrDefaultAsync(cancellationToken);
+        
+
+        return (int)pipeline.Count;
+    }
+
     public async Task UpdateRecipeAsync(Recipe recipe, CancellationToken cancellationToken)
     {
         await this._collection.ReplaceOneAsync(Builders<Recipe>.Filter.Eq(x=>x.Id, recipe.Id), recipe, new ReplaceOptions(), cancellationToken);
     }
 
-    public async Task<int> GetTotalCountAsync(Expression<Func<Recipe, bool>> predicate)
+    public async Task<int> GetTotalCountAsync(Expression<Func<Recipe, bool>> predicate, CancellationToken cancellationToken)
     {
         var filter = Builders<Recipe>.Filter.Where(predicate);
-        return (int)(await this._collection.CountDocumentsAsync(filter));
-    }
-
-    public async Task<List<Recipe>> GetSubscribedRecipesAsync(int pageNumber, int pageSize, List<Subscription> subscriptions,
-        Expression<Func<Recipe, bool>> predicate, CancellationToken cancellationToken)
-    {
-        List<ObjectId> subscriptionsIds = new List<ObjectId>();
-
-        foreach (var s in subscriptions)
-        {
-            subscriptionsIds.Add(s.AuthorId);
-        }
-
-        var filterSubscribed = Builders<Recipe>.Filter.In(Recipe => Recipe.CreatedById, subscriptionsIds);
-        var filterPredicate = Builders<Recipe>.Filter.Where(predicate);
-        var filter = Builders<Recipe>.Filter.And(filterSubscribed, filterPredicate);
-
-        return await this._collection.Find(filter)
-                                         .Skip((pageNumber - 1) * pageSize)
-                                         .Limit(pageSize)
-                                         .ToListAsync(cancellationToken);
-    }
-
-    public async Task<int> GetSubscriptionsCountAsync(Expression<Func<Recipe, bool>> predicate, List<Subscription> subscriptions, CancellationToken cancellationToken)
-    {
-        List<ObjectId> subscriptionsIds = new List<ObjectId>();
-
-        foreach (var s in subscriptions)
-        {
-            subscriptionsIds.Add(s.Id);
-        }
-
-        var filterSubscribed = Builders<Recipe>.Filter.In(Recipe => Recipe.CreatedById, subscriptionsIds);
-        var filterPredicate = Builders<Recipe>.Filter.Where(predicate);
-        var filter = Builders<Recipe>.Filter.And(filterSubscribed, filterPredicate);
-
-        return (int)(await this._collection.CountDocumentsAsync(filter));
-    }
-
-    public async Task<List<Recipe>> GetSavedRecipesAsync(int pageNumber, int pageSize,Expression<Func<Recipe, bool>> predicate, List<SavedRecipe> saves, CancellationToken cancellationToken)
-    {
-        List<ObjectId> savedRecipesIds = new List<ObjectId>();
-
-        foreach(var s in saves)
-        {
-            savedRecipesIds.Add(s.RecipeId);
-        }
-
-        var filterSavedRecipes = Builders<Recipe>.Filter.In(Recipe => Recipe.Id, savedRecipesIds);
-        var filterPredicate = Builders<Recipe>.Filter.Where(predicate);
-        var filter = Builders<Recipe>.Filter.And(filterSavedRecipes, filterPredicate);
-
-        return await this._collection.Find(filter)
-                                        .Skip((pageNumber - 1) * pageSize)
-                                        .Limit(pageSize)
-                                        .ToListAsync(cancellationToken);
-    }
-
-    public async Task<int> GetSavedRecipesCountAsync(Expression<Func<Recipe, bool>> predicate, List<SavedRecipe> saves, CancellationToken cancellationToken)
-    {
-        List<ObjectId> savedRecipesIds = new List<ObjectId>();
-
-        foreach (var s in saves)
-        {
-            savedRecipesIds.Add(s.RecipeId);
-        }
-
-        var filterSavedRecipes = Builders<Recipe>.Filter.In(Recipe => Recipe.Id, savedRecipesIds);
-        var filterPredicate = Builders<Recipe>.Filter.Where(predicate);
-        var filter = Builders<Recipe>.Filter.And(filterSavedRecipes, filterPredicate);
-
-        return (int)(await this._collection.CountDocumentsAsync(filter));
+        return (int)(await this._collection.CountDocumentsAsync(filter, null, cancellationToken));
     }
 }

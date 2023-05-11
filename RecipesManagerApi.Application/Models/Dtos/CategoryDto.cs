@@ -7,6 +7,6 @@ namespace RecipesManagerApi.Application.Models.Dtos
     {
         public string Id { get; set; }
 
-        //public string Name { get; set; }
+        public string Name { get; set; }
     }
 }

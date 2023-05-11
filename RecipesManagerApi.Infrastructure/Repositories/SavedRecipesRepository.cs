@@ -11,6 +11,11 @@ public class SavedRecipesRepository : BaseRepository<SavedRecipe>, ISavedRecipes
 {
     public SavedRecipesRepository(MongoDbContext db) : base(db, "SavedRecipes") { }
 
+    public async Task<List<SavedRecipe>> GetUsersSavesAsync(ObjectId id, CancellationToken cancellationToken)
+    {
+        return await(await this._collection.FindAsync<SavedRecipe>(x => x.CreatedById == id)).ToListAsync();
+    }
+   
     public async Task<SavedRecipe> GetSavedRecipeAsync(ObjectId id, CancellationToken cancellationToken)
     {
         return await (await this._collection.FindAsync(x => x.Id == id && x.IsDeleted == false)).FirstOrDefaultAsync(cancellationToken);

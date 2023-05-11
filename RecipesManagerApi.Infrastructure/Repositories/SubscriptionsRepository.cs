@@ -1,15 +1,15 @@
 ﻿using RecipesManagerApi.Domain.Entities;
 using RecipesManagerApi.Application.IRepositories;
-using MongoDB.Bson;
-using System.Linq.Expressions;
 using RecipesManagerApi.Infrastructure.Database;
+using System.Linq.Expressions;
 using MongoDB.Driver;
+using MongoDB.Bson;
 
 namespace RecipesManagerApi.Infrastructure.Repositories;
 
-public class SubscriptionRepository : BaseRepository<Subscription>, ISubscriptionRepository
+public class SubscriptionsRepository : BaseRepository<Subscription>, ISubscriptionsRepository
 {
-    public SubscriptionRepository(MongoDbContext db) : base(db, "Subscriptions") { }
+    public SubscriptionsRepository(MongoDbContext db) : base(db, "Subscriptions"){ }
 
     public async Task<Subscription> GetSubscriptionAsync(ObjectId id, CancellationToken cancellationToken)
     {
@@ -25,5 +25,13 @@ public class SubscriptionRepository : BaseRepository<Subscription>, ISubscriptio
     {
         await this._collection.ReplaceOneAsync(Builders<Subscription>.Filter.Eq(x => x.Id, subscription.Id), subscription, new ReplaceOptions(), cancellationToken);
     }
+
+    public async Task<List<Subscription>> GetUsersSubscriptionsAsync(ObjectId id, CancellationToken cancellationToken)
+    {
+        return await (await this._collection.FindAsync(x => x.CreatedById == id)).ToListAsync();
+    }
+
 }
+
+
 

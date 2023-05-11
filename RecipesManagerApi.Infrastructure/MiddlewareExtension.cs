@@ -21,11 +21,12 @@ namespace RecipesManagerApi.Infrastructure;
 
 public static class MiddlewareExtension
 {
-	public static IServiceCollection AddInfrastructure(this IServiceCollection services)
-	{
-		services.AddSingleton<MongoDbContext>();
-		
-		services.AddScoped<ICategoriesRepository, CategoriesRepository>();
+
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services)
+    {
+        services.AddSingleton<MongoDbContext>();
+        
+        services.AddScoped<ICategoriesRepository, CategoriesRepository>();
 		services.AddScoped<IUsersRepository, UsersRepository>();
 		services.AddScoped<IRolesRepository, RolesRepository>();
 		services.AddScoped<IRecipesRepository, RecipesRepository>();
@@ -34,7 +35,7 @@ public static class MiddlewareExtension
 		services.AddScoped<IMenusRepository, MenusRepository>();
 		services.AddScoped<ISharedRecipesRepository, SharedRecipeRepository>();
 		services.AddScoped<ISavedRecipesRepository, SavedRecipesRepository>();
-		services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+		services.AddScoped<ISubscriptionsRepository, SubscriptionsRepository>();
 		services.AddScoped<IContactsRepository, ContactsRepository>();
 		services.AddTransient<ILogsRepository, LogsRepository>();
 
@@ -72,35 +73,38 @@ public static class MiddlewareExtension
 		return services;
 	}
 
-	public static IServiceCollection AddGraphQl(this IServiceCollection services)
-	{
-		services
-			.AddGraphQLServer()
-			.AddQueryType()
-				.AddTypeExtension<CategoriesQuery>()
-				.AddTypeExtension<ContactsQuery>()
-				.AddTypeExtension<MenusQuery>()
-				.AddTypeExtension<SharedRecipesQuery>()
-				.AddTypeExtension<SavedRecipesQuery>()
-				.AddTypeExtension<UsersQuery>()
-				.AddTypeExtension<SubscriptionsQuery>()
-				.AddTypeExtension<LogsQuery>()
-				.AddTypeExtension<OpenAiLogsQuery>()
-			.AddMutationType()
-				.AddTypeExtension<SharedRecipesMutation>()
-				.AddTypeExtension<CategoriesMutation>()
-				.AddTypeExtension<RegisterMutation>()
-				.AddTypeExtension<LoginMutation>()
-				.AddTypeExtension<AccessMutation>()
-				.AddTypeExtension<UserMutation>()
-				.AddTypeExtension<RoleMutation>()
-				.AddTypeExtension<ContactsMutation>()
-				.AddTypeExtension<MenusMutation>()
-				.AddTypeExtension<SavedRecipesMutation>()
-				.AddTypeExtension<SubscriptionsMutation>()
-			.AddAuthorization()
-			.InitializeOnStartup(keepWarm: true);
-		
+
+    public static IServiceCollection AddGraphQl(this IServiceCollection services)
+    {
+        services
+            .AddGraphQLServer()
+            .AddQueryType()
+                .AddTypeExtension<CategoriesQuery>()
+                .AddTypeExtension<ContactsQuery>()
+                .AddTypeExtension<RecipesQuery>()
+                .AddTypeExtension<MenusQuery>()
+                .AddTypeExtension<SharedRecipesQuery>()
+                .AddTypeExtension<SavedRecipesQuery>()
+                .AddTypeExtension<UsersQuery>()
+                .AddTypeExtension<SubscriptionsQuery>()
+                .AddTypeExtension<LogsQuery>()
+                .AddTypeExtension<OpenAiLogsQuery>()
+            .AddMutationType()
+                .AddTypeExtension<SharedRecipesMutation>()
+                .AddTypeExtension<CategoriesMutation>()
+                .AddTypeExtension<RegisterMutation>()
+                .AddTypeExtension<LoginMutation>()
+                .AddTypeExtension<AccessMutation>()
+                .AddTypeExtension<UserMutation>()
+                .AddTypeExtension<RoleMutation>()
+                .AddTypeExtension<ContactsMutation>()
+                .AddTypeExtension<MenusMutation>()
+                .AddTypeExtension<RecipesMutation>()
+                .AddTypeExtension<SavedRecipesMutation>()
+                .AddTypeExtension<SubscriptionsMutation>()
+            .AddAuthorization()
+            .InitializeOnStartup(keepWarm: true);
+        
 
 		return services;
 	}

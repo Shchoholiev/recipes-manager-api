@@ -4,9 +4,6 @@ using RecipesManagerApi.Infrastructure.Database;
 using MongoDB.Bson;
 using System.Linq.Expressions;
 using MongoDB.Driver;
-using System.Threading;
-using static Amazon.S3.Util.S3EventNotification;
-using Amazon.S3.Model;
 using RecipesManagerApi.Application.Models.LookUps;
 
 namespace RecipesManagerApi.Infrastructure.Repositories;
@@ -169,13 +166,62 @@ public class RecipesRepository : BaseRepository<Recipe>, IRecipesRepository
             .Count()
             .FirstOrDefaultAsync(cancellationToken);
         
-
         return (int)pipeline.Count;
     }
 
-    public async Task UpdateRecipeAsync(Recipe recipe, CancellationToken cancellationToken)
+    public async Task<Recipe> UpdateRecipeAsync(ObjectId id, Recipe recipe, CancellationToken cancellationToken)
     {
-        await this._collection.ReplaceOneAsync(Builders<Recipe>.Filter.Eq(x=>x.Id, recipe.Id), recipe, new ReplaceOptions(), cancellationToken);
+        var updateDefinition = Builders<Recipe>.Update
+            .Set(r => r.Name, recipe.Name)
+            .Set(r => r.Text, recipe.Text)
+            .Set(r => r.Ingredients, recipe.Ingredients)
+            .Set(r => r.IngredientsText, recipe.IngredientsText)
+            .Set(r => r.Categories, recipe.Categories)
+            .Set(r => r.Calories, recipe.Calories)
+            .Set(r => r.ServingsCount, recipe.ServingsCount)
+            .Set(r => r.IsPublic, recipe.IsPublic)
+            .Set(r => r.LastModifiedById, recipe.LastModifiedById)
+            .Set(r => r.LastModifiedDateUtc, recipe.LastModifiedDateUtc);
+        
+        var options = new FindOneAndUpdateOptions<Recipe>
+        {
+            ReturnDocument = ReturnDocument.After
+        };
+
+        return await this._collection.FindOneAndUpdateAsync(
+            Builders<Recipe>.Filter.Eq(r => r.Id, id), updateDefinition, options, cancellationToken);
+    }
+
+    public async Task<Recipe> UpdateRecipeThumbnailAsync(ObjectId id, Recipe recipe, CancellationToken cancellationToken)
+    {
+        var updateDefinition = Builders<Recipe>.Update
+            .Set(r => r.Thumbnail, recipe.Thumbnail)
+            .Set(r => r.LastModifiedById, recipe.LastModifiedById)
+            .Set(r => r.LastModifiedDateUtc, recipe.LastModifiedDateUtc);
+        
+        var options = new FindOneAndUpdateOptions<Recipe>
+        {
+            ReturnDocument = ReturnDocument.After
+        };
+
+        return await this._collection.FindOneAndUpdateAsync(
+            Builders<Recipe>.Filter.Eq(r => r.Id, id), updateDefinition, options, cancellationToken);
+    }
+
+    public async Task<Recipe> DeleteAsync(ObjectId id, Recipe recipe, CancellationToken cancellationToken)
+    {
+        var updateDefinition = Builders<Recipe>.Update
+            .Set(r => r.IsDeleted, true)
+            .Set(r => r.LastModifiedById, recipe.LastModifiedById)
+            .Set(r => r.LastModifiedDateUtc, recipe.LastModifiedDateUtc);
+
+        var options = new FindOneAndUpdateOptions<Recipe>
+        {
+            ReturnDocument = ReturnDocument.After
+        };
+
+        return await this._collection.FindOneAndUpdateAsync(
+            Builders<Recipe>.Filter.Eq(r => r.Id, id), updateDefinition, options, cancellationToken);
     }
 
     public async Task<int> GetTotalCountAsync(Expression<Func<Recipe, bool>> predicate, CancellationToken cancellationToken)

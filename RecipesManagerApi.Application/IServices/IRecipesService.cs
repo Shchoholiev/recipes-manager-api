@@ -8,11 +8,11 @@ namespace RecipesManagerApi.Application.IServices;
 
 public interface IRecipesService
 {
-    Task AddRecipeAsync(RecipeCreateDto dto, CancellationToken cancellationToken);
+    Task<RecipeDto> AddRecipeAsync(RecipeCreateDto dto, CancellationToken cancellationToken);
 
-    Task UpdateRecipeAsync(RecipeDto dto, CancellationToken cancellationToken);
+    Task<RecipeDto> UpdateRecipeAsync(string id, RecipeCreateDto dto, CancellationToken cancellationToken);
 
-    Task DeleteRecipeAsync(RecipeDto dto, CancellationToken cancellationToken);
+    Task DeleteAsync(string id, CancellationToken cancellationToken);
 
     Task<RecipeDto> GetRecipeAsync(string id, CancellationToken cancellationToken);
 

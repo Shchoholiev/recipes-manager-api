@@ -22,14 +22,16 @@ public class RecipesController : ApiController
     }
 
     [HttpPost]  
-    public async Task CreateRecipeAsync([FromForm]RecipeCreateDto dto, CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateRecipeAsync([FromForm]RecipeCreateDto dto, CancellationToken cancellationToken)
     {
-        await _recipesService.AddRecipeAsync(dto, cancellationToken);
+        var recipe = await _recipesService.AddRecipeAsync(dto, cancellationToken);
+        return CreatedAtAction(null, new { id = recipe.Id }, recipe);
     }
 
-    [HttpPut]
-    public async Task UpdateRecipeAsync([FromForm] RecipeDto dto, CancellationToken cancellationToken)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateRecipeAsync(string id, [FromForm] RecipeCreateDto dto, CancellationToken cancellationToken)
     {
-        await _recipesService.UpdateRecipeAsync(dto, cancellationToken);
+        var recipe = await _recipesService.UpdateRecipeAsync(id, dto, cancellationToken);
+        return Ok(recipe);
     }
 }

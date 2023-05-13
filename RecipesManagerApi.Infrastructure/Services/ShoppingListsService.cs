@@ -19,12 +19,18 @@ public class ShoppingListsService : IShoppingListsService
 	private readonly IMapper _mapper;
 	private readonly IShoppingListsRepository _shoppingListsRepository;
 	private readonly IEmailsService _emailsService;
+	private readonly IContactsRepository _contactsRepository;
 	
-	public ShoppingListsService(IMapper mapper, IShoppingListsRepository shoppingListsRepository, IEmailsService emailsService)
+	public ShoppingListsService(
+		IMapper mapper,
+		IShoppingListsRepository shoppingListsRepository,
+		IEmailsService emailsService,
+		IContactsRepository contactsRepository)
 	{
 		this._mapper = mapper;
 		this._shoppingListsRepository = shoppingListsRepository;
 		this._emailsService = emailsService;
+		this._contactsRepository = contactsRepository;
 	}
 	
 	public async Task<PagedList<ShoppingListDto>> GetShoppingListsPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
@@ -52,6 +58,10 @@ public class ShoppingListsService : IShoppingListsService
 			throw new InvalidDataException("Provided id is invalid.");
 		}
 		var entity = await this._shoppingListsRepository.GetShoppingListAsync(objectId, cancellationToken);
+		if(entity == null)
+		{
+			throw new EntityNotFoundException<ShoppingList>();
+		}
 		entity.IsDeleted = true;
 		await this._shoppingListsRepository.UpdateShoppingListAsync(entity, cancellationToken);
 		return new OperationDetails { IsSuccessful = true, TimestampUtc = DateTime.UtcNow };
@@ -81,16 +91,57 @@ public class ShoppingListsService : IShoppingListsService
 	
 	public async Task<OperationDetails> SendShoppingListToEmailsAsync(string id, IEnumerable<string> emailsTo, CancellationToken cancellationToken)
 	{
-		var shoppingListDto = await this.GetShoppingListAsync(id, cancellationToken);
+		if (!ObjectId.TryParse(id, out var objectId))
+		{
+			throw new InvalidDataException("Provided id is invalid.");
+		}
+		var shoppingListLookedUp = await this._shoppingListsRepository.GetShoppingListLookedUpAsync(objectId, cancellationToken);
+		if(shoppingListLookedUp == null)
+		{
+			throw new EntityNotFoundException<ShoppingList>();
+		}
+		var shoppingListDto = this._mapper.Map<ShoppingListDto>(shoppingListLookedUp);
 		var message = new EmailMessage
 		{
 			Recipients = emailsTo.ToList(),
 			Subject = "Shopping list",
 			Body = FormEmailHTMLBody(shoppingListDto)
 		};
-		await _emailsService.SendEmailMessageAsync(message, cancellationToken);
+		
+		await Task.WhenAll(
+			this.CheckContacsAsync(shoppingListLookedUp, emailsTo, cancellationToken),
+			this._emailsService.SendEmailMessageAsync(message, cancellationToken)
+		);
+		
 		return new OperationDetails { IsSuccessful = true, TimestampUtc = DateTime.UtcNow };
 	}
+	
+	private async Task CheckContacsAsync(ShoppingListLookedUp shoppingListLookedUp, IEnumerable<string> emailsTo, CancellationToken cancellationToken)
+	{
+		if (!emailsTo.Any()) return;
+
+		var shoppingList = this._mapper.Map<ShoppingList>(shoppingListLookedUp);
+		var existingContacts = await this._contactsRepository.GetPageAsync(1, 100, 
+			c => c.CreatedById == GlobalUser.Id.Value && c.IsDeleted == false && emailsTo.Contains(c.Email), cancellationToken);
+			
+		foreach (var email in emailsTo)
+		{
+			var contact = existingContacts.Where(x => x.Email == email).FirstOrDefault();
+			if (contact == null)
+			{
+				contact = new Contact
+				{
+					Email = email,
+					CreatedById = GlobalUser.Id.Value,
+					CreatedDateUtc = DateTime.UtcNow
+				};
+				await this._contactsRepository.AddAsync(contact, cancellationToken);
+			}
+			shoppingList.SentTo.Add(contact.Id);
+		}
+		
+		await this._shoppingListsRepository.UpdateShoppingListAsync(shoppingList, cancellationToken);
+	}	
 	
 	private string FormEmailHTMLBody(ShoppingListDto shoppingList)
 	{
@@ -150,6 +201,19 @@ public class ShoppingListsService : IShoppingListsService
 					<td><h1 style=""color:#153643;font-size:24px;margin:0 0 20px 0;font-family:Arial,sans-serif;text-align:center"">Shopping list is empty</h1></td>
 				</tr>
 			");
+		}
+		if(shoppingList.Ingredients != null && shoppingList.Ingredients.Count > 0)
+		{
+			sb.Append(@$"
+				<tr>
+				<td>
+				<p style=""margin:0 0 12px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"">Other ingredients:</p>
+				");
+			foreach (var ingredient in shoppingList.Ingredients)
+			{
+				sb.Append($"<p>- {ingredient.Name}: {ingredient.Amount} {ingredient.Units}</p>");
+			}
+			sb.Append("</td></tr>");
 		}
 		sb.Append(@"
 			</table>

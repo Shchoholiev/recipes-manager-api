@@ -13,5 +13,7 @@ public class ShoppingListProfile : Profile
 		
 		CreateMap<ShoppingListLookedUp, ShoppingListDto>()
 		.ForMember(dest => dest.SentTo, opt => opt.MapFrom(src => src.SentToContacts));
+		
+		CreateMap<ShoppingListLookedUp, ShoppingList>();
 	}
 }

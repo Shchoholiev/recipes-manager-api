@@ -1,3 +1,4 @@
+using HotChocolate.Authorization;
 using RecipesManagerApi.Application.IServices;
 using RecipesManagerApi.Application.Models.CreateDtos;
 using RecipesManagerApi.Application.Models.Dtos;
@@ -8,15 +9,23 @@ namespace RecipesManagerApi.Infrastructure.Mutations;
 [ExtendObjectType(OperationTypeNames.Mutation)]
 public class ShoppingListsMutation
 {
+	[Authorize]
 	public Task<ShoppingListDto> AddShoppingListAsync(ShoppingListCreateDto shoppingList, CancellationToken cancellationToken,
 	[Service] IShoppingListsService shoppingListsService)
 	=> shoppingListsService.AddShoppingListAsync(shoppingList, cancellationToken);
 
+	[Authorize]
 	public Task<ShoppingListDto> UpdateShoppingListAsync(ShoppingListCreateDto shoppingList, CancellationToken cancellationToken,
 	[Service] IShoppingListsService shoppingListsService)
 	=> shoppingListsService.UpdateShoppingListAsync(shoppingList, cancellationToken);
 
+	[Authorize]
 	public Task<OperationDetails> DeleteShoppingListAsync(string id, CancellationToken cancellationToken,
 	[Service] IShoppingListsService shoppingListsService)
 	=> shoppingListsService.DeleteShoppingListAsync(id, cancellationToken);
+
+	[Authorize]
+	public Task<OperationDetails> SendShoppingListToEmailsAsync(string menuId, List<string> emails, CancellationToken cancellationToken,
+	[Service] IShoppingListsService shoppingListsService)
+	=> shoppingListsService.SendShoppingListToEmailsAsync(menuId, emails, cancellationToken);
 }

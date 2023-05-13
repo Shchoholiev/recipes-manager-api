@@ -48,6 +48,13 @@ public class ShoppingListsRepository : BaseRepository<ShoppingList>, IShoppingLi
 
 	public async Task<ShoppingListLookedUp> UpdateShoppingListAsync(ShoppingList shoppingList, CancellationToken cancellationToken)
 	{
+		var oldEntity = await this.GetShoppingListAsync(shoppingList.Id, cancellationToken);
+		shoppingList.CreatedById = oldEntity.CreatedById;
+		shoppingList.CreatedDateUtc = oldEntity.CreatedDateUtc;
+		if(oldEntity.SentTo != null && shoppingList.SentTo == null)
+		{
+			shoppingList.SentTo = oldEntity.SentTo;
+		}
 		await this._collection.ReplaceOneAsync(x => x.Id == shoppingList.Id, shoppingList, new ReplaceOptions(), cancellationToken);
 		return await this.GetShoppingListLookedUpAsync(shoppingList.Id, cancellationToken);
 	}
@@ -83,14 +90,14 @@ public class ShoppingListsRepository : BaseRepository<ShoppingList>, IShoppingLi
 			.ToListAsync(cancellationToken);
 	}
 
-    public async Task<ShoppingList> GetShoppingListAsync(ObjectId id, CancellationToken cancellationToken)
-    {
-        return await (await this._collection.FindAsync(x=>x.Id == id && x.IsDeleted == false)).FirstOrDefaultAsync(cancellationToken);
-    }
+	public async Task<ShoppingList> GetShoppingListAsync(ObjectId id, CancellationToken cancellationToken)
+	{
+		return await (await this._collection.FindAsync(x=>x.Id == id && x.IsDeleted == false)).FirstOrDefaultAsync(cancellationToken);
+	}
 
-    public async Task<int> GetTotalCountAsync(Expression<Func<ShoppingList, bool>> predicate)
-    {
-        var filter = Builders<ShoppingList>.Filter.Where(predicate);
+	public async Task<int> GetTotalCountAsync(Expression<Func<ShoppingList, bool>> predicate)
+	{
+		var filter = Builders<ShoppingList>.Filter.Where(predicate);
 		return (int)(await this._collection.CountDocumentsAsync(filter));
-    }
+	}
 }

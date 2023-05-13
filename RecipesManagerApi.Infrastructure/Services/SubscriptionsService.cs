@@ -17,9 +17,9 @@ public class SubscriptionsService : ISubscriptionService
 {
     private readonly IMapper _mapper;
 
-    private readonly ISubscriptionRepository _repository;
+    private readonly ISubscriptionsRepository _repository;
 
-    public SubscriptionsService(IMapper mapper, ISubscriptionRepository repository)
+    public SubscriptionsService(IMapper mapper, ISubscriptionsRepository repository)
     {
         this._mapper = mapper;
         this._repository = repository;

@@ -21,11 +21,12 @@ namespace RecipesManagerApi.Infrastructure;
 
 public static class MiddlewareExtension
 {
-	public static IServiceCollection AddInfrastructure(this IServiceCollection services)
-	{
-		services.AddSingleton<MongoDbContext>();
-		
-		services.AddScoped<ICategoriesRepository, CategoriesRepository>();
+
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services)
+    {
+        services.AddSingleton<MongoDbContext>();
+        
+        services.AddScoped<ICategoriesRepository, CategoriesRepository>();
 		services.AddScoped<IUsersRepository, UsersRepository>();
 		services.AddScoped<IRolesRepository, RolesRepository>();
 		services.AddScoped<IRecipesRepository, RecipesRepository>();
@@ -34,7 +35,7 @@ public static class MiddlewareExtension
 		services.AddScoped<IMenusRepository, MenusRepository>();
 		services.AddScoped<ISharedRecipesRepository, SharedRecipeRepository>();
 		services.AddScoped<ISavedRecipesRepository, SavedRecipesRepository>();
-		services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+		services.AddScoped<ISubscriptionsRepository, SubscriptionsRepository>();
 		services.AddScoped<IContactsRepository, ContactsRepository>();
 		services.AddScoped<IShoppingListsRepository, ShoppingListsRepository>();
 		services.AddTransient<ILogsRepository, LogsRepository>();
@@ -83,6 +84,7 @@ public static class MiddlewareExtension
 				.AddTypeExtension<MenusQuery>()
 				.AddTypeExtension<SharedRecipesQuery>()
 				.AddTypeExtension<SavedRecipesQuery>()
+        .AddTypeExtension<RecipesQuery>()
 				.AddTypeExtension<UsersQuery>()
 				.AddTypeExtension<SubscriptionsQuery>()
 				.AddTypeExtension<ShoppingListsQuery>()
@@ -98,12 +100,12 @@ public static class MiddlewareExtension
 				.AddTypeExtension<RoleMutation>()
 				.AddTypeExtension<ContactsMutation>()
 				.AddTypeExtension<MenusMutation>()
+        .AddTypeExtension<RecipesMutation>()
 				.AddTypeExtension<SavedRecipesMutation>()
 				.AddTypeExtension<SubscriptionsMutation>()
 				.AddTypeExtension<ShoppingListsMutation>()
 			.AddAuthorization()
 			.InitializeOnStartup(keepWarm: true);
-		
 
 		return services;
 	}

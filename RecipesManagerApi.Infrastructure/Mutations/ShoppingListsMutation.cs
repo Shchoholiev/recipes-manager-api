@@ -25,7 +25,7 @@ public class ShoppingListsMutation
 	=> shoppingListsService.DeleteShoppingListAsync(id, cancellationToken);
 
 	[Authorize]
-	public Task<OperationDetails> SendShoppingListToEmailsAsync(string menuId, List<string> emails, CancellationToken cancellationToken,
+	public Task<OperationDetails> SendShoppingListToEmailsAsync(string shoppingListId, List<string> emails, CancellationToken cancellationToken,
 	[Service] IShoppingListsService shoppingListsService)
-	=> shoppingListsService.SendShoppingListToEmailsAsync(menuId, emails, cancellationToken);
+	=> shoppingListsService.SendShoppingListToEmailsAsync(shoppingListId, emails, cancellationToken);
 }

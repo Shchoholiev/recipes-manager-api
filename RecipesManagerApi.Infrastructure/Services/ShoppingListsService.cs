@@ -57,13 +57,15 @@ public class ShoppingListsService : IShoppingListsService
 		{
 			throw new InvalidDataException("Provided id is invalid.");
 		}
-		var entity = await this._shoppingListsRepository.GetShoppingListAsync(objectId, cancellationToken);
-		if(entity == null)
+		
+		var shoppingList = new ShoppingList
 		{
-			throw new EntityNotFoundException<ShoppingList>();
-		}
-		entity.IsDeleted = true;
-		await this._shoppingListsRepository.UpdateShoppingListAsync(entity, cancellationToken);
+			Id = objectId,
+			LastModifiedById = GlobalUser.Id.Value,
+			LastModifiedDateUtc = DateTime.UtcNow	
+		};
+		
+		await this._shoppingListsRepository.DeleteAsync(shoppingList, cancellationToken);
 		return new OperationDetails { IsSuccessful = true, TimestampUtc = DateTime.UtcNow };
 	}
 

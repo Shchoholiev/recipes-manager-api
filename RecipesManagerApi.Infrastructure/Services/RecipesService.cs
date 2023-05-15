@@ -104,7 +104,7 @@ public class RecipesService : IRecipesService
             LastModifiedDateUtc = DateTime.UtcNow
         };
 
-        await this._recipesRepository.DeleteAsync(recipeId, recipe, cancellationToken);
+        await this._recipesRepository.DeleteAsync(recipe, cancellationToken);
     }
 
     public async Task<PagedList<RecipeDto>> GetSearchPageAsync(int pageNumber, int pageSize, string searchString, string? authorsId,

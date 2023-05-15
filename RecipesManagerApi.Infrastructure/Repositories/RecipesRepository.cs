@@ -208,22 +208,6 @@ public class RecipesRepository : BaseRepository<Recipe>, IRecipesRepository
             Builders<Recipe>.Filter.Eq(r => r.Id, id), updateDefinition, options, cancellationToken);
     }
 
-    public async Task<Recipe> DeleteAsync(ObjectId id, Recipe recipe, CancellationToken cancellationToken)
-    {
-        var updateDefinition = Builders<Recipe>.Update
-            .Set(r => r.IsDeleted, true)
-            .Set(r => r.LastModifiedById, recipe.LastModifiedById)
-            .Set(r => r.LastModifiedDateUtc, recipe.LastModifiedDateUtc);
-
-        var options = new FindOneAndUpdateOptions<Recipe>
-        {
-            ReturnDocument = ReturnDocument.After
-        };
-
-        return await this._collection.FindOneAndUpdateAsync(
-            Builders<Recipe>.Filter.Eq(r => r.Id, id), updateDefinition, options, cancellationToken);
-    }
-
     public async Task<int> GetTotalCountAsync(Expression<Func<Recipe, bool>> predicate, CancellationToken cancellationToken)
     {
         var filter = Builders<Recipe>.Filter.Where(predicate);

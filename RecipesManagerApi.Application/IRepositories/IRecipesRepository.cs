@@ -11,8 +11,6 @@ public interface IRecipesRepository : IBaseRepository<Recipe>
 
     Task<Recipe> UpdateRecipeThumbnailAsync(ObjectId id, Recipe recipe, CancellationToken cancellationToken);
 
-    Task<Recipe> DeleteAsync(ObjectId id, Recipe recipe, CancellationToken cancellationToken);
-
     Task<Recipe> GetRecipeAsync(ObjectId id, CancellationToken cancellationToken);
 
     Task<List<RecipeLookUp>> GetRecipesPageAsync(int pageNumber, int pageSize, Expression<Func<Recipe, bool>> predicate, CancellationToken cancellationToken);

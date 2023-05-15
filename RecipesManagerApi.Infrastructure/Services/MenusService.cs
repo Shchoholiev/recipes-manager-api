@@ -81,9 +81,15 @@ public class MenusService : IMenusService
 		{
 			throw new InvalidDataException("Provided id is invalid.");
 		}
-		var entity = await this._menusRepository.GetMenuAsync(objectId, cancellationToken);
-		entity.IsDeleted = true;
-		await this._menusRepository.UpdateMenuAsync(entity, cancellationToken);
+		
+		var menu = new Menu
+		{
+			Id = objectId,
+			LastModifiedById = GlobalUser.Id.Value,
+			LastModifiedDateUtc = DateTime.UtcNow	
+		};
+		
+		await this._menusRepository.DeleteAsync(menu, cancellationToken);
 		return new OperationDetails { IsSuccessful = true, TimestampUtc = DateTime.UtcNow };
 	}
 	

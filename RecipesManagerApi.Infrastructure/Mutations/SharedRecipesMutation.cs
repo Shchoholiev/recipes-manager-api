@@ -16,7 +16,7 @@ public class SharedRecipesMutation
     [Service] ISharedRecipesService recipesService)
     => recipesService.UpdateSharedRecipeAsync(dto, cancellationToken);
 
-    public Task<OperationDetails> DeleteSharedRecipeAsync(SharedRecipeDto dto, CancellationToken cancellationToken,
+    public Task<OperationDetails> DeleteSharedRecipeAsync(string id, CancellationToken cancellationToken,
     [Service] ISharedRecipesService recipesService)
-    => recipesService.DeleteSharedRecipeAsync(dto, cancellationToken);
+    => recipesService.DeleteSharedRecipeAsync(id, cancellationToken);
 }

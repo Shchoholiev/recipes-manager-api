@@ -12,10 +12,4 @@ public class Contact : EntityBase
     public string? Phone { get; set; }
 
     public bool IsImported { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public ObjectId LastModifiedById { get; set; }
-
-    public DateTime LastModifiedDateUtc { get; set; }
 }

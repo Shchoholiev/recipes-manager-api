@@ -14,10 +14,4 @@ public class ShoppingList : EntityBase
 	public String? Notes { get; set; }
 	
 	public List<ObjectId>? SentTo { get; set; }
-	
-	public bool IsDeleted { get; set; }
-	
-	public ObjectId? LastModifiedById { get; set; }
-
-    public DateTime? LastModifiedDateUtc { get; set; } 
 }

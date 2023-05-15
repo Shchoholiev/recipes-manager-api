@@ -13,11 +13,5 @@ public class Menu : EntityBase
 	
 	public List<ObjectId>? SentTo { get; set; }
 	
-	public bool IsDeleted { get; set; }
-	
 	public DateTime? ForDateUtc { get; set; } 
-	
-	public ObjectId? LastModifiedById { get; set; }
-	
-	public DateTime? LastModifiedDateUtc { get; set; }
 }

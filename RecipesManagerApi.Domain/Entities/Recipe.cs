@@ -22,10 +22,4 @@ public class Recipe : EntityBase
     public int? ServingsCount { get; set; }
 
     public bool IsPublic { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public ObjectId? LastModifiedById { get; set; }
-
-    public DateTime? LastModifiedDateUtc { get; set; }
 }

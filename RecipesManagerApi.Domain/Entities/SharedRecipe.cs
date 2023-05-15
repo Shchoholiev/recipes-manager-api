@@ -8,6 +8,4 @@ public class SharedRecipe : EntityBase
     public ObjectId RecipeId { get; set; }
 
     public int VisitsCount { get; set;}
-
-    public bool IsDeleted { get; set; }
 }

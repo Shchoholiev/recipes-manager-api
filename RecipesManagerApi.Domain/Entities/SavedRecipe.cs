@@ -6,6 +6,4 @@ namespace RecipesManagerApi.Domain.Entities;
 public class SavedRecipe : EntityBase
 { 
     public ObjectId RecipeId { get; set; }
-
-    public bool IsDeleted { get; set; }
 }

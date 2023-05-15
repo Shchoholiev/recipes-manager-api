@@ -11,7 +11,10 @@ builder.Services.AddInfrastructure();
 builder.Services.AddMapper();
 builder.Services.AddServices();
 builder.Services.AddGraphQl();
+builder.Services.ConfigureCors();
 builder.Services.AddControllers();
+builder.Services.AddHealthChecks(builder.Configuration);
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -29,14 +32,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("allowAnyOrigin");
+
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
 app.UseAuthentication();
+app.UseAuthorization();
 app.ConfogureGlobalUserMiddleware();
 
 app.MapGraphQL();
 
 app.MapControllers();
+
+app.MapHealthChecks("/health");
 
 app.Run();

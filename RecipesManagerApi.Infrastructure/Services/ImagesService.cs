@@ -56,21 +56,21 @@ namespace RecipesManagerApi.Infrastructure.Services
                 };
                 await _repository.AddAsync(imageModel, cancellationToken);
                 recipe.Thumbnail = imageModel;
-                await _recipesRepository.UpdateRecipeAsync(recipe, cancellationToken);
+                await _recipesRepository.UpdateRecipeThumbnailAsync(recipeId, recipe, cancellationToken);
 
                 Task.Run(async () => { 
                     var result = await UploadImageAsync(imageModel.OriginalPhotoGuid, image, imageModel, cancellationToken);
                     recipe.Thumbnail = result;
-                    await _recipesRepository.UpdateRecipeAsync(recipe, cancellationToken);
+                    await _recipesRepository.UpdateRecipeThumbnailAsync(recipeId, recipe, cancellationToken);
                 });
                 Task.Run(async () => { 
                     var result = await ResizeAndUploadImageAsync(imageModel.SmallPhotoGuid, 600, image, imageModel, cancellationToken);
                     recipe.Thumbnail = result;
-                    await _recipesRepository.UpdateRecipeAsync(recipe, cancellationToken);
+                    await _recipesRepository.UpdateRecipeThumbnailAsync(recipeId, recipe, cancellationToken);
                 });
             } else {
                 recipe.Thumbnail = imageFromDb;
-                await _recipesRepository.UpdateRecipeAsync(recipe, cancellationToken);
+                await _recipesRepository.UpdateRecipeThumbnailAsync(recipeId, recipe, cancellationToken);
             }
         }
 

@@ -22,6 +22,8 @@ public class RecipeLookUp
     public int? Calories { get; set; }
 
     public int? ServingsCount { get; set; }
+    
+    public int? MinutesToCook { get; set; }
 
     public bool IsPublic { get; set; }
 

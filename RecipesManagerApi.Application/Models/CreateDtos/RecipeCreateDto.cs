@@ -7,6 +7,8 @@ public class RecipeCreateDto
 {
     public string Name { get; set; }
 
+    public string? Text { get; set; }
+
     public IFormFile? Thumbnail { get; set; }
 
     public List<IngredientDto>? Ingredients { get; set; }
@@ -18,6 +20,8 @@ public class RecipeCreateDto
     public int? Calories { get; set; }
 
     public int? ServingsCount { get; set; }
+
+    public int? MinutesToCook { get; set; }
 
     public bool IsPublic { get; set; }
 }

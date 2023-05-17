@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using MongoDB.Bson;
+using RecipesManagerApi.Application.Models.CreateDtos;
 using RecipesManagerApi.Application.Models.Dtos;
 using RecipesManagerApi.Domain.Entities;
 
@@ -11,7 +12,9 @@ public interface IShoppingListsRepository : IBaseRepository<ShoppingList>
 	
 	Task<ShoppingList> GetShoppingListAsync(ObjectId id, CancellationToken cancellationToken);
 	
-	Task<ShoppingListLookedUp> UpdateShoppingListAsync(ShoppingList shoppingList, CancellationToken cancellationToken);
+	Task<ShoppingListLookedUp> UpdateShoppingListAsync(ObjectId id, ShoppingList shoppingList, CancellationToken cancellationToken);
+	
+	Task UpdateShoppingListSentToAsync(ShoppingList shoppingList, CancellationToken cancellationToken);
 	
 	Task<ShoppingListLookedUp> AddShoppingListAsync(ShoppingList shoppingList, CancellationToken cancellationToken);
 	

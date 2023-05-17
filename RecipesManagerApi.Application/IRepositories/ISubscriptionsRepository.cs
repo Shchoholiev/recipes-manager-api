@@ -9,7 +9,7 @@ public interface ISubscriptionsRepository : IBaseRepository<Subscription>
 {
     Task<Subscription> GetSubscriptionAsync(ObjectId id, CancellationToken cancellationToken);
 
-    Task UpdateSubscriptionAsync(Subscription subscription, CancellationToken cancellationToken);
+    Task<Subscription> UpdateSubscriptionAsync(Subscription subscription, CancellationToken cancellationToken);
 
     Task<int> GetTotalCountAsync(Expression<Func<Subscription, bool>> predicate);
 

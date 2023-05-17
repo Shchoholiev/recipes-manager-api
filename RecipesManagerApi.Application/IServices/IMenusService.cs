@@ -14,7 +14,7 @@ public interface IMenusService
 	
 	Task<MenuDto> AddMenuAsync(MenuCreateDto dto, CancellationToken cancellationToken);
 	
-	Task<MenuDto> UpdateMenuAsync(MenuCreateDto dto, CancellationToken cancellationToken);
+	Task<MenuDto> UpdateMenuAsync(string id, MenuCreateDto dto, CancellationToken cancellationToken);
 	
 	Task<OperationDetails> DeleteMenuAsync (string menuId, CancellationToken cancellationToken);
 	

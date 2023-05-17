@@ -103,8 +103,10 @@ public class SubscriptionsService : ISubscriptionService
 		if (entity.AuthorId != GlobalUser.Id.Value) {
 			throw new UnauthorizedEntityUpdateException<Subscription>();
 		}
-		await this._repository.UpdateSubscriptionAsync(entity, cancellationToken);
-		return this._mapper.Map<SubscriptionDto>(entity);
+		entity.LastModifiedById = GlobalUser.Id.Value;
+		entity.LastModifiedDateUtc = DateTime.UtcNow;
+		var updated = await this._repository.UpdateSubscriptionAsync(entity, cancellationToken);
+		return this._mapper.Map<SubscriptionDto>(updated);
 	}
 }
 

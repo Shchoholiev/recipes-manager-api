@@ -15,9 +15,9 @@ public class MenusMutation
 		=> service.AddMenuAsync(menuDto, cancellationToken);
 
 	[Authorize]
-	public Task<MenuDto> UpdateMenuAsync(MenuCreateDto menuDto, CancellationToken cancellationToken,
+	public Task<MenuDto> UpdateMenuAsync(string id, MenuCreateDto menuDto, CancellationToken cancellationToken,
 		[Service] IMenusService service)
-		=> service.UpdateMenuAsync(menuDto, cancellationToken);
+		=> service.UpdateMenuAsync(id, menuDto, cancellationToken);
 
 	[Authorize]
 	public Task<OperationDetails> DeleteMenuAsync(string menuId, CancellationToken cancellationToken,

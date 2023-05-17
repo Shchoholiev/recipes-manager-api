@@ -11,7 +11,7 @@ public interface IShoppingListsService
 	
 	Task<ShoppingListDto> GetShoppingListAsync(string id, CancellationToken cancellationToken);
 	
-	Task<ShoppingListDto> UpdateShoppingListAsync(ShoppingListCreateDto shoppingList, CancellationToken cancellationToken);
+	Task<ShoppingListDto> UpdateShoppingListAsync(string id, ShoppingListCreateDto shoppingList, CancellationToken cancellationToken);
 	
 	Task<OperationDetails> DeleteShoppingListAsync(string id, CancellationToken cancellationToken);
 	

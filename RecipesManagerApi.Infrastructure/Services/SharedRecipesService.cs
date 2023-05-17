@@ -29,9 +29,12 @@ public class SharedRecipesService : ISharedRecipesService
 		{
 			throw new InvalidDataException("Provided id is invalid.");
 		}
-		var entity = await this._repository.GetSharedRecipeAsync(objectId, cancellationToken);
-		entity.VisitsCount++;
-		await this._repository.UpdateSharedRecipeAsync(entity, cancellationToken);
+		var modifiedSharedRecipe = new SharedRecipe
+		{
+			LastModifiedById = GlobalUser.Id.Value,
+			LastModifiedDateUtc = DateTime.UtcNow
+		};
+		var entity = await this._repository.UpdateSharedRecipeVisitsAsync(objectId, modifiedSharedRecipe, cancellationToken);
 		var result = this._mapper.Map<SharedRecipeDto>(entity);
 		return result;
 	}
@@ -39,6 +42,8 @@ public class SharedRecipesService : ISharedRecipesService
 	public async Task<SharedRecipeDto> AddSharedRecipeAsync(SharedRecipeCreateDto dto, CancellationToken cancellationToken)
 	{
 		var entity = this._mapper.Map<SharedRecipe>(dto);
+		entity.CreatedById = GlobalUser.Id.Value;
+		entity.CreatedDateUtc = DateTime.UtcNow;
 		await this._repository.AddAsync(entity, cancellationToken);
 		return this._mapper.Map<SharedRecipeDto>(entity);
 	}
@@ -71,15 +76,8 @@ public class SharedRecipesService : ISharedRecipesService
 		var entity = await this._repository.GetSharedRecipeAsync(objectId, cancellationToken);
 		if (entity == null)
 		{
-			throw new EntityNotFoundException<Role>();
+			throw new EntityNotFoundException<SharedRecipe>();
 		}
-		return this._mapper.Map<SharedRecipeDto>(entity);
-	}
-
-	public async Task<SharedRecipeDto> UpdateSharedRecipeAsync(SharedRecipeDto dto, CancellationToken cancellationToken)
-	{
-		var entity = this._mapper.Map<SharedRecipe>(dto);
-		await this._repository.UpdateSharedRecipeAsync(entity, cancellationToken);
 		return this._mapper.Map<SharedRecipeDto>(entity);
 	}
 }

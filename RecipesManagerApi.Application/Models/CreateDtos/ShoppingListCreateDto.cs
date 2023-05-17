@@ -6,8 +6,6 @@ namespace RecipesManagerApi.Application.Models.CreateDtos;
 [GraphQLName("ShoppingListInput")]
 public class ShoppingListCreateDto
 {
-	public string? Id { get; set; }
-	
 	public string? Name { get; set; }
 	
 	public List<IngredientDto>? Ingredients { get; set; } 

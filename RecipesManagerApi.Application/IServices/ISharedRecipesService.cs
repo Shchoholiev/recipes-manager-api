@@ -8,8 +8,6 @@ public interface ISharedRecipesService
 {
     Task<SharedRecipeDto> AddSharedRecipeAsync(SharedRecipeCreateDto dto, CancellationToken cancellationToken);
 
-    Task<SharedRecipeDto> UpdateSharedRecipeAsync(SharedRecipeDto dto, CancellationToken cancellationToken);
-
     Task<SharedRecipeDto> GetSharedRecipeAsync(string id, CancellationToken cancellationToken);
 
     Task<SharedRecipeDto> AccessSharedRecipeAsync(string id, CancellationToken cancellationToken);

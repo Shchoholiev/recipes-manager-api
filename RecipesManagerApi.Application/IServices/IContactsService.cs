@@ -9,7 +9,7 @@ public interface IContactsService
 {
     Task<ContactDto> AddContactAsync(ContactCreateDto dto, CancellationToken cancellationToken);
 
-    Task<ContactDto> UpdateContactAsync(ContactDto dto, CancellationToken cancellationToken);
+    Task<ContactDto> UpdateContactAsync(string id, ContactCreateDto dto, CancellationToken cancellationToken);
 
     Task DeleteContactAsync(string id, CancellationToken cancellationToken);
 

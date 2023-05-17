@@ -15,9 +15,9 @@ public class ShoppingListsMutation
 	=> shoppingListsService.AddShoppingListAsync(shoppingList, cancellationToken);
 
 	[Authorize]
-	public Task<ShoppingListDto> UpdateShoppingListAsync(ShoppingListCreateDto shoppingList, CancellationToken cancellationToken,
+	public Task<ShoppingListDto> UpdateShoppingListAsync(string id, ShoppingListCreateDto shoppingList, CancellationToken cancellationToken,
 	[Service] IShoppingListsService shoppingListsService)
-	=> shoppingListsService.UpdateShoppingListAsync(shoppingList, cancellationToken);
+	=> shoppingListsService.UpdateShoppingListAsync(id, shoppingList, cancellationToken);
 
 	[Authorize]
 	public Task<OperationDetails> DeleteShoppingListAsync(string id, CancellationToken cancellationToken,

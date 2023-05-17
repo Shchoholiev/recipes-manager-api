@@ -12,7 +12,9 @@ public interface IMenusRepository : IBaseRepository<Menu>
 	
 	Task<List<MenuLookedUp>> GetPageAsync(int pageNumber, int pageSize, ObjectId userId, CancellationToken cancellationToken);
 	
-	Task<MenuLookedUp> UpdateMenuAsync(Menu menu, CancellationToken cancellationToken);
+	Task<MenuLookedUp> UpdateMenuAsync(ObjectId id, Menu menu, CancellationToken cancellationToken);
+	
+	Task UpdateMenuSentToAsync(Menu menu, CancellationToken cancellationToken);
 	
 	Task<int> GetTotalCountAsync(Expression<Func<Menu, bool>> predicate);
 	

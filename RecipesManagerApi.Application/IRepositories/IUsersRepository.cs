@@ -11,5 +11,5 @@ public interface IUsersRepository : IBaseRepository<User>
 
     Task<User> GetUserAsync(Expression<Func<User, bool>> predicate, CancellationToken cancellationToken);
 
-    Task UpdateUserAsync(User user, CancellationToken cancellationToken);
+    Task<User> UpdateUserAsync(User user, CancellationToken cancellationToken);
 }

@@ -64,6 +64,7 @@ public static class MiddlewareExtension
 		services.AddScoped<IOpenAiLogsService, OpenAiLogsService>();
 		services.AddScoped<IShoppingListsService, ShoppingListsService>();
 		services.AddScoped<IMenusService, MenusService>();
+		services.AddScoped<IContactsService, ContactsService>();
 
 		return services;
 	}

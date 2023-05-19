@@ -11,5 +11,5 @@ public interface IUsersService
 
     Task<UserDto> GetUserAsync(string id, CancellationToken cancellationToken);
 
-    Task UpdateUserAsync (UserDto dto, CancellationToken cancellationToken);
+    Task UpdateUserAsync(UserDto dto, CancellationToken cancellationToken);
 }

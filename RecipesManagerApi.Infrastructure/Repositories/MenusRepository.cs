@@ -52,20 +52,19 @@ public class MenusRepository : BaseRepository<Menu>, IMenusRepository
 		return (int)(await this._collection.CountDocumentsAsync(filter));
 	}
 
-	public async Task<MenuLookedUp> UpdateMenuAsync(Menu menu, CancellationToken cancellationToken)
+	public async Task<MenuLookedUp> UpdateMenuAsync(ObjectId id, Menu menu, CancellationToken cancellationToken)
 	{
-		var oldEntity = await this.GetMenuAsync(menu.Id, cancellationToken);
-		
-		menu.CreatedById = oldEntity.CreatedById;
-		menu.CreatedDateUtc = oldEntity.CreatedDateUtc;
-		
-		if(oldEntity.SentTo != null && menu.SentTo == null)
-		{
-			menu.SentTo = oldEntity.SentTo;
-		}
-		
-		await this._collection.ReplaceOneAsync(x => x.Id == menu.Id, menu, new ReplaceOptions(), cancellationToken);
-		return await this.GetMenuLookedUpAsync(menu.Id, cancellationToken);
+		var updateDefinition = Builders<Menu>.Update
+			.Set(m => m.Name, menu.Name)
+			.Set(m => m.RecipesIds, menu.RecipesIds)
+			.Set(m => m.Notes, menu.Notes)
+			.Set(m => m.ForDateUtc, menu.ForDateUtc)
+			.Set(m => m.LastModifiedById, menu.LastModifiedById)
+			.Set(m => m.LastModifiedDateUtc, menu.LastModifiedDateUtc);
+
+		await this._collection.FindOneAndUpdateAsync(
+			Builders<Menu>.Filter.Eq(m => m.Id, id), updateDefinition, new FindOneAndUpdateOptions<Menu>(), cancellationToken);
+		return await this.GetMenuLookedUpAsync(id, cancellationToken);
 	}
 
 	public async Task<List<MenuLookedUp>> GetPageAsync(int pageNumber, int pageSize, ObjectId userId, CancellationToken cancellationToken)
@@ -101,9 +100,20 @@ public class MenusRepository : BaseRepository<Menu>, IMenusRepository
 			.ToListAsync(cancellationToken);
 	}
 	
-	public async Task<MenuLookedUp> AddMenuAsync(Menu entity, CancellationToken cancellationToken)
+	public async Task<MenuLookedUp> AddMenuAsync(Menu menu, CancellationToken cancellationToken)
 	{
-		await this._collection.InsertOneAsync(entity, new InsertOneOptions() ,cancellationToken);
-		return await this.GetMenuLookedUpAsync(entity.Id, cancellationToken);
+		await this._collection.InsertOneAsync(menu, new InsertOneOptions() ,cancellationToken);
+		return await this.GetMenuLookedUpAsync(menu.Id, cancellationToken);
+	}
+
+	public async Task UpdateMenuSentToAsync(Menu menu, CancellationToken cancellationToken)
+	{
+		var updateDefinition = Builders<Menu>.Update
+			.Set(m => m.SentTo, menu.SentTo)
+			.Set(m => m.LastModifiedById, menu.LastModifiedById)
+			.Set(m => m.LastModifiedDateUtc, menu.LastModifiedDateUtc);
+
+		await this._collection.FindOneAndUpdateAsync(
+			Builders<Menu>.Filter.Eq(m => m.Id, menu.Id), updateDefinition, new FindOneAndUpdateOptions<Menu>(), cancellationToken);
 	}
 }

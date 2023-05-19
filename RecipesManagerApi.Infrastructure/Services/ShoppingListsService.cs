@@ -57,13 +57,15 @@ public class ShoppingListsService : IShoppingListsService
 		{
 			throw new InvalidDataException("Provided id is invalid.");
 		}
-		var entity = await this._shoppingListsRepository.GetShoppingListAsync(objectId, cancellationToken);
-		if(entity == null)
+		
+		var shoppingList = new ShoppingList
 		{
-			throw new EntityNotFoundException<ShoppingList>();
-		}
-		entity.IsDeleted = true;
-		await this._shoppingListsRepository.UpdateShoppingListAsync(entity, cancellationToken);
+			Id = objectId,
+			LastModifiedById = GlobalUser.Id.Value,
+			LastModifiedDateUtc = DateTime.UtcNow	
+		};
+		
+		await this._shoppingListsRepository.DeleteAsync(shoppingList, cancellationToken);
 		return new OperationDetails { IsSuccessful = true, TimestampUtc = DateTime.UtcNow };
 	}
 
@@ -81,10 +83,16 @@ public class ShoppingListsService : IShoppingListsService
 		return this._mapper.Map<ShoppingListDto>(entity);
 	}
 
-	public async Task<ShoppingListDto> UpdateShoppingListAsync(ShoppingListCreateDto shoppingList, CancellationToken cancellationToken)
+	public async Task<ShoppingListDto> UpdateShoppingListAsync(string id, ShoppingListCreateDto shoppingList, CancellationToken cancellationToken)
 	{
+		if(!ObjectId.TryParse(id, out var objectId))
+		{
+			throw new InvalidDataException("Provided id is invalid.");
+		}
 		var entity = this._mapper.Map<ShoppingList>(shoppingList);
-		var entityLookedUp = await this._shoppingListsRepository.UpdateShoppingListAsync(entity, cancellationToken);
+		entity.LastModifiedById = GlobalUser.Id.Value;
+		entity.LastModifiedDateUtc = DateTime.UtcNow;
+		var entityLookedUp = await this._shoppingListsRepository.UpdateShoppingListAsync(objectId, entity, cancellationToken);
 		var dto = this._mapper.Map<ShoppingListDto>(entityLookedUp);
 		return dto;
 	}
@@ -138,9 +146,11 @@ public class ShoppingListsService : IShoppingListsService
 				await this._contactsRepository.AddAsync(contact, cancellationToken);
 			}
 			shoppingList.SentTo.Add(contact.Id);
+			shoppingList.LastModifiedById = GlobalUser.Id.Value;
+			shoppingList.LastModifiedDateUtc = DateTime.UtcNow;
 		}
 		
-		await this._shoppingListsRepository.UpdateShoppingListAsync(shoppingList, cancellationToken);
+		await this._shoppingListsRepository.UpdateShoppingListSentToAsync(shoppingList, cancellationToken);
 	}	
 	
 	private string FormEmailHTMLBody(ShoppingListDto shoppingList)

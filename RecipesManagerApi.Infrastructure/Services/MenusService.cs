@@ -17,7 +17,6 @@ namespace RecipesManagerApi.Infrastructure.Services;
 
 public class MenusService : IMenusService
 {
-	private const int ContactsChecksMaxValue = 100;
 	private readonly IMenusRepository _menusRepository;
 	private readonly IMapper _mapper;
 	private readonly IEmailsService _emailsService;
@@ -67,10 +66,16 @@ public class MenusService : IMenusService
 		return this._mapper.Map<MenuDto>(menu);
 	}
 	
-	public async Task<MenuDto> UpdateMenuAsync(MenuCreateDto createDto, CancellationToken cancellationToken)
+	public async Task<MenuDto> UpdateMenuAsync(string id, MenuCreateDto createDto, CancellationToken cancellationToken)
 	{
-		var newEntity = this._mapper.Map<Menu>(createDto);
-		var entityLookedUp = await this._menusRepository.UpdateMenuAsync(newEntity, cancellationToken);
+		if(!ObjectId.TryParse(id, out var objectId))
+		{
+			throw new InvalidDataException("Provided id is invalid.");
+		}
+		var entity = this._mapper.Map<Menu>(createDto);
+		entity.LastModifiedById = GlobalUser.Id.Value;
+		entity.LastModifiedDateUtc = DateTime.UtcNow;
+		var entityLookedUp = await this._menusRepository.UpdateMenuAsync(objectId, entity, cancellationToken);
 		var dto = this._mapper.Map<MenuDto>(entityLookedUp);
 		return dto;
 	}
@@ -81,9 +86,15 @@ public class MenusService : IMenusService
 		{
 			throw new InvalidDataException("Provided id is invalid.");
 		}
-		var entity = await this._menusRepository.GetMenuAsync(objectId, cancellationToken);
-		entity.IsDeleted = true;
-		await this._menusRepository.UpdateMenuAsync(entity, cancellationToken);
+		
+		var menu = new Menu
+		{
+			Id = objectId,
+			LastModifiedById = GlobalUser.Id.Value,
+			LastModifiedDateUtc = DateTime.UtcNow	
+		};
+		
+		await this._menusRepository.DeleteAsync(menu, cancellationToken);
 		return new OperationDetails { IsSuccessful = true, TimestampUtc = DateTime.UtcNow };
 	}
 	
@@ -107,14 +118,14 @@ public class MenusService : IMenusService
 		};
 		
 		await Task.WhenAll(
-			this.CheckContacs(menuLookedUp, emailsTo, cancellationToken),
-			_emailsService.SendEmailMessageAsync(message, cancellationToken)
+			this.CheckContacsAsync(menuLookedUp, emailsTo, cancellationToken),
+			this._emailsService.SendEmailMessageAsync(message, cancellationToken)
 		);
 
 		return new OperationDetails { IsSuccessful = true, TimestampUtc = DateTime.UtcNow };
 	}
 	
-	private async Task CheckContacs(MenuLookedUp menuLookedUp, IEnumerable<string> emailsTo, CancellationToken cancellationToken)
+	private async Task CheckContacsAsync(MenuLookedUp menuLookedUp, IEnumerable<string> emailsTo, CancellationToken cancellationToken)
 	{
 		if (!emailsTo.Any()) return;
 
@@ -136,9 +147,11 @@ public class MenusService : IMenusService
 				await this._contactsRepository.AddAsync(contact, cancellationToken);
 			}
 			menu.SentTo.Add(contact.Id);
+			menu.LastModifiedById = GlobalUser.Id.Value;
+			menu.LastModifiedDateUtc = DateTime.UtcNow;
 		}
 		
-		await this._menusRepository.UpdateMenuAsync(menu, cancellationToken);
+		await this._menusRepository.UpdateMenuSentToAsync(menu, cancellationToken);
 	}	
 	
 	private string FormMenuEmailHTMLBody(MenuDto menu)

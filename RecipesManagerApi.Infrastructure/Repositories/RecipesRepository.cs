@@ -64,7 +64,7 @@ public class RecipesRepository : BaseRepository<Recipe>, IRecipesRepository
             .FirstOrDefaultAsync(cancellationToken);
         
 
-        return (int)pipeline.Count;
+        return (int)(pipeline?.Count ?? 0);
     }
 
     public async Task<List<RecipeLookUp>> GetSubscribedRecipesAsync(int pageNumber, int pageSize, ObjectId userId,
@@ -166,7 +166,7 @@ public class RecipesRepository : BaseRepository<Recipe>, IRecipesRepository
             .Count()
             .FirstOrDefaultAsync(cancellationToken);
         
-        return (int)pipeline.Count;
+        return (int)(pipeline?.Count ?? 0);
     }
 
     public async Task<Recipe> UpdateRecipeAsync(ObjectId id, Recipe recipe, CancellationToken cancellationToken)
@@ -199,22 +199,6 @@ public class RecipesRepository : BaseRepository<Recipe>, IRecipesRepository
             .Set(r => r.LastModifiedById, recipe.LastModifiedById)
             .Set(r => r.LastModifiedDateUtc, recipe.LastModifiedDateUtc);
         
-        var options = new FindOneAndUpdateOptions<Recipe>
-        {
-            ReturnDocument = ReturnDocument.After
-        };
-
-        return await this._collection.FindOneAndUpdateAsync(
-            Builders<Recipe>.Filter.Eq(r => r.Id, id), updateDefinition, options, cancellationToken);
-    }
-
-    public async Task<Recipe> DeleteAsync(ObjectId id, Recipe recipe, CancellationToken cancellationToken)
-    {
-        var updateDefinition = Builders<Recipe>.Update
-            .Set(r => r.IsDeleted, true)
-            .Set(r => r.LastModifiedById, recipe.LastModifiedById)
-            .Set(r => r.LastModifiedDateUtc, recipe.LastModifiedDateUtc);
-
         var options = new FindOneAndUpdateOptions<Recipe>
         {
             ReturnDocument = ReturnDocument.After

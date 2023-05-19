@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using RecipesManagerApi.Application.IRepositories;
+using RecipesManagerApi.Application.Models.CreateDtos;
 using RecipesManagerApi.Domain.Entities;
 using RecipesManagerApi.Infrastructure.Database;
 
@@ -46,17 +47,19 @@ public class ShoppingListsRepository : BaseRepository<ShoppingList>, IShoppingLi
 			.FirstOrDefaultAsync(cancellationToken);
 	}
 
-	public async Task<ShoppingListLookedUp> UpdateShoppingListAsync(ShoppingList shoppingList, CancellationToken cancellationToken)
+	public async Task<ShoppingListLookedUp> UpdateShoppingListAsync(ObjectId id, ShoppingList shoppingList, CancellationToken cancellationToken)
 	{
-		var oldEntity = await this.GetShoppingListAsync(shoppingList.Id, cancellationToken);
-		shoppingList.CreatedById = oldEntity.CreatedById;
-		shoppingList.CreatedDateUtc = oldEntity.CreatedDateUtc;
-		if(oldEntity.SentTo != null && shoppingList.SentTo == null)
-		{
-			shoppingList.SentTo = oldEntity.SentTo;
-		}
-		await this._collection.ReplaceOneAsync(x => x.Id == shoppingList.Id, shoppingList, new ReplaceOptions(), cancellationToken);
-		return await this.GetShoppingListLookedUpAsync(shoppingList.Id, cancellationToken);
+		var updateDefinition = Builders<ShoppingList>.Update
+			.Set(l => l.Name, shoppingList.Name)
+			.Set(l => l.Ingredients, shoppingList.Ingredients)
+			.Set(l => l.RecipesIds, shoppingList.RecipesIds)
+			.Set(l => l.Notes, shoppingList.Notes)
+			.Set(l => l.LastModifiedById, shoppingList.LastModifiedById)
+			.Set(l => l.LastModifiedDateUtc, shoppingList.LastModifiedDateUtc);
+			
+		await this._collection.FindOneAndUpdateAsync(
+				Builders<ShoppingList>.Filter.Eq(l => l.Id, id), updateDefinition, new FindOneAndUpdateOptions<ShoppingList>(), cancellationToken);
+		return await this.GetShoppingListLookedUpAsync(id, cancellationToken);
 	}
 	
 	public async Task<List<ShoppingListLookedUp>> GetPageAsync(int pageNumber, int pageSize, ObjectId userId, CancellationToken cancellationToken)
@@ -99,5 +102,16 @@ public class ShoppingListsRepository : BaseRepository<ShoppingList>, IShoppingLi
 	{
 		var filter = Builders<ShoppingList>.Filter.Where(predicate);
 		return (int)(await this._collection.CountDocumentsAsync(filter));
+	}
+
+	public async Task UpdateShoppingListSentToAsync(ShoppingList shoppingList, CancellationToken cancellationToken)
+	{
+		var updateDefinition = Builders<ShoppingList>.Update
+			.Set(l => l.SentTo, shoppingList.SentTo)
+			.Set(l => l.LastModifiedById, shoppingList.LastModifiedById)
+			.Set(l => l.LastModifiedDateUtc, shoppingList.LastModifiedDateUtc);
+		
+		await this._collection.FindOneAndUpdateAsync(
+			Builders<ShoppingList>.Filter.Eq(l => l.Id, shoppingList.Id), updateDefinition, new FindOneAndUpdateOptions<ShoppingList>(), cancellationToken);
 	}
 }

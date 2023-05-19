@@ -7,5 +7,5 @@ public interface IContactsRepository : IBaseRepository<Contact>
 {
     Task<Contact> GetContactAsync(ObjectId id, CancellationToken cancellationToken);
 
-    Task UpdateContactAsync(Contact contact, CancellationToken cancellationToken);
+    Task<Contact> UpdateContactAsync(ObjectId id, Contact contact, CancellationToken cancellationToken);
 }

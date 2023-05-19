@@ -22,7 +22,5 @@ public class User : EntityBase
     public Guid? WebId { get; set; }
 
     public List<Role> Roles { get; set; }
-
-    public bool IsDeleted { get; set; }
 }
 

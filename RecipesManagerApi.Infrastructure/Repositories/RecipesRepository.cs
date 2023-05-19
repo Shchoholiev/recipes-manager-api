@@ -64,7 +64,7 @@ public class RecipesRepository : BaseRepository<Recipe>, IRecipesRepository
             .FirstOrDefaultAsync(cancellationToken);
         
 
-        return (int)pipeline.Count;
+        return (int)(pipeline?.Count ?? 0);
     }
 
     public async Task<List<RecipeLookUp>> GetSubscribedRecipesAsync(int pageNumber, int pageSize, ObjectId userId,
@@ -166,7 +166,7 @@ public class RecipesRepository : BaseRepository<Recipe>, IRecipesRepository
             .Count()
             .FirstOrDefaultAsync(cancellationToken);
         
-        return (int)pipeline.Count;
+        return (int)(pipeline?.Count ?? 0);
     }
 
     public async Task<Recipe> UpdateRecipeAsync(ObjectId id, Recipe recipe, CancellationToken cancellationToken)

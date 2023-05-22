@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using System.Linq.Expressions;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using RecipesManagerApi.Application.IRepositories;
 using RecipesManagerApi.Domain.Entities;
@@ -15,7 +16,13 @@ namespace RecipesManagerApi.Infrastructure.Repositories
 			return await(await this._collection.FindAsync(x => x.Id == id)).FirstOrDefaultAsync(cancellationToken);
 		}
 
-		public async Task<OpenAiLog> UpdateOpenAiLogAsync(OpenAiLog log, CancellationToken cancellationToken)
+        public async Task<int> GetTotalCountAsync(Expression<Func<OpenAiLog, bool>> predicate, CancellationToken cancellationToken)
+        {
+            var filter = Builders<OpenAiLog>.Filter.Where(predicate);
+			return (int)(await this._collection.CountDocumentsAsync(filter, new CountOptions(), cancellationToken));
+        }
+
+        public async Task<OpenAiLog> UpdateOpenAiLogAsync(OpenAiLog log, CancellationToken cancellationToken)
 		{
 			var updateDefinition = Builders<OpenAiLog>.Update
 				.Set(l => l.Request, log.Request)

@@ -63,7 +63,7 @@ public class OpenAiLogsService : IOpenAiLogsService
 
 		var entities = await this._repository.GetPageAsync(pageNumber, pageSize, x => x.CreatedById == objectId, cancellationToken);
 		var dtos = this._mapper.Map<List<OpenAiLogDto>>(entities);
-		var count = await this._repository.GetTotalCountAsync();
+		var count = await this._repository.GetTotalCountAsync(l => l.CreatedById == objectId, cancellationToken);
 		return new PagedList<OpenAiLogDto>(dtos, pageNumber, pageSize, count);
 	}
 

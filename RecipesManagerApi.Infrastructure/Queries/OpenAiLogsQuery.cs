@@ -14,12 +14,12 @@ public class OpenAiLogsQuery
         => service.GetLogsPageAsync(pageNumber, pageSize, cancellationToken);
 
     [Authorize(Roles = new[] { "Admin" })]
+    public Task<PagedList<OpenAiLogDto>> GetOpenAiLogsPageAsync(string userId, int pageNumber, int pageSize, CancellationToken cancellationToken,
+        [Service] IOpenAiLogsService service)
+        => service.GetLogsPageAsync(userId, pageNumber, pageSize, cancellationToken);
+
+    [Authorize(Roles = new[] { "Admin" })]
     public Task<OpenAiLogDto> GetOpenAiLogAsync(string id, CancellationToken cancellationToken,
         [Service] IOpenAiLogsService service)
         => service.GetLogAsync(id, cancellationToken);
-
-    [Authorize(Roles = new[] { "Admin" })]
-    public Task<PagedList<OpenAiLogDto>> GetOpenAiLogsPageOAsync(string id, int pageNumber, int pageSize, CancellationToken cancellationToken,
-        [Service] IOpenAiLogsService service)
-        => service.GetLogsPageAsync(id, pageNumber, pageSize, cancellationToken);
 }

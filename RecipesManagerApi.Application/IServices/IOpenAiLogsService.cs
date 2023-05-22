@@ -11,7 +11,7 @@ public interface IOpenAiLogsService
 
     Task<PagedList<OpenAiLogDto>> GetLogsPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken);
 
-    Task<PagedList<OpenAiLogDto>> GetLogsPageAsync(string id, int pageNumber, int pageSize, CancellationToken cancellationToken);
+    Task<PagedList<OpenAiLogDto>> GetLogsPageAsync(string usedId, int pageNumber, int pageSize, CancellationToken cancellationToken);
 
     Task<OpenAiLogDto> UpdateLogAsync(OpenAiLogDto dto, CancellationToken cancellationToken);
 }

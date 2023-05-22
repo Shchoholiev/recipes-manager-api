@@ -54,9 +54,9 @@ public class OpenAiLogsService : IOpenAiLogsService
 		return new PagedList<OpenAiLogDto>(dtos, pageNumber, pageSize, count);
 	}
 
-	public async Task<PagedList<OpenAiLogDto>> GetLogsPageAsync(string id, int pageNumber, int pageSize, CancellationToken cancellationToken)
+	public async Task<PagedList<OpenAiLogDto>> GetLogsPageAsync(string usedId, int pageNumber, int pageSize, CancellationToken cancellationToken)
 	{
-		if (!ObjectId.TryParse(id, out var objectId))
+		if (!ObjectId.TryParse(usedId, out var objectId))
 		{
 			throw new InvalidDataException("Provided id is invalid.");
 		}

@@ -81,13 +81,14 @@ public class OpenAiService : IOpenAiService
             if (string.IsNullOrEmpty(line)) continue;
             
             var json = line?.Substring(6, line.Length - 6);
-            if (json == "[DONE]") yield break;
+            if (json == "[DONE]") {
+                log.Response = allData;
+                Task.Run(() => _openAiLogsService.UpdateLogAsync(log, cancellationToken));
+                yield break;
+            }
 
             var openAiResponse = JsonConvert.DeserializeObject<OpenAiResponse>(json, _jsonSettings);
             yield return openAiResponse;
         }
-        
-        log.Response = allData;
-        Task.Run(() => _openAiLogsService.UpdateLogAsync(log, cancellationToken));
     }
 }

@@ -25,11 +25,12 @@ public class DbInitializer
 {
 	public static void FirstInitialization()
 	{
-		string thumbnailsPath = @"RecipesManagerApi.DbInitializer\Thumbnails";
+		string thumbnailsPath = @"RecipesManagerApi.DbInitializer/Thumbnails";
 		
 		IConfiguration configuration = new ConfigurationBuilder()
 			.SetBasePath(Directory.GetCurrentDirectory())
-			.AddJsonFile(@"RecipesManagerApi.Api\appsettings.Development.json")
+			.AddJsonFile(@"RecipesManagerApi.Api/appsettings.Development.json")
+			.AddJsonFile(@"RecipesManagerApi.Api/appsettings.Production.json")
 			.Build();
 		
 		ILoggerFactory logger = LoggerFactory.Create(builder => 
@@ -186,6 +187,7 @@ public class DbInitializer
 			usersRepository.AddAsync(userSystem, CancellationToken.None)
 		);
 		
+		GlobalUser.Id = userSystem.Id;
 		CategoryCreateDto categoryBreakfast = new CategoryCreateDto { Name = "Breakfast" };
 		CategoryCreateDto categoryLunch = new CategoryCreateDto { Name = "Lunch" };
 		CategoryCreateDto categoryDinner = new CategoryCreateDto { Name = "Dinner" };

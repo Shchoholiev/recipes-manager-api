@@ -14,7 +14,7 @@ public class OpenAiLogsQuery
         => service.GetLogsPageAsync(pageNumber, pageSize, cancellationToken);
 
     [Authorize(Roles = new[] { "Admin" })]
-    public Task<PagedList<OpenAiLogDto>> GetOpenAiLogsPageAsync(string userId, int pageNumber, int pageSize, CancellationToken cancellationToken,
+    public Task<PagedList<OpenAiLogDto>> GetOpenAiLogsPageByUserIdAsync(string userId, int pageNumber, int pageSize, CancellationToken cancellationToken,
         [Service] IOpenAiLogsService service)
         => service.GetLogsPageAsync(userId, pageNumber, pageSize, cancellationToken);
 

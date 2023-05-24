@@ -20,9 +20,6 @@ public class IngredientsController : ApiController
 
     [HttpPost("parse")]
     public async Task ParseIngredientsAsync([FromBody] IngredientsParseInput input, CancellationToken cancellationToken) {
-        var g = Response.HttpContext.Features.Get<IHttpResponseBodyFeature>();
-        g.DisableBuffering();
-
         Response.Headers.Add("Content-Type", "text/event-stream");
         Response.Headers.Add("Cache-Control", "no-cache");
         Response.Headers.Add("Connection", "keep-alive");

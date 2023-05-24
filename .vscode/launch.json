@@ -30,6 +30,19 @@
             "name": ".NET Core Attach",
             "type": "coreclr",
             "request": "attach"
-        }
+        },
+        {
+            "name": "DbInitializer",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-dbInitializer",
+            "program": "${workspaceFolder}/RecipesManagerApi.DbInitializer/bin/Debug/net7.0/RecipesManagerApi.DbInitializer.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        },
     ]
 }

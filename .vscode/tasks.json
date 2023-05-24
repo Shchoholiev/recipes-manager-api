@@ -36,6 +36,16 @@
                 "${workspaceFolder}/RecipesManagerApi.Api/RecipesManagerApi.Api.csproj"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build-dbInitializer",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/RecipesManagerApi.DbInitializer/RecipesManagerApi.DbInitializer.csproj"
+            ],
+            "problemMatcher": "$msCompile"
         }
     ]
 }

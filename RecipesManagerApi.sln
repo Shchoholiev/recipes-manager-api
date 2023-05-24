@@ -3,15 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipesManagerApi.Api", "RecipesManagerApi.Api\RecipesManagerApi.Api.csproj", "{C0AB6F8B-E433-47C5-A65C-C5194CF8FF82}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipesManagerApi.Domain", "RecipesManagerApi.Domain\RecipesManagerApi.Domain.csproj", "{A8C65F81-5679-44DB-8CC4-5A8B5BB2A491}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipesManagerApi.Application", "RecipesManagerApi.Application\RecipesManagerApi.Application.csproj", "{A119D08B-263A-4EB0-AD49-EA041B1608C4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipesManagerApi.Infrastructure", "RecipesManagerApi.Infrastructure\RecipesManagerApi.Infrastructure.csproj", "{1ACA61A4-57D4-41B8-8F00-D5AD6A0FC07D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipesManagerApi.Api", "RecipesManagerApi.Api\RecipesManagerApi.Api.csproj", "{C0AB6F8B-E433-47C5-A65C-C5194CF8FF82}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipesManagerApi.DbInitializer", "RecipesManagerApi.DbInitializer\RecipesManagerApi.DbInitializer.csproj", "{5E161B07-E99D-4055-8141-4B6693D83481}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,9 +36,5 @@ Global
 		{C0AB6F8B-E433-47C5-A65C-C5194CF8FF82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C0AB6F8B-E433-47C5-A65C-C5194CF8FF82}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C0AB6F8B-E433-47C5-A65C-C5194CF8FF82}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5E161B07-E99D-4055-8141-4B6693D83481}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5E161B07-E99D-4055-8141-4B6693D83481}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5E161B07-E99D-4055-8141-4B6693D83481}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5E161B07-E99D-4055-8141-4B6693D83481}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipesManagerApi.Infrastru
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipesManagerApi.Api", "RecipesManagerApi.Api\RecipesManagerApi.Api.csproj", "{C0AB6F8B-E433-47C5-A65C-C5194CF8FF82}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipesManagerApi.DbInitializer", "RecipesManagerApi.DbInitializer\RecipesManagerApi.DbInitializer.csproj", "{5E161B07-E99D-4055-8141-4B6693D83481}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{C0AB6F8B-E433-47C5-A65C-C5194CF8FF82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C0AB6F8B-E433-47C5-A65C-C5194CF8FF82}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C0AB6F8B-E433-47C5-A65C-C5194CF8FF82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E161B07-E99D-4055-8141-4B6693D83481}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E161B07-E99D-4055-8141-4B6693D83481}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E161B07-E99D-4055-8141-4B6693D83481}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E161B07-E99D-4055-8141-4B6693D83481}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

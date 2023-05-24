@@ -26,11 +26,11 @@ public class DbInitializer
 	public static void FirstInitialization()
 	{
 		string thumbnailsPath = @"RecipesManagerApi.DbInitializer/Thumbnails";
+		var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 		
 		IConfiguration configuration = new ConfigurationBuilder()
 			.SetBasePath(Directory.GetCurrentDirectory())
-			.AddJsonFile(@"RecipesManagerApi.Api/appsettings.Development.json")
-			.AddJsonFile(@"RecipesManagerApi.Api/appsettings.Production.json")
+			.AddJsonFile($"RecipesManagerApi.Api/appsettings.{environment}.json")
 			.Build();
 		
 		ILoggerFactory logger = LoggerFactory.Create(builder => 
@@ -94,6 +94,10 @@ public class DbInitializer
 		{
 			Name = "User"
 		};
+		RoleCreateDto rolePremium = new RoleCreateDto
+		{
+			Name = "Premium"
+		};
 		RoleCreateDto roleAdmin = new RoleCreateDto
 		{
 			Name = "Admin"
@@ -101,10 +105,11 @@ public class DbInitializer
 		
 		var roleGuestDto = rolesService.AddRoleAsync(roleGuest, CancellationToken.None).Result;
 		var roleUserDto =  rolesService.AddRoleAsync(roleUser, CancellationToken.None).Result;
+		var rolePremiumDto =  rolesService.AddRoleAsync(rolePremium, CancellationToken.None).Result;
 		var roleAdminDto =  rolesService.AddRoleAsync(roleAdmin, CancellationToken.None).Result;
 		
 		var entitiesRoles = mapper.Map<List<Role>>(new List<RoleDto> { roleGuestDto, roleUserDto });
-		var entitiesAdminRoles = mapper.Map<List<Role>>(new List<RoleDto> { roleGuestDto, roleUserDto, roleAdminDto });
+		var entitiesAdminRoles = mapper.Map<List<Role>>(new List<RoleDto> { roleGuestDto, roleUserDto, rolePremiumDto, roleAdminDto });
 		
 		User userDmytro = new User
 		{

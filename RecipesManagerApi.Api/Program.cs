@@ -5,6 +5,9 @@ using RecipesManagerApi.Infrastructure.Queries;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var appConfig = Environment.GetEnvironmentVariable("APP_CONFIG") ?? builder.Configuration.GetConnectionString("AppConfig");
+builder.Configuration.AddAzureAppConfiguration(appConfig);
+
 builder.Services.AddJWTTokenAuthentication(builder.Configuration);
 builder.Services.AddHttpClients(builder.Configuration);
 builder.Services.AddInfrastructure();

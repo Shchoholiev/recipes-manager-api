@@ -33,21 +33,24 @@ public class SavedRecipesService : ISavedRecipesService
 		return this._mapper.Map<SavedRecipeDto>(entity);
 	}
 
-	public async Task<OperationDetails> DeleteSavedRecipeAsync(string id, CancellationToken cancellationToken)
+	public async Task<OperationDetails> DeleteSavedRecipeAsync(string recipeId, CancellationToken cancellationToken)
 	{
-		if (!ObjectId.TryParse(id, out var objectId))
+		if (!ObjectId.TryParse(recipeId, out var objectId))
 		{
 			throw new InvalidDataException("Provided id is invalid.");
 		}
-		
 		var savedRecipe = new SavedRecipe
 		{
-			Id = objectId,
+			RecipeId = objectId,
+			CreatedById = GlobalUser.Id.Value,
 			LastModifiedById = GlobalUser.Id.Value,
 			LastModifiedDateUtc = DateTime.UtcNow
 		};
-		
-		await this._repository.DeleteAsync(savedRecipe, cancellationToken);
+		var deletedRecipe = await this._repository.DeleteSavedRecipeAsync(savedRecipe, cancellationToken);
+		if(deletedRecipe == null)
+		{
+			throw new EntityNotFoundException<SavedRecipe>();
+		}
 		return new OperationDetails() { IsSuccessful = true, TimestampUtc = DateTime.UtcNow };
 	}
 

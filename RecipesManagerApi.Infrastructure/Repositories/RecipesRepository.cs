@@ -13,9 +13,53 @@ public class RecipesRepository : BaseRepository<Recipe>, IRecipesRepository
     public RecipesRepository(MongoDbContext db)
         : base(db, "Recipes") { }
 
-    public async Task<Recipe> GetRecipeAsync(ObjectId id, CancellationToken cancellationToken)
+    public async Task<Recipe> GetRecipeAsync(ObjectId id, CancellationToken cancellationToken) 
     {
         return await (await this._collection.FindAsync(x => x.Id == id)).FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<RecipeLookUp> GetRecipeAsync(ObjectId id, ObjectId userId, CancellationToken cancellationToken)
+    {
+        var recipe = await _collection.Aggregate()
+            .Match(Builders<Recipe>.Filter.Where(r => r.Id == id))
+            .Lookup("Users", "CreatedById", "_id", "CreatedBy")
+            .AppendStage<RecipeLookUp>("{ $addFields: { CreatedBy: { $arrayElemAt: ['$CreatedBy', 0] } } }")
+            .AppendStage<BsonDocument>(@"
+            { 
+                $lookup: { 
+                    from: 'SavedRecipes',
+                    let: { recipeId: '$_id', userId: ObjectId('" + userId.ToString() + @"') },
+                    pipeline: [
+                        { 
+                            $match: { 
+                                $and: [
+                                    { $expr: { $eq: ['$CreatedById', '$$userId'] } },
+                                    { $expr: { $eq: ['$RecipeId', '$$recipeId'] } },
+                                    { IsDeleted: false }
+                                ]
+                            } 
+                        }
+                    ],
+                    as: 'SavedRecipe',
+                }
+            }")
+            .AppendStage<BsonDocument>(@"
+            {
+                $addFields: {
+                    IsSaved: {
+                        $cond: {
+                            if: { $eq: [{ $size: '$SavedRecipe' }, 0] },
+                            then: false,
+                            else: true
+                        }
+                    }
+                }
+            }")
+            .AppendStage<RecipeLookUp>(new BsonDocument("$project", new BsonDocument("SavedRecipe", 0)))
+            .As<RecipeLookUp>()
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return recipe;
     }
 
     public async Task<List<RecipeLookUp>> GetRecipesPageAsync(int pageNumber, int pageSize, ObjectId userId, 

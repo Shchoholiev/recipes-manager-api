@@ -147,7 +147,7 @@ public class RecipesService : IRecipesService
         {
             throw new InvalidDataException("Provided id is invalid.");
         }
-        var entity = await this._recipesRepository.GetRecipeAsync(objectId, cancellationToken);
+        var entity = await this._recipesRepository.GetRecipeAsync(objectId, GlobalUser.Id.Value, cancellationToken);
         return this._mapper.Map<RecipeDto>(entity);
     }
 

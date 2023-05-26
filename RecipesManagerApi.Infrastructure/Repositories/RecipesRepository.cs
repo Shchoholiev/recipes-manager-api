@@ -18,12 +18,46 @@ public class RecipesRepository : BaseRepository<Recipe>, IRecipesRepository
         return await (await this._collection.FindAsync(x => x.Id == id)).FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<List<RecipeLookUp>> GetRecipesPageAsync(int pageNumber, int pageSize, Expression<Func<Recipe, bool>> predicate, CancellationToken cancellationToken)
+    public async Task<List<RecipeLookUp>> GetRecipesPageAsync(int pageNumber, int pageSize, ObjectId userId, 
+        Expression<Func<Recipe, bool>> predicate, CancellationToken cancellationToken)
     {
+        var id = userId.ToString();
         var recipes = await _collection.Aggregate()
             .Match(Builders<Recipe>.Filter.Where(predicate))
             .Lookup("Users", "CreatedById", "_id", "CreatedBy")
             .AppendStage<RecipeLookUp>("{ $addFields: { CreatedBy: { $arrayElemAt: ['$CreatedBy', 0] } } }")
+            .AppendStage<BsonDocument>(@"
+            { 
+                $lookup: { 
+                    from: 'SavedRecipes',
+                    let: { recipeId: '$_id', userId: ObjectId('" + userId.ToString() + @"') },
+                    pipeline: [
+                        { 
+                            $match: { 
+                                $and: [
+                                    { $expr: { $eq: ['$CreatedById', '$$userId'] } },
+                                    { $expr: { $eq: ['$RecipeId', '$$recipeId'] } },
+                                    { IsDeleted: false }
+                                ]
+                            } 
+                        }
+                    ],
+                    as: 'SavedRecipe',
+                }
+            }")
+            .AppendStage<BsonDocument>(@"
+            {
+                $addFields: {
+                    IsSaved: {
+                        $cond: {
+                            if: { $eq: [{ $size: '$SavedRecipe' }, 0] },
+                            then: false,
+                            else: true
+                        }
+                    }
+                }
+            }")
+            .AppendStage<RecipeLookUp>(new BsonDocument("$project", new BsonDocument("SavedRecipe", 0)))
             .Skip((pageNumber - 1) * pageSize)
             .Limit(pageSize)
             .As<RecipeLookUp>()
@@ -42,6 +76,12 @@ public class RecipesRepository : BaseRepository<Recipe>, IRecipesRepository
             .AppendStage<RecipeLookUp>(new BsonDocument("$match", new BsonDocument("SavedRecipe.CreatedById", userId)))
             .AppendStage<RecipeLookUp>(new BsonDocument("$match", new BsonDocument("SavedRecipe.IsDeleted", false)))
             .AppendStage<RecipeLookUp>(new BsonDocument("$project", new BsonDocument("SavedRecipe", 0)))
+            .AppendStage<BsonDocument>(@"
+            {
+                $addFields: {
+                    IsSaved: true
+                }
+            }")
             .Skip((pageNumber - 1) * pageSize)
             .Limit(pageSize)
             .As<RecipeLookUp>()
@@ -112,6 +152,39 @@ public class RecipesRepository : BaseRepository<Recipe>, IRecipesRepository
                 }
             }")
             .AppendStage<RecipeLookUp>(new BsonDocument("$project", new BsonDocument("Subscription", 0)))
+
+            .AppendStage<BsonDocument>(@"
+            { 
+                $lookup: { 
+                    from: 'SavedRecipes',
+                    let: { recipeId: '$_id', userId: ObjectId('" + userId.ToString() + @"') },
+                    pipeline: [
+                        { 
+                            $match: { 
+                                $and: [
+                                    { $expr: { $eq: ['$CreatedById', '$$userId'] } },
+                                    { $expr: { $eq: ['$RecipeId', '$$recipeId'] } },
+                                    { IsDeleted: false }
+                                ]
+                            } 
+                        }
+                    ],
+                    as: 'SavedRecipe',
+                }
+            }")
+            .AppendStage<BsonDocument>(@"
+            {
+                $addFields: {
+                    IsSaved: {
+                        $cond: {
+                            if: { $eq: [{ $size: '$SavedRecipe' }, 0] },
+                            then: false,
+                            else: true
+                        }
+                    }
+                }
+            }")
+            .AppendStage<RecipeLookUp>(new BsonDocument("$project", new BsonDocument("SavedRecipe", 0)))
             .Skip((pageNumber - 1) * pageSize)
             .Limit(pageSize)
             .As<RecipeLookUp>()

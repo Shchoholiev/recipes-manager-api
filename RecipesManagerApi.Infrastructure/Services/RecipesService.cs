@@ -165,7 +165,7 @@ public class RecipesService : IRecipesService
                 || (authorId != ObjectId.Empty && r.CreatedById == authorId)
             );
 
-        var recipesTask = this._recipesRepository.GetRecipesPageAsync(pageNumber, pageSize, predicate, cancellationToken);
+        var recipesTask = this._recipesRepository.GetRecipesPageAsync(pageNumber, pageSize, userId, predicate, cancellationToken);
         var countTask = this._recipesRepository.GetTotalCountAsync(predicate, cancellationToken);
         await Task.WhenAll(recipesTask, countTask);
 
@@ -189,7 +189,7 @@ public class RecipesService : IRecipesService
                 || (r.Categories != null && r.Categories.Any(c => categoriesIds.Contains(c.Id)))
             );
 
-        var recipesTask = this._recipesRepository.GetRecipesPageAsync(pageNumber, pageSize, predicate, cancellationToken);
+        var recipesTask = this._recipesRepository.GetRecipesPageAsync(pageNumber, pageSize, userId, predicate, cancellationToken);
         var countTask = this._recipesRepository.GetTotalCountAsync(predicate, cancellationToken);
         await Task.WhenAll(recipesTask, countTask);
 

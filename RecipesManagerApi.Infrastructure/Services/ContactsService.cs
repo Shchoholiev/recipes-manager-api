@@ -8,6 +8,7 @@ using RecipesManagerApi.Application.Paging;
 using RecipesManagerApi.Domain.Entities;
 using RecipesManagerApi.Application.Models.CreateDtos;
 using RecipesManagerApi.Application.GlodalInstances;
+using RecipesManagerApi.Application.Models.Operations;
 
 namespace RecipesManagerApi.Infrastructure.Services;
 
@@ -32,7 +33,7 @@ public class ContactsService : IContactsService
 		return this._mapper.Map<ContactDto>(newEntity);
 	}
 
-	public async Task DeleteContactAsync(string id, CancellationToken cancellationToken)
+	public async Task<OperationDetails> DeleteContactAsync(string id, CancellationToken cancellationToken)
 	{
 		if (!ObjectId.TryParse(id, out var objectId))
 		{
@@ -47,9 +48,10 @@ public class ContactsService : IContactsService
 		};
 		
 		await this._contactsRepository.DeleteAsync(contact, cancellationToken);
-	}
+        return new OperationDetails() { IsSuccessful = true, TimestampUtc = DateTime.UtcNow };
+    }
 
-	public async Task<ContactDto> GetContactAsync(string id, CancellationToken cancellationToken)
+    public async Task<ContactDto> GetContactAsync(string id, CancellationToken cancellationToken)
 	{
 		if (!ObjectId.TryParse(id, out var objectId)) {
 			throw new InvalidDataException("Provided id is invalid.");

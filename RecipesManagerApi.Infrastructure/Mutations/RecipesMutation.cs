@@ -1,5 +1,6 @@
 ﻿using RecipesManagerApi.Application.IServices;
 using HotChocolate.Authorization;
+using RecipesManagerApi.Application.Models.Operations;
 
 namespace RecipesManagerApi.Infrastructure.Mutations;
 
@@ -7,7 +8,7 @@ namespace RecipesManagerApi.Infrastructure.Mutations;
 public class RecipesMutation
 {
     [Authorize]
-    public Task DeleteRecipeAsync(string id, CancellationToken cancellationToken,
+    public Task<OperationDetails> DeleteRecipeAsync(string id, CancellationToken cancellationToken,
         [Service] IRecipesService service)
         => service.DeleteAsync(id, cancellationToken);
 }

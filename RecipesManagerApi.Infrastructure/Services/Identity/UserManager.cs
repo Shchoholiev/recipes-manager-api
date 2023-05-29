@@ -43,8 +43,9 @@ public class UserManager : IUserManager
 
     public async Task<TokensModel> LoginAsync(LoginModel login, CancellationToken cancellationToken)
     {
-        var user = login.Email != null ? await this._usersRepository.GetUserAsync(x => x.Email == login.Email, cancellationToken) :
-                                         await this._usersRepository.GetUserAsync(x => x.Phone == login.Phone, cancellationToken);
+        var user = login.Email != null 
+            ? await this._usersRepository.GetUserAsync(x => x.Email == login.Email, cancellationToken) 
+            : await this._usersRepository.GetUserAsync(x => x.Phone == login.Phone, cancellationToken);
   
         if (user == null)
         {
@@ -57,6 +58,7 @@ public class UserManager : IUserManager
         }
 
         user.RefreshToken = this.GetRefreshToken();
+        user.RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(30);
         await this._usersRepository.UpdateUserAsync(user, cancellationToken);
         var tokens = this.GetUserTokens(user);
 
@@ -97,7 +99,7 @@ public class UserManager : IUserManager
             Roles = new List<Role> { roleUser, roleGuest },
             PasswordHash = this._passwordHasher.Hash(register.Password),
             RefreshToken = this.GetRefreshToken(),
-            RefreshTokenExpiryDate = DateTime.Now.AddDays(7),
+            RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(30),
             CreatedDateUtc = DateTime.UtcNow
         };
 
@@ -132,7 +134,7 @@ public class UserManager : IUserManager
             Name = "Guest",
             Roles = new List<Role> { role },
             RefreshToken = this.GetRefreshToken(),
-            RefreshTokenExpiryDate = DateTime.Now.AddDays(7),
+            RefreshTokenExpiryDate = DateTime.Now.AddDays(30),
             CreatedDateUtc = DateTime.UtcNow
         };
 
@@ -167,7 +169,7 @@ public class UserManager : IUserManager
             Name = register.Name,
             Roles = new List<Role> { role },
             RefreshToken = this.GetRefreshToken(),
-            RefreshTokenExpiryDate = DateTime.Now.AddDays(7),
+            RefreshTokenExpiryDate = DateTime.Now.AddDays(30),
             CreatedDateUtc = DateTime.UtcNow
         };
 

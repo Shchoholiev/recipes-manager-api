@@ -1,6 +1,7 @@
 using MongoDB.Bson;
 using RecipesManagerApi.Application.Models;
 using RecipesManagerApi.Application.Models.Dtos;
+using RecipesManagerApi.Application.Models.Operations;
 using RecipesManagerApi.Application.Paging;
 using RecipesManagerApi.Domain.Enums;
 
@@ -12,7 +13,7 @@ public interface IRecipesService
 
     Task<RecipeDto> UpdateRecipeAsync(string id, RecipeCreateDto dto, CancellationToken cancellationToken);
 
-    Task DeleteAsync(string id, CancellationToken cancellationToken);
+    Task<OperationDetails> DeleteAsync(string id, CancellationToken cancellationToken);
 
     Task<RecipeDto> GetRecipeAsync(string id, CancellationToken cancellationToken);
 

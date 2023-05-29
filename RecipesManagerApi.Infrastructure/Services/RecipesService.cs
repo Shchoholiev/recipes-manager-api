@@ -14,6 +14,7 @@ using RecipesManagerApi.Application.Exceptions;
 using LinqKit;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Azure;
+using RecipesManagerApi.Application.Models.Operations;
 
 namespace RecipesManagerApi.Infrastructure.Services;
 
@@ -93,7 +94,7 @@ public class RecipesService : IRecipesService
         return this._mapper.Map<RecipeDto>(updated);
     }
 
-    public async Task DeleteAsync(string id, CancellationToken cancellationToken)
+    public async Task<OperationDetails> DeleteAsync(string id, CancellationToken cancellationToken)
     {
         if (!ObjectId.TryParse(id, out var recipeId))
         {
@@ -108,6 +109,7 @@ public class RecipesService : IRecipesService
         };
 
         await this._recipesRepository.DeleteAsync(recipe, cancellationToken);
+        return new OperationDetails() { IsSuccessful = true, TimestampUtc = DateTime.UtcNow };
     }
 
     public async Task<PagedList<RecipeDto>> GetSearchPageAsync(int pageNumber, int pageSize, string searchString, string? authorsId,

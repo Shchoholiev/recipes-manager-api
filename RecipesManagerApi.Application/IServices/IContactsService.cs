@@ -1,6 +1,7 @@
 using MongoDB.Bson;
 using RecipesManagerApi.Application.Models.CreateDtos;
 using RecipesManagerApi.Application.Models.Dtos;
+using RecipesManagerApi.Application.Models.Operations;
 using RecipesManagerApi.Application.Paging;
 
 namespace RecipesManagerApi.Application.IServices;
@@ -11,7 +12,7 @@ public interface IContactsService
 
     Task<ContactDto> UpdateContactAsync(string id, ContactCreateDto dto, CancellationToken cancellationToken);
 
-    Task DeleteContactAsync(string id, CancellationToken cancellationToken);
+    Task<OperationDetails> DeleteContactAsync(string id, CancellationToken cancellationToken);
 
     Task<ContactDto> GetContactAsync(string id, CancellationToken cancellationToken);
 

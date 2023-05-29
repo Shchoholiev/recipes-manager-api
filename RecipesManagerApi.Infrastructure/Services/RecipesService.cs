@@ -11,6 +11,9 @@ using RecipesManagerApi.Application.Models.Dtos;
 using MongoDB.Driver;
 using System.Linq.Expressions;
 using RecipesManagerApi.Application.Exceptions;
+using LinqKit;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Azure;
 
 namespace RecipesManagerApi.Infrastructure.Services;
 
@@ -156,19 +159,25 @@ public class RecipesService : IRecipesService
     {
         searchString = searchString.ToLower();
         Expression<Func<Recipe, bool>> predicate = (Recipe r)
-            => !r.IsDeleted && r.IsPublic && r.CreatedById != userId
-            && (
-                (!string.IsNullOrEmpty(searchString) 
-                && 
-                (r.Name.ToLower().Contains(searchString)
+            => !r.IsDeleted && r.IsPublic && r.CreatedById != userId;
+        if (!string.IsNullOrEmpty(searchString))
+        {
+            predicate = predicate.And(r => (    
+                       r.Name.ToLower().Contains(searchString)
                     || (!string.IsNullOrEmpty(r.Text) && r.Text.ToLower().Contains(searchString))
                     || (!string.IsNullOrEmpty(r.IngredientsText) && r.IngredientsText.ToLower().Contains(searchString))
                     || (r.Ingredients != null && r.Ingredients.Any(i => i.Name.ToLower().Contains(searchString)))
                     || (r.Categories != null && r.Categories.Any(c => c.Name.ToLower().Contains(searchString)))
-                ))
-                || (r.Categories != null && r.Categories.Any(c => categoriesIds.Contains(c.Id)))
-                || (authorId != ObjectId.Empty && r.CreatedById == authorId)
-            );
+                )); 
+        }
+        if (!categoriesIds.IsNullOrEmpty()) 
+        {
+            predicate = predicate.And( r => (r.Categories != null && r.Categories.Any(c => categoriesIds.Contains(c.Id))));
+        }
+        if(authorId != ObjectId.Empty)
+        {
+            predicate = predicate.And( r => (r.CreatedById == authorId));
+        }
 
         var recipesTask = this._recipesRepository.GetRecipesPageAsync(pageNumber, pageSize, userId, predicate, cancellationToken);
         var countTask = this._recipesRepository.GetTotalCountAsync(predicate, cancellationToken);
@@ -186,18 +195,21 @@ public class RecipesService : IRecipesService
     {
         searchString = searchString.ToLower();
         Expression<Func<Recipe, bool>> predicate = (Recipe r)
-            => !r.IsDeleted && r.IsPublic && r.CreatedById == userId
-            && (
-                (!string.IsNullOrEmpty(searchString) 
-                && 
-                (r.Name.ToLower().Contains(searchString)
+            => !r.IsDeleted && r.IsPublic && r.CreatedById == userId;
+        if (!string.IsNullOrEmpty(searchString))
+        {
+            predicate = predicate.And(r => (
+                       r.Name.ToLower().Contains(searchString)
                     || (!string.IsNullOrEmpty(r.Text) && r.Text.ToLower().Contains(searchString))
                     || (!string.IsNullOrEmpty(r.IngredientsText) && r.IngredientsText.ToLower().Contains(searchString))
                     || (r.Ingredients != null && r.Ingredients.Any(i => i.Name.ToLower().Contains(searchString)))
                     || (r.Categories != null && r.Categories.Any(c => c.Name.ToLower().Contains(searchString)))
-                ))
-                || (r.Categories != null && r.Categories.Any(c => categoriesIds.Contains(c.Id)))
-            );
+                ));
+        }
+        if (!categoriesIds.IsNullOrEmpty())
+        {
+            predicate = predicate.And(r => (r.Categories != null && r.Categories.Any(c => categoriesIds.Contains(c.Id))));
+        }
 
         var recipesTask = this._recipesRepository.GetRecipesPageAsync(pageNumber, pageSize, userId, predicate, cancellationToken);
         var countTask = this._recipesRepository.GetTotalCountAsync(predicate, cancellationToken);
@@ -215,19 +227,24 @@ public class RecipesService : IRecipesService
     {
         searchString = searchString.ToLower();
         Expression<Func<Recipe, bool>> predicate = (Recipe r)
-            => !r.IsDeleted
-            && (
-                (!string.IsNullOrEmpty(searchString) 
-                && 
-                (r.Name.ToLower().Contains(searchString)
+            => !r.IsDeleted;
+        if (!string.IsNullOrEmpty(searchString)) {
+            predicate = predicate.And(r => (
+                       r.Name.ToLower().Contains(searchString)
                     || (!string.IsNullOrEmpty(r.Text) && r.Text.ToLower().Contains(searchString))
                     || (!string.IsNullOrEmpty(r.IngredientsText) && r.IngredientsText.ToLower().Contains(searchString))
                     || (r.Ingredients != null && r.Ingredients.Any(i => i.Name.ToLower().Contains(searchString)))
                     || (r.Categories != null && r.Categories.Any(c => c.Name.ToLower().Contains(searchString)))
-                ))
-                || (r.Categories != null && r.Categories.Any(c => categoriesIds.Contains(c.Id)))
-                || (authorId != ObjectId.Empty && r.CreatedById == authorId)
-            );
+                ));
+        }
+        if (!categoriesIds.IsNullOrEmpty()) 
+        {
+            predicate = predicate.And(r => (r.Categories != null && r.Categories.Any(c => categoriesIds.Contains(c.Id))));
+        }
+        if (authorId != ObjectId.Empty)
+        {
+            predicate = predicate.And(r => (r.CreatedById == authorId));
+        }
 
         var recipesTask = this._recipesRepository.GetSubscribedRecipesAsync(pageNumber, pageSize, userId, predicate, cancellationToken);
         var countTask = this._recipesRepository.GetSubscriptionsCountAsync(predicate, userId, cancellationToken);
@@ -246,19 +263,25 @@ public class RecipesService : IRecipesService
     {
         searchString = searchString.ToLower();
         Expression<Func<Recipe, bool>> predicate = (Recipe r)
-            => !r.IsDeleted
-            && (
-                (!string.IsNullOrEmpty(searchString) 
-                && 
-                (r.Name.ToLower().Contains(searchString)
+            => !r.IsDeleted;
+        if (!string.IsNullOrEmpty(searchString))
+        {
+            predicate = predicate.And(r => (
+                       r.Name.ToLower().Contains(searchString)
                     || (!string.IsNullOrEmpty(r.Text) && r.Text.ToLower().Contains(searchString))
                     || (!string.IsNullOrEmpty(r.IngredientsText) && r.IngredientsText.ToLower().Contains(searchString))
                     || (r.Ingredients != null && r.Ingredients.Any(i => i.Name.ToLower().Contains(searchString)))
                     || (r.Categories != null && r.Categories.Any(c => c.Name.ToLower().Contains(searchString)))
-                ))
-                || (r.Categories != null && r.Categories.Any(c => categoriesIds.Contains(c.Id)))
-                || (authorId != ObjectId.Empty && r.CreatedById == authorId)
-            );
+                ));
+        }
+        if (!categoriesIds.IsNullOrEmpty())
+        {
+            predicate = predicate.And(r => (r.Categories != null && r.Categories.Any(c => categoriesIds.Contains(c.Id))));
+        }
+        if (authorId != ObjectId.Empty)
+        {
+            predicate = predicate.And(r => (r.CreatedById == authorId));
+        }
 
         var recipesTask = this._recipesRepository.GetSavedRecipesAsync(pageNumber, pageSize, userId, predicate, cancellationToken);
         var countTask = this._recipesRepository.GetSavedRecipesCountAsync(predicate, userId, cancellationToken);

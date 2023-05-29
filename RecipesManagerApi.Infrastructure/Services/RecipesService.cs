@@ -154,13 +154,18 @@ public class RecipesService : IRecipesService
     private async Task<PagedList<RecipeDto>> GetPublicRecipesPageAsync(int pageNumber, int pageSize, string searchString, ObjectId userId, ObjectId authorId,
         List<ObjectId> categoriesIds, CancellationToken cancellationToken)
     {
+        searchString = searchString.ToLower();
         Expression<Func<Recipe, bool>> predicate = (Recipe r)
             => !r.IsDeleted && r.IsPublic && r.CreatedById != userId
-            && (r.Name.Contains(searchString)
-                || (!string.IsNullOrEmpty(r.Text) && r.Text.Contains(searchString))
-                || (!string.IsNullOrEmpty(r.IngredientsText) && r.IngredientsText.Contains(searchString))
-                || (r.Ingredients != null && r.Ingredients.Any(i => i.Name.Contains(searchString)))
-                || (r.Categories != null && r.Categories.Any(c => c.Name.Contains(searchString)))
+            && (
+                (!string.IsNullOrEmpty(searchString) 
+                && 
+                (r.Name.ToLower().Contains(searchString)
+                    || (!string.IsNullOrEmpty(r.Text) && r.Text.ToLower().Contains(searchString))
+                    || (!string.IsNullOrEmpty(r.IngredientsText) && r.IngredientsText.ToLower().Contains(searchString))
+                    || (r.Ingredients != null && r.Ingredients.Any(i => i.Name.ToLower().Contains(searchString)))
+                    || (r.Categories != null && r.Categories.Any(c => c.Name.ToLower().Contains(searchString)))
+                ))
                 || (r.Categories != null && r.Categories.Any(c => categoriesIds.Contains(c.Id)))
                 || (authorId != ObjectId.Empty && r.CreatedById == authorId)
             );
@@ -179,13 +184,18 @@ public class RecipesService : IRecipesService
     private async Task<PagedList<RecipeDto>> GetPersonalRecipesPageAsync(int pageNumber, int pageSize, string searchString, ObjectId userId,
         List<ObjectId> categoriesIds, CancellationToken cancellationToken)
     {
+        searchString = searchString.ToLower();
         Expression<Func<Recipe, bool>> predicate = (Recipe r)
-            => !r.IsDeleted && r.CreatedById == userId
-            && (r.Name.Contains(searchString)
-                || (!string.IsNullOrEmpty(r.Text) && r.Text.Contains(searchString))
-                || (!string.IsNullOrEmpty(r.IngredientsText) && r.IngredientsText.Contains(searchString))
-                || (r.Ingredients != null && r.Ingredients.Any(i => i.Name.Contains(searchString)))
-                || (r.Categories != null && r.Categories.Any(c => c.Name.Contains(searchString)))
+            => !r.IsDeleted && r.IsPublic && r.CreatedById == userId
+            && (
+                (!string.IsNullOrEmpty(searchString) 
+                && 
+                (r.Name.ToLower().Contains(searchString)
+                    || (!string.IsNullOrEmpty(r.Text) && r.Text.ToLower().Contains(searchString))
+                    || (!string.IsNullOrEmpty(r.IngredientsText) && r.IngredientsText.ToLower().Contains(searchString))
+                    || (r.Ingredients != null && r.Ingredients.Any(i => i.Name.ToLower().Contains(searchString)))
+                    || (r.Categories != null && r.Categories.Any(c => c.Name.ToLower().Contains(searchString)))
+                ))
                 || (r.Categories != null && r.Categories.Any(c => categoriesIds.Contains(c.Id)))
             );
 
@@ -203,13 +213,18 @@ public class RecipesService : IRecipesService
     private async Task<PagedList<RecipeDto>> GetSubscribedRecipesPageAsync(int pageNumber, int pageSize, string searchString, ObjectId userId, ObjectId authorId,
         List<ObjectId> categoriesIds, CancellationToken cancellationToken)
     {
+        searchString = searchString.ToLower();
         Expression<Func<Recipe, bool>> predicate = (Recipe r)
             => !r.IsDeleted
-            && (r.Name.Contains(searchString)
-                || (!string.IsNullOrEmpty(r.Text) && r.Text.Contains(searchString))
-                || (!string.IsNullOrEmpty(r.IngredientsText) && r.IngredientsText.Contains(searchString))
-                || (r.Ingredients != null && r.Ingredients.Any(i => i.Name.Contains(searchString)))
-                || (r.Categories != null && r.Categories.Any(c => c.Name.Contains(searchString)))
+            && (
+                (!string.IsNullOrEmpty(searchString) 
+                && 
+                (r.Name.ToLower().Contains(searchString)
+                    || (!string.IsNullOrEmpty(r.Text) && r.Text.ToLower().Contains(searchString))
+                    || (!string.IsNullOrEmpty(r.IngredientsText) && r.IngredientsText.ToLower().Contains(searchString))
+                    || (r.Ingredients != null && r.Ingredients.Any(i => i.Name.ToLower().Contains(searchString)))
+                    || (r.Categories != null && r.Categories.Any(c => c.Name.ToLower().Contains(searchString)))
+                ))
                 || (r.Categories != null && r.Categories.Any(c => categoriesIds.Contains(c.Id)))
                 || (authorId != ObjectId.Empty && r.CreatedById == authorId)
             );
@@ -229,14 +244,20 @@ public class RecipesService : IRecipesService
     private async Task<PagedList<RecipeDto>> GetSavedRecipesPageAsync(int pageNumber, int pageSize, string searchString, ObjectId userId, ObjectId? authorId,
         List<ObjectId> categoriesIds, CancellationToken cancellationToken)
     {
+        searchString = searchString.ToLower();
         Expression<Func<Recipe, bool>> predicate = (Recipe r)
             => !r.IsDeleted
-            && (r.Name.Contains(searchString)
-                || (!string.IsNullOrEmpty(r.Text) && r.Text.Contains(searchString))
-                || (!string.IsNullOrEmpty(r.IngredientsText) && r.IngredientsText.Contains(searchString))
-                || (r.Ingredients != null && r.Ingredients.Any(i => i.Name.Contains(searchString)))
-                || (r.Categories != null && r.Categories.Any(c => c.Name.Contains(searchString)))
+            && (
+                (!string.IsNullOrEmpty(searchString) 
+                && 
+                (r.Name.ToLower().Contains(searchString)
+                    || (!string.IsNullOrEmpty(r.Text) && r.Text.ToLower().Contains(searchString))
+                    || (!string.IsNullOrEmpty(r.IngredientsText) && r.IngredientsText.ToLower().Contains(searchString))
+                    || (r.Ingredients != null && r.Ingredients.Any(i => i.Name.ToLower().Contains(searchString)))
+                    || (r.Categories != null && r.Categories.Any(c => c.Name.ToLower().Contains(searchString)))
+                ))
                 || (r.Categories != null && r.Categories.Any(c => categoriesIds.Contains(c.Id)))
+                || (authorId != ObjectId.Empty && r.CreatedById == authorId)
             );
 
         var recipesTask = this._recipesRepository.GetSavedRecipesAsync(pageNumber, pageSize, userId, predicate, cancellationToken);

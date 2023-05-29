@@ -38,8 +38,9 @@ public class TokensService : ITokensService
             throw new InvalidDataException("Provided id is invalid.");
         }
 
-        var user = await this._usersRepository.GetUserAsync(objectId, cancellationToken); if (user == null || user?.RefreshToken != tokensModel.RefreshToken
-            || user?.RefreshTokenExpiryDate <= DateTime.Now)
+        var user = await this._usersRepository.GetUserAsync(objectId, cancellationToken); 
+        if (user == null || user?.RefreshToken != tokensModel.RefreshToken
+            || user?.RefreshTokenExpiryDate <= DateTime.UtcNow)
         {
             throw new SecurityTokenExpiredException();
         }
@@ -47,6 +48,7 @@ public class TokensService : ITokensService
         var newAccessToken = this.GenerateAccessToken(principal.Claims);
         var newRefreshToken = this.GenerateRefreshToken();
         user.RefreshToken = newRefreshToken;
+        user.RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(30);
         await this._usersRepository.UpdateUserAsync(user, cancellationToken);
 
         this._logger.LogInformation($"Refreshed user tokens.");

@@ -197,7 +197,7 @@ public class RecipesService : IRecipesService
     {
         searchString = searchString.ToLower();
         Expression<Func<Recipe, bool>> predicate = (Recipe r)
-            => !r.IsDeleted && r.IsPublic && r.CreatedById == userId;
+            => !r.IsDeleted && r.CreatedById == userId;
         if (!string.IsNullOrEmpty(searchString))
         {
             predicate = predicate.And(r => (

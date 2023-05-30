@@ -7,6 +7,7 @@ using RecipesManagerApi.Domain.Entities;
 using Image = RecipesManagerApi.Domain.Entities.Image;
 using System.Security.Cryptography;
 using RecipesManagerApi.Domain.Enums;
+using RecipesManagerApi.Application.GlodalInstances;
 
 namespace RecipesManagerApi.Infrastructure.Services
 {
@@ -50,51 +51,40 @@ namespace RecipesManagerApi.Infrastructure.Services
                     Extension = imageExtension,
                     Md5Hash = md5Hash,
                     ImageUploadState = ImageUploadStates.Started,
-                    //must be changed to User Id
-                    CreatedById = new ObjectId(),
+                    CreatedById = GlobalUser.Id ?? ObjectId.Empty,
                     CreatedDateUtc = DateTime.UtcNow
                 };
                 await _repository.AddAsync(imageModel, cancellationToken);
                 recipe.Thumbnail = imageModel;
-                await _recipesRepository.UpdateRecipeAsync(recipe, cancellationToken);
+                await _recipesRepository.UpdateRecipeThumbnailAsync(recipeId, recipe, cancellationToken);
 
-                Task.Run(async () => { 
-                    var result = await UploadImageAsync(imageModel.OriginalPhotoGuid, image, imageModel, cancellationToken);
-                    recipe.Thumbnail = result;
-                    await _recipesRepository.UpdateRecipeAsync(recipe, cancellationToken);
-                });
-                Task.Run(async () => { 
-                    var result = await ResizeAndUploadImageAsync(imageModel.SmallPhotoGuid, 600, image, imageModel, cancellationToken);
-                    recipe.Thumbnail = result;
-                    await _recipesRepository.UpdateRecipeAsync(recipe, cancellationToken);
-                });
+                try
+                {
+                    await Task.WhenAll(
+                        _cloudStorageService.UploadFileAsync(image, imageModel.OriginalPhotoGuid, imageModel.Extension, cancellationToken),
+                        ResizeAndUploadImageAsync(imageModel.SmallPhotoGuid, 600, image, imageModel, cancellationToken)
+                    );
+                    
+                    imageModel.ImageUploadState = ImageUploadStates.Uploaded;
+                }
+                catch (Exception ex)
+                {
+                    imageModel.ImageUploadState = ImageUploadStates.Failed;
+                    throw ex;
+                }
+                
+                await _repository.UpdateAsync(imageModel, cancellationToken);
+                await _recipesRepository.UpdateRecipeThumbnailAsync(recipeId, recipe, cancellationToken);
             } else {
                 recipe.Thumbnail = imageFromDb;
-                await _recipesRepository.UpdateRecipeAsync(recipe, cancellationToken);
+                await _recipesRepository.UpdateRecipeThumbnailAsync(recipeId, recipe, cancellationToken);
             }
         }
 
-        private async Task<Image> UploadImageAsync(Guid guid, byte[] image, Image imageModel, CancellationToken cancellationToken)
-        {
-            try
-            {
-                await _cloudStorageService.UploadFileAsync(image, guid, imageModel.Extension, cancellationToken);
-                imageModel.ImageUploadState = ImageUploadStates.Uploaded;
-            }
-            catch (Exception ex)
-            {
-                imageModel.ImageUploadState = ImageUploadStates.Failed;
-                throw ex;
-            }
-
-            await _repository.UpdateAsync(imageModel, cancellationToken);
-            return imageModel;
-        }
-
-        private async Task<Image> ResizeAndUploadImageAsync(Guid guid, int width, byte[] image, Image imageModel, CancellationToken cancellationToken)
+        private async Task ResizeAndUploadImageAsync(Guid guid, int width, byte[] image, Image imageModel, CancellationToken cancellationToken)
         {
             var resizedImage = this.ResizeImage(image, width);
-            return await this.UploadImageAsync(guid, resizedImage, imageModel, cancellationToken);
+            await _cloudStorageService.UploadFileAsync(resizedImage, guid, imageModel.Extension, cancellationToken);
         }
 
         private byte[] ResizeImage(byte[] imageBytes, int width)

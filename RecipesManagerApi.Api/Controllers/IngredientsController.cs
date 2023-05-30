@@ -1,14 +1,15 @@
-using System.Text;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
 using RecipesManagerApi.Api.Models;
 using RecipesManagerApi.Application.IServices;
+using RecipesManagerApi.Application.Models.Dtos;
 
 namespace RecipesManagerApi.Api.Controllers;
 
-[Route("ingredients")]
-public class IngredientsController : Controller
+[Authorize]
+public class IngredientsController : ApiController
 {
     private readonly IIngredientsService _ingredientsService;
 
@@ -18,22 +19,36 @@ public class IngredientsController : Controller
     }
 
     [HttpPost("parse")]
-    public async Task ParseingredientsAsync([FromBody] IngredientsParseInput input, CancellationToken cancellationToken) {
+    public async Task ParseIngredientsAsync([FromBody] IngredientsParseInput input, CancellationToken cancellationToken) {
         Response.Headers.Add("Content-Type", "text/event-stream");
         Response.Headers.Add("Cache-Control", "no-cache");
         Response.Headers.Add("Connection", "keep-alive");
+        await Response.Body.FlushAsync(cancellationToken);
 
         var ingredients = _ingredientsService.ParseIngredientsAsync(input.Text, cancellationToken);
-        var writer = new HttpResponseStreamWriter(Response.Body, Encoding.UTF8);
 
         await foreach (var ingredient in ingredients)
         {
             var chunk = JsonConvert.SerializeObject(ingredient);
-            var hexadecimalLength = Encoding.UTF8.GetByteCount(chunk).ToString("X");
-            await writer.WriteAsync($"{hexadecimalLength}\r\n{chunk}\r\n");
-            await writer.FlushAsync();
+            await Response.WriteAsync($"data: {chunk}\n\n", cancellationToken);
+            await Response.Body.FlushAsync(cancellationToken);
         }
-        await writer.WriteAsync("0\r\n\r\n");
-        await writer.FlushAsync();
+    }
+
+    [HttpPost("estimate-calories")]
+    public async Task EstimateCaloriesAsync([FromBody] List<IngredientDto> ingredientsDtos, CancellationToken cancellationToken) {
+        Response.Headers.Add("Content-Type", "text/event-stream");
+        Response.Headers.Add("Cache-Control", "no-cache");
+        Response.Headers.Add("Connection", "keep-alive");
+        await Response.Body.FlushAsync(cancellationToken);
+
+        var ingredients = _ingredientsService.EstimateIngredientsCaloriesAsync(ingredientsDtos, cancellationToken);
+        
+        await foreach (var ingredient in ingredients)
+        {
+            var chunk = JsonConvert.SerializeObject(ingredient);
+            await Response.WriteAsync($"data: {chunk}\n\n", cancellationToken);
+            await Response.Body.FlushAsync(cancellationToken);
+        }
     }
 }

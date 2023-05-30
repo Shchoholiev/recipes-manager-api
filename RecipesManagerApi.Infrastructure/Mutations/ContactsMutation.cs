@@ -1,6 +1,7 @@
 using RecipesManagerApi.Application.IServices;
-using RecipesManagerApi.Application.Models;
+using RecipesManagerApi.Application.Models.Dtos;
 using RecipesManagerApi.Application.Models.CreateDtos;
+using RecipesManagerApi.Application.Models.Operations;
 
 namespace RecipesManagerApi.Infrastructure.Mutations;
 
@@ -11,12 +12,12 @@ public class ContactsMutation
         [Service] IContactsService service)
         => service.AddContactAsync(contact, cancellationToken);
 
-    public Task<ContactDto> UpdateContactAsync(ContactDto contact, CancellationToken cancellationToken,
+    public Task<ContactDto> UpdateContactAsync(string id, ContactCreateDto contact, CancellationToken cancellationToken,
         [Service] IContactsService service)
-        => service.UpdateContactAsync(contact, cancellationToken);
+        => service.UpdateContactAsync(id, contact, cancellationToken);
 
-    public Task DeleteContactAsync(ContactDto contact, CancellationToken cancellationToken,
+    public Task<OperationDetails> DeleteContactAsync(string id, CancellationToken cancellationToken,
         [Service] IContactsService service)
-        => service.DeleteContactAsync(contact, cancellationToken);
+        => service.DeleteContactAsync(id, cancellationToken);
     
 }

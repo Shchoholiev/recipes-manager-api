@@ -1,10 +1,13 @@
 using System.Text;
+using Azure.AI.OpenAI;
+using Microsoft.Extensions.Configuration;
 using MongoDB.Bson;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using RecipesManagerApi.Application.GlodalInstances;
 using RecipesManagerApi.Application.IRepositories;
 using RecipesManagerApi.Application.IServices;
+using RecipesManagerApi.Application.Models.Dtos;
 using RecipesManagerApi.Application.Models.OpenAi;
 using RecipesManagerApi.Domain.Entities;
 
@@ -24,10 +27,21 @@ public class OpenAiService : IOpenAiService
 
     private readonly IOpenAiLogsRepository _openAiLogsRepository;
 
-    public OpenAiService(IHttpClientFactory httpClientFactory, IOpenAiLogsRepository openAiLogsRepository)
+    private readonly IOpenAiLogsService _openAiLogsService;
+
+    private readonly IConfiguration _configuration;
+
+    private readonly OpenAIClient _openAIClient;
+
+    public OpenAiService(IHttpClientFactory httpClientFactory, IOpenAiLogsRepository openAiLogsRepository, IOpenAiLogsService openAiLogsService, IConfiguration configuration)
     {
         _httpClient = httpClientFactory.CreateClient("OpenAiHttpClient");
         _openAiLogsRepository = openAiLogsRepository;
+        _openAiLogsService = openAiLogsService;
+        _configuration = configuration;
+
+	    var openAiApiKey = _configuration.GetSection("OpenAi")?.GetValue<string>("ApiKey");
+        _openAIClient = new OpenAIClient(openAiApiKey, new OpenAIClientOptions());
     }
 
     public async Task<OpenAiResponse?> GetChatCompletion(ChatCompletionRequest chat, CancellationToken cancellationToken)
@@ -36,66 +50,59 @@ public class OpenAiService : IOpenAiService
         var jsonBody = JsonConvert.SerializeObject(chat, _jsonSettings);
         var body = new StringContent(jsonBody, Encoding.UTF8, "application/json");
 
-        var log = await _openAiLogsRepository.AddAsync(new OpenAiLog {
+        var log = await _openAiLogsService.AddLogAsync(new OpenAiLogDto {
             Request = jsonBody,
             Response = null,
             CreatedDateUtc = DateTime.UtcNow,
-            CreatedById = GlobalUser.Id ?? ObjectId.Empty,
+            CreatedById = GlobalUser.Id.ToString() ?? ObjectId.Empty.ToString(),
         }, cancellationToken);
 
         var httpResponse = await _httpClient.PostAsync("chat/completions", body, cancellationToken);
         var responseBody = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
         log.Response = responseBody;
-        Task.Run(() => _openAiLogsRepository.UpdateAsync(log, cancellationToken));
+        Task.Run(async () => _openAiLogsService.UpdateLogAsync(log, cancellationToken));
     
         var response = JsonConvert.DeserializeObject<OpenAiResponse>(responseBody, _jsonSettings);
 
         return response;
     }
 
-    public async IAsyncEnumerable<OpenAiResponse> GetChatCompletionStream(ChatCompletionRequest chat, CancellationToken cancellationToken)
+    public async IAsyncEnumerable<OpenAiResponse> GetChatCompletionStream(ChatCompletionsOptions chat, CancellationToken cancellationToken)
     {
-        chat.Stream = true;
         var jsonBody = JsonConvert.SerializeObject(chat, _jsonSettings);
         var body = new StringContent(jsonBody, Encoding.UTF8, "application/json");
-
-        var log = await _openAiLogsRepository.AddAsync(new OpenAiLog {
+        Console.WriteLine(jsonBody);
+        var log = await _openAiLogsService.AddLogAsync(new OpenAiLogDto {
             Request = jsonBody,
             Response = null,
             CreatedDateUtc = DateTime.UtcNow,
-            CreatedById = GlobalUser.Id ?? ObjectId.Empty,
+            CreatedById = GlobalUser.Id.ToString() ?? ObjectId.Empty.ToString(),
         }, cancellationToken);
 
-        var httpResponse = await _httpClient.PostAsync("chat/completions", body, cancellationToken);
-        var stream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
-
         var allData = string.Empty;
-        var lastIndex = 0;
 
-        var buffer = new byte[256];
-		var bytesRead = 0;
-		while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
-		{
-			var chunk = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-            allData += chunk;
+        var response = await _openAIClient.GetChatCompletionsStreamingAsync(
+            deploymentOrModelName: "gpt-3.5-turbo",
+            chat,
+            cancellationToken);
+        using StreamingChatCompletions streamingChatCompletions = response.Value;
 
-            var endIndex = allData.IndexOf("\n\n", lastIndex);
-            while (endIndex > -1)
+        await foreach (var choice in streamingChatCompletions.GetChoicesStreaming(cancellationToken))
+        {
+            await foreach (var message in choice.GetMessageStreaming(cancellationToken))
             {
-                var json = allData.Substring(lastIndex + 6, endIndex - lastIndex - 6);
-                if (json == "[DONE]") {
-                    endIndex = -1;
-                    continue;
+                allData += JsonConvert.SerializeObject(message)+ "\n\n";;
+                if (message.Content == null) {
+                    log.Response = allData;
+                    Task.Run(() => _openAiLogsService.UpdateLogAsync(log, cancellationToken));
                 }
-                var openAiResponse = JsonConvert.DeserializeObject<OpenAiResponse>(json, _jsonSettings);
+
+                var openAiResponse = new OpenAiResponse {
+                    Choices = new List<OpenAiChoice> { new OpenAiChoice { Delta = new OpenAiDelta { Content = message.Content } }}
+                };
+
                 yield return openAiResponse;
-
-                lastIndex = endIndex + 2;
-                endIndex = allData.IndexOf("\n\n", lastIndex);
             }
-		}
-
-        log.Response = allData;
-        Task.Run(() => _openAiLogsRepository.UpdateAsync(log, cancellationToken));
+        }
     }
 }

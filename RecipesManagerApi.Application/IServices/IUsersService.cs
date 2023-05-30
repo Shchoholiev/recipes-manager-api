@@ -1,5 +1,5 @@
 ﻿using MongoDB.Bson;
-using RecipesManagerApi.Application.Models;
+using RecipesManagerApi.Application.Models.Dtos;
 using RecipesManagerApi.Application.Paging;
 
 namespace RecipesManagerApi.Application.IServices;
@@ -11,5 +11,5 @@ public interface IUsersService
 
     Task<UserDto> GetUserAsync(string id, CancellationToken cancellationToken);
 
-    Task UpdateUserAsync (UserDto dto, CancellationToken cancellationToken);
+    Task UpdateUserAsync(UserDto dto, CancellationToken cancellationToken);
 }

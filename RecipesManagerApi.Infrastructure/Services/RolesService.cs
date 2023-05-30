@@ -3,7 +3,8 @@ using MongoDB.Bson;
 using RecipesManagerApi.Application.Exceptions;
 using RecipesManagerApi.Application.IRepositories;
 using RecipesManagerApi.Application.IServices;
-using RecipesManagerApi.Application.Models;
+using RecipesManagerApi.Application.Models.CreateDtos;
+using RecipesManagerApi.Application.Models.Dtos;
 using RecipesManagerApi.Application.Paging;
 using RecipesManagerApi.Domain.Entities;
 
@@ -20,10 +21,11 @@ public class RolesService : IRolesService
         this._mapper = mapper;
     }
 
-    public async Task AddRoleAsync(RoleDto dto, CancellationToken cancellationToken)
+    public async Task<RoleDto> AddRoleAsync(RoleCreateDto dto, CancellationToken cancellationToken)
     {
         var entity = this._mapper.Map<Role>(dto);
         await this._repository.AddAsync(entity, cancellationToken);
+        return this._mapper.Map<RoleDto>(entity);
     }
 
     public async Task<PagedList<RoleDto>> GetRolesPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)

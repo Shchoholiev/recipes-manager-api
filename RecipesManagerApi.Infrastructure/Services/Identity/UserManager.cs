@@ -1,15 +1,16 @@
-using Amazon.SecurityToken.Model;
 using AutoMapper;
-using DnsClient;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using MongoDB.Bson;
 using RecipesManagerApi.Application.Exceptions;
+using RecipesManagerApi.Application.GlodalInstances;
 using RecipesManagerApi.Application.Interfaces.Identity;
 using RecipesManagerApi.Application.IRepositories;
 using RecipesManagerApi.Application.IServices.Identity;
-using RecipesManagerApi.Application.Models;
+using RecipesManagerApi.Application.Models.Dtos;
 using RecipesManagerApi.Application.Models.Identity;
+using RecipesManagerApi.Application.Models.Operations;
 using RecipesManagerApi.Domain.Entities;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 
@@ -42,7 +43,10 @@ public class UserManager : IUserManager
 
     public async Task<TokensModel> LoginAsync(LoginModel login, CancellationToken cancellationToken)
     {
-        var user = await this._usersRepository.GetUserAsync(x => x.Email == login.Email, cancellationToken);
+        var user = login.Email != null 
+            ? await this._usersRepository.GetUserAsync(x => x.Email == login.Email, cancellationToken) 
+            : await this._usersRepository.GetUserAsync(x => x.Phone == login.Phone, cancellationToken);
+  
         if (user == null)
         {
             throw new EntityNotFoundException<User>();
@@ -54,6 +58,7 @@ public class UserManager : IUserManager
         }
 
         user.RefreshToken = this.GetRefreshToken();
+        user.RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(30);
         await this._usersRepository.UpdateUserAsync(user, cancellationToken);
         var tokens = this.GetUserTokens(user);
 
@@ -65,29 +70,43 @@ public class UserManager : IUserManager
     public async Task<TokensModel> RegisterAsync(RegisterModel register, CancellationToken cancellationToken)
     {
         ValidatePassword(register.Password);
-        ValidateEmail(register.Email);
+        if(register.Email != null) ValidateEmail(register.Email);
+        if(register.Phone != null) ValidateNumber(register.Phone);
 
-        if (await this._usersRepository.ExistsAsync(u => u.Email == register.Email, cancellationToken))
+        if (register.Email != null)
         {
-            throw new EntityAlreadyExistsException<User>("user email", register.Email);
+            if (await this._usersRepository.ExistsAsync(u => u.Email == register.Email, cancellationToken))
+            {
+                throw new EntityAlreadyExistsException<User>("user email", register.Email);
+            }
+        }
+        else
+        {
+            if (await this._usersRepository.ExistsAsync(u => u.Phone == register.Phone, cancellationToken))
+            {
+                throw new EntityAlreadyExistsException<User>("user phone number", register.Phone);
+            }
         }
 
-        var role = await this._rolesRepository.GetRoleAsync(r => r.Name == "User", cancellationToken);
+        var roleUser = await this._rolesRepository.GetRoleAsync(r => r.Name == "User", cancellationToken);
+        var roleGuest = await this._rolesRepository.GetRoleAsync(r => r.Name == "Guest", cancellationToken);
 
         var user = new User
         {
             Name = register.Name,
             Email = register.Email,
-            Roles = new List<Role> { role },
+            Phone = register.Phone,
+            Roles = new List<Role> { roleUser, roleGuest },
             PasswordHash = this._passwordHasher.Hash(register.Password),
             RefreshToken = this.GetRefreshToken(),
-            RefreshTokenExpiryDate = DateTime.Now.AddDays(7),
+            RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(30),
+            CreatedDateUtc = DateTime.UtcNow
         };
 
         await this._usersRepository.AddAsync(user, cancellationToken);
         var tokens = this.GetUserTokens(user);
 
-        this._logger.LogInformation($"Created user with email: {user.Email}.");
+        this._logger.LogInformation($"Created user with email: {user.Email} and phone: {user.Phone}.");
 
         return tokens;
     }
@@ -100,7 +119,7 @@ public class UserManager : IUserManager
         {
             user.RefreshToken = this.GetRefreshToken();
             await this._usersRepository.UpdateUserAsync(user, cancellationToken);
-            var userTokens = this.GetWebGuestTokens(user);
+            var userTokens = this.GetUserTokens(user);
 
             this._logger.LogInformation($"Logged in web guest with web id: {register.WebId}.");
 
@@ -115,11 +134,12 @@ public class UserManager : IUserManager
             Name = "Guest",
             Roles = new List<Role> { role },
             RefreshToken = this.GetRefreshToken(),
-            RefreshTokenExpiryDate = DateTime.Now.AddDays(7),
+            RefreshTokenExpiryDate = DateTime.Now.AddDays(30),
+            CreatedDateUtc = DateTime.UtcNow
         };
 
         await this._usersRepository.AddAsync(newUser, cancellationToken);
-        var tokens = this.GetWebGuestTokens(newUser);
+        var tokens = this.GetUserTokens(newUser);
 
         this._logger.LogInformation($"Created web guest with web id: {newUser.WebId}.");
 
@@ -134,7 +154,7 @@ public class UserManager : IUserManager
 
             user.RefreshToken = this.GetRefreshToken();
             await this._usersRepository.UpdateUserAsync(user, cancellationToken);
-            var userTokens = this.GetWebGuestTokens(user);
+            var userTokens = this.GetUserTokens(user);
 
             this._logger.LogInformation($"Logged in apple guest with device id: {register.AppleDeviceId}.");
 
@@ -149,18 +169,19 @@ public class UserManager : IUserManager
             Name = register.Name,
             Roles = new List<Role> { role },
             RefreshToken = this.GetRefreshToken(),
-            RefreshTokenExpiryDate = DateTime.Now.AddDays(7),
+            RefreshTokenExpiryDate = DateTime.Now.AddDays(30),
+            CreatedDateUtc = DateTime.UtcNow
         };
 
         await this._usersRepository.AddAsync(newUser, cancellationToken);
-        var tokens = this.GetAppleGuestTokens(newUser);
+        var tokens = this.GetUserTokens(newUser);
 
         this._logger.LogInformation($"Created apple guest with apple device id: {newUser.AppleDeviceId}.");
 
         return tokens;
     }
 
-    public async Task<TokensModel> AddToRoleAsync(string roleName, string email, CancellationToken cancellationToken)
+    public async Task<TokensModel> AddToRoleAsync(string roleName, string id, CancellationToken cancellationToken)
     {
         var role = await this._rolesRepository.GetRoleAsync(r => r.Name == roleName, cancellationToken);
         if (role == null)
@@ -168,7 +189,12 @@ public class UserManager : IUserManager
             throw new EntityNotFoundException<Role>();
         }
 
-        var user = await this._usersRepository.GetUserAsync(x => x.Email == email, cancellationToken);
+        if (!ObjectId.TryParse(id, out var objectId))
+        {
+            throw new InvalidDataException("Provided id is invalid.");
+        }
+
+        var user = await this._usersRepository.GetUserAsync(objectId, cancellationToken); 
         if (user == null)
         {
             throw new EntityNotFoundException<User>();
@@ -178,12 +204,12 @@ public class UserManager : IUserManager
         await this._usersRepository.UpdateUserAsync(user, cancellationToken);
         var tokens = this.GetUserTokens(user);
 
-        this._logger.LogInformation($"Added role {roleName} to user with email: {email}.");
+        this._logger.LogInformation($"Added role {roleName} to user with id: {id}.");
 
         return tokens;
     }
 
-    public async Task<TokensModel> RemoveFromRoleAsync(string roleName, string email, CancellationToken cancellationToken)
+    public async Task<TokensModel> RemoveFromRoleAsync(string roleName, string id, CancellationToken cancellationToken)
     {
         var role = await this._rolesRepository.GetRoleAsync(r => r.Name == roleName, cancellationToken);
         if (role == null)
@@ -191,7 +217,12 @@ public class UserManager : IUserManager
             throw new EntityNotFoundException<Role>();
         }
 
-        var user = await this._usersRepository.GetUserAsync(x => x.Email == email, cancellationToken);
+        if (!ObjectId.TryParse(id, out var objectId))
+        {
+            throw new InvalidDataException("Provided id is invalid.");
+        }
+
+        var user = await this._usersRepository.GetUserAsync(objectId, cancellationToken);
         if (user == null)
         {
             throw new EntityNotFoundException<User>();
@@ -203,33 +234,84 @@ public class UserManager : IUserManager
         await this._usersRepository.UpdateUserAsync(user, cancellationToken);
         var tokens = this.GetUserTokens(user);
 
-        this._logger.LogInformation($"Added role {roleName} to user with email: {email}.");
+        this._logger.LogInformation($"Added role {roleName} to user with id: {id}.");
 
         return tokens;
     }
 
-    public async Task<TokensModel> UpdateAsync(string email, UserDto userDto, CancellationToken cancellationToken)
-    {
-        var user = await this._usersRepository.GetUserAsync(x => x.Email == email, cancellationToken);
+    public async Task<UpdateUserModel> UpdateAsync(UserDto userDto, CancellationToken cancellationToken)
+    {        
+        if(userDto.Roles.Any(x => x.Name == "Guest") && !userDto.Roles.Any(x => x.Name == "User"))
+        {
+            if(userDto.Password != null && (userDto.Email != null || userDto.Phone != null))
+            {
+                var roleEntity = await this._rolesRepository.GetRoleAsync(x => x.Name == "User", cancellationToken);
+                var roleDto = this._mapper.Map<RoleDto>(roleEntity);
+                userDto.Roles.Add(roleDto);
+            }
+        }
+
+        var user = await this._usersRepository.GetUserAsync(x => x.Id == GlobalUser.Id, cancellationToken);
+
         if (user == null)
         {
             throw new EntityNotFoundException<User>();
         }
 
-        if (email != userDto.Email
-            && await this._usersRepository.GetUserAsync(x => x.Email == userDto.Email, cancellationToken) != null)
+        if (userDto.Roles.Any(x => x.Name == "User") && userDto.Email != null)
         {
-            throw new EntityAlreadyExistsException<User>("email", userDto.Email);
+            if (await this._usersRepository.GetUserAsync(x => x.Email == userDto.Email, cancellationToken) != null)
+            {
+                throw new EntityAlreadyExistsException<User>("email", userDto.Email);
+            }
+        }
+        if (userDto.Roles.Any(x => x.Name == "User") && userDto.Phone != null)
+        {
+            if (await this._usersRepository.GetUserAsync(x => x.Phone == userDto.Phone, cancellationToken) != null)
+            {
+                throw new EntityAlreadyExistsException<User>("phone", userDto.Phone);
+            }
         }
 
         this._mapper.Map(userDto, user);
+        if (!userDto.Password.IsNullOrEmpty())
+        {
+            user.PasswordHash = this._passwordHasher.Hash(userDto.Password);
+        }
         user.RefreshToken = this.GetRefreshToken();
         await this._usersRepository.UpdateUserAsync(user, cancellationToken);
+
         var tokens = this.GetUserTokens(user);
 
-        this._logger.LogInformation($"Update user with email: {email}.");
+        this._logger.LogInformation($"Update user with id: {GlobalUser.Id.ToString()}.");
 
-        return tokens;
+        return new UpdateUserModel() {Tokens = tokens, User = this._mapper.Map<UserDto>(user) };
+    }
+
+    public async Task<UpdateUserModel> UpdateUserByAdminAsync(string id, UserDto userDto, CancellationToken cancellationToken)
+    {
+        if (!ObjectId.TryParse(id, out var objectId))
+        {
+            throw new InvalidDataException("Provided id is invalid.");
+        }
+
+        var user = await this._usersRepository.GetUserAsync(objectId, cancellationToken);
+
+        if (user == null)
+        {
+            throw new EntityNotFoundException<User>();
+        }
+
+        this._mapper.Map(userDto, user);
+
+        user.RefreshToken = this.GetRefreshToken();
+        await this._usersRepository.UpdateUserAsync(user, cancellationToken);
+
+        var tokens = this.GetUserTokens(user);
+
+        this._logger.LogInformation($"Update user with id: {id}.");
+
+        return new UpdateUserModel() { Tokens = tokens, User = this._mapper.Map<UserDto>(user) };
     }
 
     private string GetRefreshToken()
@@ -255,41 +337,14 @@ public class UserManager : IUserManager
         };
     }
 
-    private TokensModel GetAppleGuestTokens(User user)
-    {
-        var claims = this.GetAppleGuestClaims(user);
-        var accessToken = this._tokensService.GenerateAccessToken(claims);
-
-        this._logger.LogInformation($"Returned new access and refresh tokens.");
-
-        return new TokensModel
-        {
-            AccessToken = accessToken,
-            RefreshToken = user.RefreshToken,
-        };
-    }
-
-    private TokensModel GetWebGuestTokens(User user)
-    {
-        var claims = this.GetWebGuestClaims(user);
-        var accessToken = this._tokensService.GenerateAccessToken(claims);
-
-        this._logger.LogInformation($"Returned new access and refresh tokens.");
-
-        return new TokensModel
-        {
-            AccessToken = accessToken,
-            RefreshToken = user.RefreshToken,
-        };
-    }
-
     private IEnumerable<Claim> GetClaims(User user)
     {
-        var claims = new List<Claim>
+        var claims = new List<Claim>()
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Name),
-                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Name, user.Name ?? string.Empty),
+                new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
+                new Claim(ClaimTypes.MobilePhone, user.Phone ?? string.Empty)
             };
 
         foreach (var role in user.Roles)
@@ -297,57 +352,19 @@ public class UserManager : IUserManager
             claims.Add(new Claim(ClaimTypes.Role, role.Name));
         }
 
-        this._logger.LogInformation($"Returned claims for user with email: {user.Email}.");
-
-        return claims;
-    }
-
-    private IEnumerable<Claim> GetAppleGuestClaims(User user)
-    {
-        var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Name),
-                new Claim("AppleId", user.AppleDeviceId.ToString()),
-            };
-
-        foreach (var role in user.Roles)
-        {
-            claims.Add(new Claim(ClaimTypes.Role, role.Name));
-        }
-
-        this._logger.LogInformation($"Returned claims for user with email: {user.Email}.");
-
-        return claims;
-    }
-
-    private IEnumerable<Claim> GetWebGuestClaims(User user)
-    {
-        var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Name),
-                new Claim("WebId", user.WebId.ToString()),
-            };
-
-        foreach (var role in user.Roles)
-        {
-            claims.Add(new Claim(ClaimTypes.Role, role.Name));
-        }
-
-        this._logger.LogInformation($"Returned claims for user with email: {user.Email}.");
+        this._logger.LogInformation($"Returned claims for user with id: {user.Id.ToString()}.");
 
         return claims;
     }
 
     private void ValidatePassword(string password)
     {
-        string regex = @"^(?=.*[a-zA-Z])(?=.*[\W_]).{8,}$";
+        /*string regex = @"^(?=.*[a-zA-Z])(?=.*[\W_]).{8,}$";
 
         if (!Regex.IsMatch(password, regex))
         {
             throw new InvalidPasswordException(password);
-        }
+        }*/
     }
 
     private void ValidateEmail(string email)
@@ -357,6 +374,16 @@ public class UserManager : IUserManager
         if (!Regex.IsMatch(email, regex))
         {
             throw new InvalidEmailException(email);
+        }
+    }
+
+    private void ValidateNumber(string phone)
+    {
+        string regex = @"^\+[0-9]{1,15}$";
+
+        if (!Regex.IsMatch(phone, regex))
+        {
+            throw new InvalidPhoneNumberException(phone);
         }
     }
 }

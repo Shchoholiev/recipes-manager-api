@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using MongoDB.Bson;
 using RecipesManagerApi.Application.Exceptions;
+using RecipesManagerApi.Application.GlodalInstances;
 using RecipesManagerApi.Application.IRepositories;
 using RecipesManagerApi.Application.IServices;
-using RecipesManagerApi.Application.Models;
 using RecipesManagerApi.Application.Models.CreateDtos;
+using RecipesManagerApi.Application.Models.Dtos;
 using RecipesManagerApi.Application.Paging;
 using RecipesManagerApi.Domain.Entities;
 using System.Linq.Expressions;
@@ -26,6 +27,8 @@ namespace RecipesManagerApi.Infrastructure.Services
         public async Task<CategoryDto> AddCategoryAsync(CategoryCreateDto dto, CancellationToken cancellationToken)
         {
             var entity = this._mapper.Map<Category>(dto);
+            entity.CreatedById = GlobalUser.Id.Value;
+            entity.CreatedDateUtc = DateTime.UtcNow;
             var newEntity = await this._repository.AddAsync(entity, cancellationToken);
             return this._mapper.Map<CategoryDto>(entity);
         }

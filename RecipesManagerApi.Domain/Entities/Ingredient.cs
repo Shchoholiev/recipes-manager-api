@@ -13,4 +13,6 @@ public class Ingredient
     public String? Units { get; set; }
 
     public Double? Amount { get; set; }
+
+    public int? TotalCalories { get; set; }
 }

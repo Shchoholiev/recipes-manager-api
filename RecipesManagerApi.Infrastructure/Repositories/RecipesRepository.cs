@@ -117,8 +117,31 @@ public class RecipesRepository : BaseRepository<Recipe>, IRecipesRepository
             .Lookup("Users", "CreatedById", "_id", "CreatedBy")
             .AppendStage<RecipeLookUp>("{ $addFields: { CreatedBy: { $arrayElemAt: ['$CreatedBy', 0] } } }")
             .Lookup("SavedRecipes", "_id", "RecipeId", "SavedRecipe")
-            .AppendStage<RecipeLookUp>(new BsonDocument("$match", new BsonDocument("SavedRecipe.CreatedById", userId)))
-            .AppendStage<RecipeLookUp>(new BsonDocument("$match", new BsonDocument("SavedRecipe.IsDeleted", false)))
+            .AppendStage<BsonDocument>(@"
+            { 
+                $lookup: { 
+                    from: 'SavedRecipes',
+                    localField: '_id',
+                    foreignField: 'RecipeId',
+                    as: 'SavedRecipe',
+                    pipeline: [
+                        { 
+                            $match: { 
+                                $and: [
+                                    { CreatedById: { $eq: ObjectId('" + userId.ToString() + @"') } },
+                                    { IsDeleted: false }
+                                ]
+                            } 
+                        }
+                    ]
+                }
+            }")
+            .AppendStage<BsonDocument>(@"
+            {
+                $match: {
+                    SavedRecipe: { $ne: [] } 
+                }
+            }")
             .AppendStage<RecipeLookUp>(new BsonDocument("$project", new BsonDocument("SavedRecipe", 0)))
             .AppendStage<BsonDocument>(@"
             {
@@ -196,7 +219,6 @@ public class RecipesRepository : BaseRepository<Recipe>, IRecipesRepository
                 }
             }")
             .AppendStage<RecipeLookUp>(new BsonDocument("$project", new BsonDocument("Subscription", 0)))
-
             .AppendStage<BsonDocument>(@"
             { 
                 $lookup: { 

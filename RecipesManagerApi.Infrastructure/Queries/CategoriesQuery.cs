@@ -14,6 +14,12 @@ public class CategoriesQuery
         [Service] ICategoriesService service)
         => service.GetCategoriesPageAsync(pageNumber, pageSize, cancellationToken);
 
+    [Authorize]
+    public Task<PagedList<CategoryDto>> SearchCategoriesAsync([Service] ICategoriesService service, 
+        CancellationToken cancellationToken, int pageNumber = 1, int pageSize = 10, string search = "")
+        => service.GetCategoriesPageAsync(pageNumber, pageSize, search, cancellationToken);
+
+    [Authorize]
     public Task<CategoryDto> GetCategoryAsync(string id, CancellationToken cancellationToken, 
         [Service] ICategoriesService service)
         => service.GetCategoryAsync(id, cancellationToken);

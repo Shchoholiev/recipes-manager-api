@@ -16,6 +16,8 @@ namespace RecipesManagerApi.Application.IRepositories
 		Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken);
 
 		Task<int> GetTotalCountAsync();
+
+		Task<int> GetCountAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken);
 		
 		Task<TEntity> DeleteAsync(TEntity entity, CancellationToken cancellationToken);
 	}

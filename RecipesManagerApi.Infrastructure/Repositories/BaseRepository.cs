@@ -47,6 +47,11 @@ namespace RecipesManagerApi.Infrastructure.Repositories
 			return (int)(await this._collection.EstimatedDocumentCountAsync());
 		}
 
+		public async Task<int> GetCountAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken)
+		{
+			return (int)(await this._collection.CountDocumentsAsync(predicate, cancellationToken: cancellationToken));
+		}
+
 		public async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken)
 		{
 			return await this._collection.Find(predicate).AnyAsync(cancellationToken);

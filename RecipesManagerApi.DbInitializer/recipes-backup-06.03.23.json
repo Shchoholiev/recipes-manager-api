@@ -1,0 +1,457 @@
+[
+    {
+        "Id": 53,
+        "Name": "Tai cucumber salad",
+        "Ingredients": "",
+        "Text": "Cucumber scallions peanuts \nSous: chili (chili paste?) garlic sesame oil lots of oil ",
+        "Thumbnail": "https:\/\/educationalportal.blob.core.windows.net\/recipes-photos\/8579D9FA-C6C4-4962-88B4-C949BFA6E3A3.jpg",
+        "Category": [
+            {
+                "Id": 43,
+                "Name": "salad"
+            }
+        ]
+    },
+    {
+        "Id": 62,
+        "Name": "Sabich ",
+        "Ingredients": "",
+        "Text": "Place eggs in cold oven set to 175 degrees and let bake for 8 hours \nSprinkle skinny eggplant with Swenetian salt ( some spicy salt I got at Ukrainian store) roast at 425 with olive oil\nAssemble sandwiches \nPita bread whole wheat from Indian store \nGreen cabbage massage cabbidge!\nRed cabbidge massage\nIsrael salad: cucumber tomatoes onion salt pepper olive oil\nEggplant\nEgg cut in slices\nTahini mix with spice from Ali a little plastic bag garlic parsley chives add water grind in food processor \nHummus diluted with water\nParsley green onion cilantro \n",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 47,
+                "Name": "Main Dish"
+            }
+        ]
+    },
+    {
+        "Id": 65,
+        "Name": "Korean lettuce rolls",
+        "Ingredients": "Rice made into a shape of a ball in a small cup\nCauliflower with pepper ginger garlic sesame oil and soy sous fried\nMushrooms \nZucchini \nTofu (soft from Asian store) marinated and cooked as a chunk then cut into squares \nCucumber salad ? On a Chinese grader or special slicer \nWrap rice and other ingredients in a leaf or lettuce or in a seaweed leaf",
+        "Text": "",
+        "Thumbnail": " ",
+        "Category": [
+            {
+                "Id": 47,
+                "Name": "Main Dish"
+            }
+        ]
+    },
+    {
+        "Id": 74,
+        "Name": "Waffles",
+        "Ingredients": "Flour 1 cup\nWheat flour 1\/4 cup\nBaking powder 2 teaspoon \nSalt a pinch\nSugar 2 tablespoons\nOil 2 tablespoons\nWater 1 1\/4 cup\nVanilla 2 teaspoons\n\nFlower for 1x 2x 3x\n2\/3; 1 1\/3; 2c indian flour\n1\/3; 2\/3; 1c chickpea...\n.25; .5; .75 Ukrainian wheat \n\nPancakes same 1\/4 cup corn flour some garbanzo been flour and lots more water or milk: about 1\/2 cup extra",
+        "Text": "Mix and cook",
+        "Thumbnail": "https:\/\/educationalportal.blob.core.windows.net\/recipes-photos\/B302A16D-700F-4D51-9434-2DE7B946B305.jpg",
+        "Category": [
+            {
+                "Id": 51,
+                "Name": "Breakfast"
+            }
+        ]
+    },
+    {
+        "Id": 75,
+        "Name": "Hot pot",
+        "Ingredients": "Broth\nMeat \nTofu silken but stays in shape \nMushrooms \nVegetables including Chinese cabbage \nRamen or other noodles or rice\nSouses \nSesame paste\nSesame oil\nGarlic crushed or cooked crushed garlic \nChili oil\nCilantro \nScallions ",
+        "Text": "",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 47,
+                "Name": "Main Dish"
+            }
+        ]
+    },
+    {
+        "Id": 76,
+        "Name": "White cake",
+        "Ingredients": "1 cup plain soy milk\n* 1 tablespoon apple cider vinegar\n* 1 1\/2 cups unbleached all-purpose flour\n* 1 cup white sugar\n* 1 teaspoon baking soda\n* 1 teaspoon baking powder\n* 1\/2 teaspoon salt\n* 1\/3 cup canola oil\n* 1 tablespoon lemon juice\n* 1 tablespoon vanilla extract\n* \t\n* Mix with mixer, bake at 350 for 35 min",
+        "Text": "",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 53,
+                "Name": "Baked goods "
+            }
+        ]
+    },
+    {
+        "Id": 77,
+        "Name": "miso ginger salad ",
+        "Ingredients": "Kale\nSunflower seeds\nWild rice\nCucumber \nRoasted seasoned tofu\nCooked mushrooms \nBasil\nMiso ginger dressing ",
+        "Text": "",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 43,
+                "Name": "salad"
+            }
+        ]
+    },
+    {
+        "Id": 78,
+        "Name": "marinated tofu",
+        "Ingredients": "\nAbout a table spoon of red chili paste\nLess than a tablespoon of honey \nSome sesame seed oil\nChili crunch or chili flakes\nEnough soy sauce to make it liquid\n\nOr \n\nSoy Sauce\nMiso\nGinger raw\nGarlic raw\nHoney ",
+        "Text": "",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 47,
+                "Name": "Main Dish"
+            }
+        ]
+    },
+    {
+        "Id": 79,
+        "Name": "Lemon grass and coconut tai soup",
+        "Ingredients": "\n* ¼ cup extra virgin olive oil\n\n* 1 tbsp. vegetable oil\n* 1 tbsp. minced galangal or 1\/2 tbsp dried galangal flakes\n\n* 1 lemongrass stalk, finely chopped\n* 4 cups vegetable broth\n* 1 can coconut milk\n* 3 kaffir lime leaves\n\n* , or 1 tbsp. jarred sliced kaffir lime leaves\n* 1 cup fresh baby corn, chopped\n* 1 cup shiitake caps, chopped\n* 1\/2 lb. extra firm tofu, cubed\n* 1 broccoli crown, chopped\n* juice of 1\/2 lime\n* 2-3 scallions, chopped\n* 1\/4 cup fresh cilantro, finely chopped\n",
+        "Text": "",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 54,
+                "Name": "Soup"
+            }
+        ]
+    },
+    {
+        "Id": 80,
+        "Name": "Overnight oats",
+        "Ingredients": "1 tablespoons Chia seeds, maple syrup and peanut butter \n1\/2 cup oatmeal and 1 cup milk\nMix keep in fridge overnight ",
+        "Text": "",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 51,
+                "Name": "Breakfast"
+            }
+        ]
+    },
+    {
+        "Id": 82,
+        "Name": "Pulled BBQ Jackfruit (pulled “pork” ",
+        "Ingredients": "* Fry an onion \n* 20 oz canned unripe jackfruit in brine(drained weight: 10 oz \/ 280 g)\n* Cut center parts off\n* \n* 1 teaspoon olive oil\n* 1 tablespoon tomato paste\n* 1\/4 cup water\n* 1\/4 teaspoon garlic powder\n* 1\/4 teaspoon paprika powder\n* 1\/4 teaspoon curry powder\n* 1\/2 teaspoon salt\n* Cook until liquid evaporates. Break with fork in to pieces.  \n* 1\/2 cup your favorite BBQ Sauce cook one more minute\n* Small piece of butter.\n\nIngredients for the Wrap\n* 2 homemade tortillas (half the recipe)\n* 1 cup loosely packed lamb's lettuce\n* 8 tomato slices\n* 1\/4 cup homemade Garlic Sunflower Seed Dressing",
+        "Text": "",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 47,
+                "Name": "Main Dish"
+            }
+        ]
+    },
+    {
+        "Id": 83,
+        "Name": "Lagasse Portuguese Kale Chorizo soup",
+        "Ingredients": "1 1\/2 cups finely chopped yellow onion (from 1 [10-oz.] onion)\n\n3 garlic cloves, minced\n\n2 lbs. russet potatoes, peeled and cut into 1\/2-in. cubes\n\n8 cups chicken stock\n\n3\/4 tsp. kosher salt\n\n1\/2 tsp. black pepper\n\n1\/2 tsp. crushed red pepper\n\n8 oz. smoked, cooked Spanish-style chorizo or hot smoked sausage, cut into 1\/2-in. chunks\n1 bunch (8 oz.) kale, stemmed and cut into 1\/4-in.-thick slices\n\n1\/2 cup chopped fresh cilantro\n\n1\/4 cup chopped fresh flat-leaf parsley\n\n2 Tbsp. chopped fresh mint\n\n",
+        "Text": "Heat olive oil in a large saucepan or stockpot over medium high. Add onion and garlic, and cook, stirring occasionally, until onion is translucent, about 5 minutes. Add chorizo, potatoes and chicken stock. Cover and bring to a boil. Remove lid, and stir in salt, black pepper, and crushed red pepper. Reduce heat to medium, and simmer, uncovered, until potatoes are tender, about 10 minutes.\nAdd kale and chickpeas cook , add parsley cilantro mint. ",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 54,
+                "Name": "Soup"
+            }
+        ]
+    },
+    {
+        "Id": 84,
+        "Name": " Cream of Broccoli Soup",
+        "Ingredients": "",
+        "Text": "Two potatoes \nCarrot\nCelery \nHalf a large onion\nGarlic greens\nBoil\nAdd broccoli about 5 cups uncut\nCook 7 min, cool, process in blender \nCook add very little salt white pepper paprika 3\/4 cup cashew milk, large chunk of butter",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 54,
+                "Name": "Soup"
+            }
+        ]
+    },
+    {
+        "Id": 85,
+        "Name": "Egg rolls",
+        "Ingredients": "",
+        "Text": "Fry quickly 1 onion 2 carrots ? Mushrooms add cabbage, Chinese five spice, white pepper \nWhen almost ready add soy sous, sesame oil, salt\nLet it it stand \nMix 1 spoon flour with 3 water\nWrap egg rolls \nFry ",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 56,
+                "Name": "Snacks"
+            }
+        ]
+    },
+    {
+        "Id": 86,
+        "Name": "Стеляжки",
+        "Ingredients": "Almost 2 sticks of butter melted \n1 cup vegan sour cream\nSalt \n1 1\/2 t spoon yeast feed for 5 min with some water and sugar and’s \nTablespoon of flax seed \nAdd flour until soft dough as vareniki dough. Wait for it to raise\nDivide in 2. Roll each out and cut each into 16 “pizza slices” .\nPlace prune or another fruit on wide end and roll up.\nRoll in sugar",
+        "Text": "Bake 350 ",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 53,
+                "Name": "Baked goods "
+            }
+        ]
+    },
+    {
+        "Id": 87,
+        "Name": "Falafel",
+        "Ingredients": "Package of dry chickpeas: 2 cups soak overnight or 16 h in water cover with 2-3 inches. Drain\nOnion garlic \n* 1 lb dry chickpeas\/garbanzo beans - you must start with dry, do NOT substitute canned, they will not work!\n* 1 small onion, roughly chopped\n* 1\/4 cup chopped fresh parsley\n* 3-5 cloves garlic \n- [ ] 1 1\/2 tbsp flour or chickpea flour\n* 1 3\/4 tsp salt\n* 2 tsp cumin\n* 1 tsp ground coriander\n* 1\/4 tsp black pepper\n* 1\/4 tsp cayenne pepper\n* Pinch of ground cardamom\n\n“Japanese version\nMushrooms \nOnions, I had some cilantro \nTwo heaping tablespoons miso\nTwo tablespoons nutritional yeast \nCumin\nChili powder \nBlack pepper ",
+        "Text": "",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 56,
+                "Name": "Snacks"
+            }
+        ]
+    },
+    {
+        "Id": 88,
+        "Name": "caviar from frozen ",
+        "Ingredients": "Defrost caviar, place it in hot water with two tablespoons of salt so you hand can’t truly stay in it. 50-60 C  After a bit replace with another batch of salted water. Gently by hand separate caviar from film. Rinse with another batch of salted water. Hang to dry in cloth bag.\nI did keep it longer in salted water for one of the batches and I think I came out too salty. Add tablespoon of oil.",
+        "Text": "This method is better for removing skins from frozen caviar vs cold method in my opinion because hot water makes film coagulate. ",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 56,
+                "Name": "Snacks"
+            }
+        ]
+    },
+    {
+        "Id": 89,
+        "Name": "carrot cake ",
+        "Ingredients": "",
+        "Text": "* 2¼ cups (256g) flour (I use half spelt, half all purpose flour)\n* 3 teaspoons baking powder (*see note below)\n* 1 teaspoon baking soda\n* 3 teaspoons cinnamon\n* ½ teaspoon nutmeg\n* 1 teaspoon salt\n* ½ cup (125g) applesauce\n* 1 cup original Almond Breeze Almond Milk\n* 2 teaspoons vanilla\n* 1 cup cane sugar\n* ½ cup (melted) coconut or canola oil\n* 2 cups (240g) grated carrots, medium-packed\n1\/2 cup nuts 1\/2 cup raisins. Was great \nI made cake with mostly whole wheat flour and I could taste it first day but by second day I could not. Cake was not as moist as I wish. Try 3 cups of carrots.\nFrosting 2\/3 coconut cream 1\/3 butter, non alcoholic whiskey \nfrosting:\n* ½ cup (58g) raw macadamia nuts (soaked, drained and rinsed)*\n* ½ (68g) cup raw cashews (soaked, drained and rinsed)*\n* ¼ cup almond milk\n* ¼ cup maple syrup\n* 2 tablespoons coconut oil\n* 1 teaspoon vanilla\n* 2 teaspoons fresh lemon juice\n* ½ teaspoon salt\n\nInstructions\n1. Preheat the oven to 350°F and grease a 9x13 baking pan.\n2. In a large bowl, whisk together the flour, baking powder, baking soda, cinnamon, nutmeg and salt.\n3. In a separate bowl, whisk together the applesauce, almond milk, vanilla, sugar and oil.\n4. Mix the dry ingredients into the bowl with the wet ingredients.\n5. Fold in the carrots and stir until just combined.\n6. Bake for 30 to 40 minutes or until a toothpick inserted comes out clean. Let cake cool completely before frosting.\n7. Make the frosting: combine all frosting ingredients into a high speed blender. Blend until very smooth for 1 to 2 minutes or more, scraping down the sides occasionally. You can add an extra tablespoon of almond milk if necessary to get your blade moving.\n8. Chill for at least 30 minutes before spreading. (It will firm up a bit).\n9. Store frosted cake in the fridge.",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 53,
+                "Name": "Baked goods "
+            }
+        ]
+    },
+    {
+        "Id": 92,
+        "Name": "corned beef and cabbage ",
+        "Ingredients": "I microwaves corned beef 5+4 minutes while boiling water in teapot \nCook 1 h \nAdd potatoes and carrots boil 10 min \nSpices bay lives mustard red pepper black paper salt \nadd cabbage in large chunks boil 20 min. ",
+        "Text": "",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 47,
+                "Name": "Main Dish"
+            }
+        ]
+    },
+    {
+        "Id": 93,
+        "Name": "Halushki ",
+        "Ingredients": "I used 3 eggs and 2 cups buttermilk it turned out too stif. Either flour was wrong or too much eggs, or too much flour but if it has to have shape it should have enough flour. ",
+        "Text": "",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 47,
+                "Name": "Main Dish"
+            }
+        ]
+    },
+    {
+        "Id": 94,
+        "Name": "Жаворонки ",
+        "Ingredients": "для теста\nвода - 500 мл,\nдрожжи свежие - 30 г,\nсахар - 0,5-0,75 стакана,\nванильный сахар - 1 чайная ложка,\nсоль - 1 чайная ложка,\nрастительное масло - 0,5 стакана,\nFlax seeds found about 2 tablespoons \nмука - 6-8 стаканов\nизюм для украшения,\nрастительное масло или сладкий чай для смазывания",
+        "Text": "After it rises decide into 40 pieces and farm into birds, cut feathers and tails\nPlace small berries for eyes \nBrush with Hosin (Asian sous) sous mixed with tea. Bake about 15 min 350",
+        "Thumbnail": "https:\/\/educationalportal.blob.core.windows.net\/recipes-photos\/53D07BBB-9EB6-47B0-9739-D28684E23A05.jpg",
+        "Category": [
+            {
+                "Id": 53,
+                "Name": "Baked goods "
+            }
+        ]
+    },
+    {
+        "Id": 95,
+        "Name": "Sushi",
+        "Ingredients": "Sushi\n\n* 2\/3 cup uncooked short-grain white rice rinse add 1 1\/3 cup water. 3 tablespoons rice vinegar 3 tablespoons white sugar 1 1\/2 teaspoons salt\n* 4 sheets nori seaweed sheets \n* 1\/2 cucumber, peeled, cut into small strips \n* 2 tablespoons pickled ginger \n* 1 avocado (we used cucumber and  fry small onion ginger pour over 1\/2  cup carrot, pour soy sous and tablespoon of rice vinegar)\n* \n* 11\/2020\n* 1 1\/2 cup sushi rice 2 cups water \n* 1\/4 cup rice vinegar \n* 3 teaspoons sugar\n* Salt ",
+        "Text": "",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 56,
+                "Name": "Snacks"
+            }
+        ]
+    },
+    {
+        "Id": 96,
+        "Name": "Chocolate Cake",
+        "Ingredients": "Chocolate Cake\n\n▢ 1 cup unsweetened almond milk\n▢ 1 tablespoon apple cider vinegar\n▢ 2 cups all purpose flour\n▢ 1 3\/4 cups granulated sugar\n▢ 3\/4 cup cocoa powder\n▢ 2 teaspoons baking powder\n▢ 1 1\/2 teaspoons baking soda\n▢ 1 teaspoon salt\n▢ 1\/2 cup canola oil OR melted coconut oil\n▢ 2\/3 cup unsweetened applesauce\n▢ 1 tablespoon pure vanilla extract\n▢ 1 cup boiling water\nMacha frosting \n2 packets of Mach ? 2 heaping teaspoons \n30 g liquor \n30g milk\n1 stick butter \nMaybe 3 cups powdered sugar \n\nChocolate Buttercream Frosting\n\n▢ 1 cup cocoa powder\n▢ 1 1\/2 cups earth balance vegan butter, softened baking sticks preferred\n▢ 4-5 cups powdered sugar\n▢ 2 teaspoons pure vanilla extract\n▢ 1\/4-1\/2 cup unsweetened almond milk",
+        "Text": "Preheat oven to 350 degrees F and grease two 9-inch cake pans. I also line them with parchment rounds and lightly flour for easy removal of the cakes later.\nMeasure 1 cup unsweetened almond milk and add the tablespoon of vinegar to it. Stir slightly and set aside to curdle.\nIn a large bowl, add the flour, sugar, cocoa powder, baking powder, baking soda and salt. Whisk well to combine.\nNow add the oil, applesauce, vanilla and almond milk\/vinegar mixture. Mix on medium speed with a hand mixer (or stand mixer with the paddle attachment) until well combined. \nLower the speed and carefully pour in the boiling water, continuing to mix into the cake batter until combined. The batter will seem very runny at this point; that is how it should be, trust me!\nDivide the batter evenly between your cake pans. Bake for 30-35 minutes, or until a toothpick inserted in the center comes out clean.",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 53,
+                "Name": "Baked goods "
+            }
+        ]
+    },
+    {
+        "Id": 97,
+        "Name": "Soondubu Korean silken tofu soup ",
+        "Ingredients": "",
+        "Text": "Fry onion or white part of scallions with heaping scoop spoon of Korean chili paste or cut up chili until onions tender \nAdd a medium zucchini or two small ones  cut in small pieces, fry add 2 garlic cloves shreds, a tablespoon of the soy sous, teaspoon tamari and tiny bit wostchester add broth. \n1\/2 pot I think 2 liter soup pot of vegetable broth. Add 4 squares of kelp cook for few min remove kelp. After transfer some broth to the frying pen, cook. Transfer to pot add a package of silken tofu, add salt, cook 3-5 min add greens of scallions cook ",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 54,
+                "Name": "Soup"
+            }
+        ]
+    },
+    {
+        "Id": 98,
+        "Name": "poki bowl",
+        "Ingredients": "",
+        "Text": "Prepare sushi rice\nTop \ncucumber \nGraded carrot\nCabbage\nSteamed asparagus\nTofu or tuna fried with Korean hot oil \nDressing Siracha mayonnaise or mayonnaise mixed with Korean chili paste and some milk to dilute \nSesame seeds\nScallions",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 47,
+                "Name": "Main Dish"
+            }
+        ]
+    },
+    {
+        "Id": 99,
+        "Name": "Галушки веганьськи",
+        "Ingredients": "Soy milk add vinegar flax seed meal and let sit \nDo not do gluten free!",
+        "Text": "",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 54,
+                "Name": "Soup"
+            }
+        ]
+    },
+    {
+        "Id": 100,
+        "Name": "Sweet Potato and Asparagus Samosas",
+        "Ingredients": "For the filling:\n\n2 medium-sized sweet potatoes, peeled and diced into small cubes\n1 cup asparagus, chopped into small pieces\n1 tsp cumin seeds\n1 tsp coriander seeds\n1 tsp garam masala powder\n1 tsp red chili powder\n1 tsp ginger paste\n1 tsp garlic paste\nSalt to taste\n2 tbsp vegetable oil\n1\/4 cup chopped cilantro\n\n\nFor the dough:\n\n2 cups all-purpose flour\n1\/4 cup vegetable oil\n1\/2 tsp salt\n1\/2 cup water\n\nFor frying:\n\nVegetable oil",
+        "Text": "1. In a large skillet, heat 2 tbsp of oil over medium heat. Add the cumin seeds and coriander seeds and let them cook for 30 seconds until fragrant.\n2. Add the ginger paste, garlic paste, and asparagus to the skillet and cook for 2-3 minutes until the asparagus is tender.\n3. Add the sweet potato, garam masala powder, red chili powder, and salt to the skillet and mix well. Cook for 8-10 minutes until the sweet potato is tender and cooked through. Remove from heat and add chopped cilantro. Set aside to cool.\n4. To make the dough, combine the flour, vegetable oil, and salt in a bowl. Slowly add water and knead until a smooth dough forms. Cover the dough and let it rest for 30 minutes.\n5. Divide the dough into small balls and roll each ball out into a thin circle. Cut the circle in half to make two semi-circles.\n6. Take one semi-circle and fold it into a cone shape. Fill the cone with 2-3 tablespoons of the sweet potato and asparagus filling. Pinch the top of the cone to seal it shut.\n7. Repeat with the remaining dough and filling.\n8. Heat vegetable oil in a deep frying pan over medium heat. Fry the samosas in batches until they are golden brown and crispy.\n9. Serve hot with your favorite dipping sauce or chutney.",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 57,
+                "Name": "Indian"
+            }
+        ]
+    },
+    {
+        "Id": 101,
+        "Name": "Mushroom and Spinach Curry",
+        "Ingredients": "2 tbsp vegetable oil\n1 onion, finely chopped\n2 garlic cloves, minced\n1 tbsp grated ginger\n1 tsp ground cumin\n1 tsp ground coriander\n1 tsp garam masala\n1\/2 tsp turmeric powder\n1\/2 tsp chili powder\n1 can (14.5 oz) diced tomatoes\n1 cup coconut milk\nSalt and pepper to taste\n8 oz mushrooms, sliced\n6 oz fresh spinach, chopped\nFresh cilantro for garnish (optional)",
+        "Text": "1. Heat oil in a large skillet over medium-high heat. Add onion, garlic, and ginger and sauté until the onion is translucent.\n2. Add cumin, coriander, garam masala, turmeric, and chili powder to the skillet and stir well.\n3. Add the diced tomatoes, coconut milk, salt, and pepper to the skillet and bring to a boil. Reduce heat and simmer for 10 minutes.\n4. Add the sliced mushrooms and chopped spinach to the skillet and stir well. Cook for an additional 5-7 minutes or until the mushrooms are tender and the spinach is wilted.\n5. Garnish with fresh cilantro, if desired.\n6. Serve hot with rice or naan bread.",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 57,
+                "Name": "Indian"
+            }
+        ]
+    },
+    {
+        "Id": 102,
+        "Name": "Паска 2020",
+        "Ingredients": "",
+        "Text": "2.5 ч ложки дрожжей добавит пол стакана тёплой воды и лодку сахара пусть поиграет минут 10\n4 яйца взбить немногос 1 стакан сахара, добавить пол литра тёплого молока, соль потопы чайные ложки, затем добавить дрожжи. Добавить 3 стакана муки вымешать и пусть подойдёт. Когда подойдёт добавить муки перемешать пусть подойдёт ещё раз, добавить ещё муки ( а так думаю что в общей сложность 5 может 6 стаканов муки ( считая те что вначале) ваниль, изюм и вымесит 3-4 ложками масла. Пусть подойдёт, положить тесто в формы 1\/3 пусть подойдёт, потом выпекать 350 довольно долго\n7 cups of flour was a bit dry. Add rom?\nBake 37 min",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 53,
+                "Name": "Baked goods "
+            }
+        ]
+    },
+    {
+        "Id": 103,
+        "Name": "Korean carrots ",
+        "Ingredients": "* морковь - 500 г,\n* \t\tлук репчатый - 1 шт,\n* \t\tчеснок - 2-3 зубчика,\n* \t\tрастительное масло - 50-60 мл,\n* \t\tуксус 9% - 1,5-2 столовых ложки,\n* \t\tкориандр - 1\/4 чайной ложки,\n* \t\tкрасный острый молотый перец,\n* \t\tчерный молотый перец,\n* \t\tсахар - щепотка,\n* \t\tсоль",
+        "Text": "Fry onion in oil until golden. Remove onion : pour oil over carrot, garlic and spice mixture. Add vinegar. ",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 43,
+                "Name": "salad"
+            }
+        ]
+    },
+    {
+        "Id": 104,
+        "Name": "Asian salad",
+        "Ingredients": "Carrots\nRadishes graded \nCucumber \nPepper\nCabbage with salt cut short sticks ",
+        "Text": "Dressing oil \nSesame oil\nLime\nRice vinegar \nGarnish with crushed peanuts and cilantro ",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 43,
+                "Name": "salad"
+            }
+        ]
+    },
+    {
+        "Id": 105,
+        "Name": "General Tso Tofu ",
+        "Ingredients": "Cut tofu into 1\/2 inch cubes, mix tempura and count tofu in it, refrigerate 5 min\nCut Broccoli into small pieces Microwave 2 min\nDeep fry tofu\nGarlic\n2 clove\nGarlic\nGinger\n1 thumb\nGinger cook in frying pan then add the rest of sous ingredients\nBrown Sugar\n2 tablespoon\nBrown Sugar\nSoy Sauce\n2 tablespoon\nSoy Sauce\n(ContainsSoy, Wheat)\nSweet Soy Glaze\n4 tablespoon\nSweet Soy Glaze\n(ContainsSoy, Wheat)\nMix with 1 tb spoon sesame oil and 1 to spoon corn starch\nCook until thickened \nAdd broccoli and tofu cook 2 min add sesame seeds and chili flakes. \nServe with rice",
+        "Text": "",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 47,
+                "Name": "Main Dish"
+            }
+        ]
+    },
+    {
+        "Id": 106,
+        "Name": "Gallo Pinto ",
+        "Ingredients": "* \n*  2 tablespoons light-tasti u ng oil (vegetable, mild olive, canola)\n*  1 red bell pepper , chopped\n*  1 small yellow onion , chopped\n*  2 cloves garlic , minced\n*  2 cups cooked black beans , in 3\/4 cup reserved cooking liquid*\n*  1\/4 cup Salsa Lizano ** smoky ( I used souse from enchilada = adobo chili and some smoked salt.\n*  3 cups cooked rice , preferably, day-old and refrigerated\n*  1\/4 cup chopped fresh cilantro",
+        "Text": "",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 51,
+                "Name": "Breakfast"
+            }
+        ]
+    },
+    {
+        "Id": 107,
+        "Name": "сирна паска",
+        "Ingredients": "3 egg yolks\n125 g sugar \n100 g whipping cream\n\n1 box of Ukrainian cheese 1 lb творог\n1\/2 stick soft butter \n\nZest of most of a small lemon \n\n50 ml whipping cream\n\nHandful raisins ",
+        "Text": "Whip egg yolks with sugar\nWarm cream until 70 C, add yolks. Cook until yolks cook and mixture becomes consistency of thin sour cream \nMix cheese and butter in a blender add lemon zest and yolk cream mixture.\nWhip remaining cream in a bowl add it and raisins to the mixture and mix carefully. Pour into 4 layers of cheesecloth in a colander wrap put a weight on it. Refrigerate 6-24 h. ",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 58,
+                "Name": "dessert "
+            }
+        ]
+    },
+    {
+        "Id": 108,
+        "Name": "waffles Non vegan ",
+        "Ingredients": "1¾ cups all-purpose flour\n1 tablespoon baking powder\n¼ teaspoon salt\n2 egg yolks\n1¾ cups milk\n1\/2 cup cooking oil\n2 egg whites\n",
+        "Text": "1. In a large mixing bowl stir together flour backing powder, and salt \n\n2. In another medium mixing bowl beat egg ' Jll\nServe warm. Maks\nslightly. Stir in milk and oil. Add egg yolk mix\nNutrition Facts per wa\nall at once to the dry mixture. Stir just till moise 29 mg chol., 88 mg sodi ened (batter should be lumpy).\n\n3. In a small mixing bowl beat egg whites till stiff peaks form (ups stand straight). Gently fold beaten egg whites into flour and egg yolk mixture, leaving a few fluffs of egg white. Do not overmix.",
+        "Thumbnail": "",
+        "Category": [
+            {
+                "Id": 51,
+                "Name": "Breakfast"
+            }
+        ]
+    }
+]

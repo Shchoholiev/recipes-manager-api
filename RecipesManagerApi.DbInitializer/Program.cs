@@ -4,7 +4,7 @@ internal class Program
 {
 	private static void Main(string[] args)
 	{
-		DbInitializer.FirstInitialization();
+		DbInitializer.ExistingRecipesTransfer();
 		Console.WriteLine("Done.");
 	}
 }

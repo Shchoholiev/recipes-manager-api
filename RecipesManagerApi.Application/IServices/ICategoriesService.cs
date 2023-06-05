@@ -10,6 +10,8 @@ namespace RecipesManagerApi.Application.IServices
 
         Task<PagedList<CategoryDto>> GetCategoriesPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken);
 
+        Task<PagedList<CategoryDto>> GetCategoriesPageAsync(int pageNumber, int pageSize, string search, CancellationToken cancellationToken);
+
         Task<CategoryDto> GetCategoryAsync(string id, CancellationToken cancellationToken);
     }
 }

@@ -827,7 +827,7 @@ public class DbInitializer
 		var userAnna = new User
 		{
 			Name = "Anna",
-			Email = "ayermako@yahoo.com",
+			Email = "anna@gmail.com",
 			Roles = new List<Role>() {guestRole, userRole, premiumRole},
 			PasswordHash = passwordHasher.Hash("fuckrussians"),
 			RefreshToken = tokensService.GenerateRefreshToken(),

@@ -18,6 +18,11 @@ using AutoMapper;
 using RecipesManagerApi.Application.Interfaces.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
+using System.IO;
+using Newtonsoft.Json;
+using MongoDB.Bson;
+using System.Linq;
+using System.Net.Http;
 
 namespace RecipesManagerApi.DbInitializer;
 
@@ -755,6 +760,152 @@ public class DbInitializer
 		{
 			disposable.Dispose();
 		}
+	}
+
+	public static async void ExistingRecipesTransfer() {
+		var sourceFilePath = @"RecipesManagerApi.DbInitializer/recipes-backup-06.03.23.json";
+		
+		IConfiguration configuration = new ConfigurationBuilder()
+			.SetBasePath(Directory.GetCurrentDirectory())
+			.AddJsonFile($"RecipesManagerApi.DbInitializer/recipes-manager-dev-2023-06-04.json")
+			.Build();
+		
+		ILoggerFactory logger = LoggerFactory.Create(builder => 
+		{
+			builder.AddConsole();
+		});
+		
+		var serviceProvider = new ServiceCollection()
+			.AddSingleton(configuration)
+			.AddSingleton(logger)
+			.AddSingleton(typeof(ILogger<>), typeof(Logger<>))
+			.AddSingleton<MongoDbContext>()
+			.AddAutoMapper(Assembly.GetAssembly(typeof(CategoryProfile)))
+			
+			.AddScoped<IRolesService, RolesService>()
+			.AddScoped<IUsersService, UsersService>()
+			.AddScoped<ICategoriesService, CategoriesService>()
+			.AddScoped<IRecipesService, RecipesService>()
+			.AddScoped<IImagesService, ImagesService>()
+			.AddScoped<ICloudStorageService, CloudStorageService>()
+			.AddScoped<ITokensService, TokensService>()
+			.AddScoped<ISavedRecipesService, SavedRecipesService>()
+			.AddScoped<ISubscriptionService, SubscriptionsService>()
+			.AddScoped<IMenusService, MenusService>()
+			.AddScoped<IShoppingListsService, ShoppingListsService>()
+			.AddScoped<IEmailsService, EmailsService>()
+			.AddScoped<IContactsService, ContactsService>()
+			
+			.AddScoped<IUserManager, UserManager>()
+			.AddScoped<IRolesRepository, RolesRepository>()
+			.AddScoped<IUsersRepository, UsersRepository>()
+			.AddScoped<ICategoriesRepository, CategoriesRepository>()
+			.AddScoped<IRecipesRepository, RecipesRepository>()
+			.AddScoped<IImagesRepository, ImagesRepository>()
+			.AddScoped<ISubscriptionsRepository, SubscriptionsRepository>()
+			.AddScoped<ISavedRecipesRepository, SavedRecipesRepository>()
+			.AddScoped<IPasswordHasher, PasswordHasher>()
+			.AddScoped<ISubscriptionsRepository, SubscriptionsRepository>()
+			.AddScoped<IMenusRepository, MenusRepository>()
+			.AddScoped<IShoppingListsRepository, ShoppingListsRepository>()
+			.AddScoped<IContactsRepository, ContactsRepository>()
+			.BuildServiceProvider();
+		
+		var rolesRepository = serviceProvider.GetService<IRolesRepository>();
+		var usersRepository = serviceProvider.GetService<IUsersRepository>();
+		var passwordHasher = serviceProvider.GetService<IPasswordHasher>();
+		var categoriesService = serviceProvider.GetService<ICategoriesService>();
+		var recipesService = serviceProvider.GetService<IRecipesService>();
+		var mapper = serviceProvider.GetService<IMapper>();
+		var tokensService = serviceProvider.GetService<ITokensService>();
+
+		var roles = rolesRepository.GetPageAsync(1, 10, CancellationToken.None).Result;
+		var premiumRole = roles.FirstOrDefault(r => r.Name == "Premium");
+		var userRole = roles.FirstOrDefault(r => r.Name == "User");
+		var guestRole = roles.FirstOrDefault(r => r.Name == "Guest");
+		
+		var userAnna = new User
+		{
+			Name = "Anna",
+			Email = "anna@gmail.com",
+			Roles = new List<Role>() {guestRole, userRole, premiumRole},
+			PasswordHash = passwordHasher.Hash("fuckrussians"),
+			RefreshToken = tokensService.GenerateRefreshToken(),
+			RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(30),
+			CreatedDateUtc = DateTime.UtcNow
+		};
+
+		userAnna = usersRepository.AddAsync(userAnna, CancellationToken.None).Result;
+		GlobalUser.Id = userAnna.Id;
+
+		var fileContents = File.ReadAllText(sourceFilePath);
+		dynamic jsonData = JsonConvert.DeserializeObject(fileContents);
+
+		foreach (var recipe in jsonData)
+		{
+			var categoryName = recipe.Category[0].Name.ToString();
+			var foundCategories = categoriesService.GetCategoriesPageAsync(1, 10, categoryName, CancellationToken.None).Result;
+			var category = new CategoryDto();
+			if (foundCategories.Items.Count > 0)
+			{
+				category = foundCategories.Items[0];
+			} 
+			else 
+			{
+				var newCategory = new CategoryCreateDto()
+				{
+					Name = categoryName
+				};
+
+				category = categoriesService.AddCategoryAsync(newCategory, CancellationToken.None).Result;
+				if (category.Id != ObjectId.Empty.ToString())
+				{
+					Console.WriteLine($"Category {category.Id}, {category.Name} added");
+				}
+			}
+
+			var newRecipe = new RecipeCreateDto() {
+				Name = recipe.Name.ToString(),
+				Text = recipe.Text.ToString(),
+				IngredientsText = recipe.Ingredients.ToString(),
+				Categories = new List<CategoryDto>() { category },
+			};
+
+			if (!string.IsNullOrEmpty(recipe.Thumbnail.ToString()))
+			{
+				try
+				{
+					newRecipe.Thumbnail = ConvertWebImageToFormFileAsync(recipe.Thumbnail.ToString()).Result;
+				}
+				catch (System.Exception ex)
+				{
+					Console.WriteLine(ex);
+				}
+			}
+
+			var result = recipesService.AddRecipeAsync(newRecipe, CancellationToken.None).Result;
+			if (result.Id != ObjectId.Empty.ToString())
+			{
+				Console.WriteLine($"Recipe {result.Id}, {result.Name} added");
+			}
+		}
+	}
+	
+	private static async Task<IFormFile> ConvertWebImageToFormFileAsync(string url)
+	{
+		byte[] bytes;
+		using (HttpClient httpClient = new HttpClient())
+		{
+			bytes = await httpClient.GetByteArrayAsync(url);
+		}
+		string name = Path.GetFileName(url);
+		string type = "image/jpeg";
+		
+		return new FormFile(new MemoryStream(bytes), 0, bytes.Length, name, name)
+		{
+			Headers = new HeaderDictionary(),
+			ContentType = type
+		};
 	}
 	
 	private static IFormFile ConvertJpegToFormFile(string path)

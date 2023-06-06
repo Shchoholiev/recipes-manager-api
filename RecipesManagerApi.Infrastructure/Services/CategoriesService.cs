@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using LinqKit;
 using MongoDB.Bson;
 using RecipesManagerApi.Application.Exceptions;
 using RecipesManagerApi.Application.GlodalInstances;
@@ -53,6 +54,21 @@ namespace RecipesManagerApi.Infrastructure.Services
             var entities = await this._repository.GetPageAsync(pageNumber, pageSize, cancellationToken);
             var dtos = this._mapper.Map<List<CategoryDto>>(entities);
             var count = await this._repository.GetTotalCountAsync();
+            return new PagedList<CategoryDto>(dtos, pageNumber, pageSize, count);
+        }
+
+        public async Task<PagedList<CategoryDto>> GetCategoriesPageAsync(int pageNumber, int pageSize, string search, CancellationToken cancellationToken)
+        {
+            search = search.ToLower();
+            Expression<Func<Category, bool>> predicate = (Category c) => !c.IsDeleted;
+            if (!string.IsNullOrEmpty(search))
+            {
+                predicate = predicate.And(c => c.Name.ToLower().Contains(search));
+            }
+            var entities = await this._repository.GetPageAsync(pageNumber, pageSize, predicate, cancellationToken);
+            var dtos = this._mapper.Map<List<CategoryDto>>(entities);
+            var count = await this._repository.GetCountAsync(predicate, cancellationToken);
+            
             return new PagedList<CategoryDto>(dtos, pageNumber, pageSize, count);
         }
     }

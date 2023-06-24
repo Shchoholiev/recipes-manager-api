@@ -39,6 +39,7 @@ public static class MiddlewareExtension
 		services.AddScoped<IContactsRepository, ContactsRepository>();
 		services.AddScoped<IShoppingListsRepository, ShoppingListsRepository>();
 		services.AddTransient<ILogsRepository, LogsRepository>();
+		services.AddScoped<IRecipeViewActivitiesRepository, RecipeViewActivitiesRepository>();
 
 		return services;
 	}
@@ -65,6 +66,7 @@ public static class MiddlewareExtension
 		services.AddScoped<IShoppingListsService, ShoppingListsService>();
 		services.AddScoped<IMenusService, MenusService>();
 		services.AddScoped<IContactsService, ContactsService>();
+		services.AddScoped<IUserActivityService, UserActivityService>();
 
 		return services;
 	}

@@ -32,13 +32,16 @@ public class RecipesService : IRecipesService
 
     private readonly ICategoriesRepository _categoriesRepository;
 
+    private readonly IUserActivityService _userActivityService;
+
     public RecipesService(
         IMapper mapper,
         IRecipesRepository recipesRepository,
         IImagesService imagesService,
         ISubscriptionsRepository subscriptionsRepository,
         ISavedRecipesRepository savedRecipesRepository,
-        ICategoriesRepository categoriesRepository)
+        ICategoriesRepository categoriesRepository,
+        IUserActivityService userActivityService)
     {
         this._mapper = mapper;
         this._recipesRepository = recipesRepository;
@@ -46,6 +49,7 @@ public class RecipesService : IRecipesService
         this._savedRecipesRepository = savedRecipesRepository;
         this._subscriptionsRepository = subscriptionsRepository;
         this._categoriesRepository = categoriesRepository;
+        this._userActivityService = userActivityService;
     }
 
     public async Task<RecipeDto> AddRecipeAsync(RecipeCreateDto dto, CancellationToken cancellationToken)
@@ -152,7 +156,10 @@ public class RecipesService : IRecipesService
         {
             throw new InvalidDataException("Provided id is invalid.");
         }
+
         var entity = await this._recipesRepository.GetRecipeAsync(objectId, GlobalUser.Id.Value, cancellationToken);
+        var viewDto = new RecipeViewActivityDto { RecipeId = objectId };
+        Task.Run(() => _userActivityService.AddRecipeViewActivityAsync(viewDto, cancellationToken));
         return this._mapper.Map<RecipeDto>(entity);
     }
 
